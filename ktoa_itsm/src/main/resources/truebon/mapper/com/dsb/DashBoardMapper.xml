@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="DashBoardMapper">
+   
+   <resultMap id="DashBoardList" type="egovframework.com.cmm.dsb.model.DashBoardVO">
+   	   <result property="previous_month" column="previous_month"/>
+   	   <result property="current_month" column="current_month"/>
+       <result property="previous_month_carry" column="previous_month_carry"/>
+       <result property="current_month_carry" column="current_month_carry"/>
+       <result property="previous_month_all" column="previous_month_all"/>
+       <result property="current_month_all" column="current_month_all"/>
+       <result property="previous_all" column="previous_all"/>
+       <result property="current_all" column="current_all"/>
+       <result property="previous_success" column="previous_success"/>
+       <result property="current_success" column="current_success"/>
+       
+       <result property="my_previous_month_all" column="my_previous_month_all"/>
+       <result property="my_current_month_all" column="my_current_month_all"/>
+       <result property="my_previous_month_process" column="my_previous_month_process"/>
+       <result property="my_current_month_process" column="my_current_month_process"/>
+       <result property="my_previous_month_carry" column="my_previous_month_carry"/>
+       <result property="my_current_month_carry" column="my_current_month_carry"/>
+       <result property="my_previous_month_process_carry" column="my_previous_month_process_carry"/>
+       <result property="my_current_month_process_carry" column="my_current_month_process_carry"/>
+       <result property="dlalzDate" column="DLALZ_DATE" />
+       <result property="chrgrNm" column="CHRGR_NM" />
+   </resultMap>
+  <!-- egovframework.com.cmm.dsb.model.DashBoardVO -->
+   <select id="serviceRequestProcessingStatistics"  parameterType="egovframework.com.cmm.dsb.model.DashBoardVO" resultMap="DashBoardList">
+       SELECT											
+    <!-- (SELECT MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))) AS previous_month,
+    (SELECT MONTH(CURRENT_DATE()) AS current_month) AS current_month,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) AS previous_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%')) AS current_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND SR_PROG_STAT_CD = 3) AS previous_month_process,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND SR_PROG_STAT_CD = 3) AS current_month_process,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) AS previous_month_carry,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND SR_PROG_STAT_CD != 3) AS current_month_carry,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE > CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) AS previous_month_process_carry,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE > CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%')) AS current_month_process_carry; -->
+   	<![CDATA[
+   	(SELECT MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))) AS previous_month,
+    (SELECT MONTH(CURRENT_DATE())) AS current_month,	
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) OR (REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE = '')) AS previous_month_carry,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%')) OR (REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE = '')) AS current_month_carry,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) AS previous_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%')) AS current_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) OR ((REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) OR (REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE = ''))) AS previous_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%')) OR ((REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%')) OR (REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE = ''))) AS current_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE DLNG_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%')) AS previous_success,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE DLNG_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%')) AS current_success,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) OR (REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE = '') AND DLNG_CHRGR_NO  = #{ucn}) AS my_previous_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) OR (REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE = '') AND DLNG_CHRGR_NO  = #{ucn}) AS my_current_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) AS my_previous_month_process,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) AS my_current_month_process,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) OR ((REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) OR (REQ_DATE < CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_DATE = '') AND DLNG_CHRGR_NO  = #{ucn})) AS my_previous_month_carry,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE (REQ_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) OR ((REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE >= CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) OR (REQ_DATE < CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_DATE = '') AND DLNG_CHRGR_NO  = #{ucn})) AS my_current_month_carry,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE DLNG_DATE LIKE CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) AS my_previous_month_process_carry,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE DLNG_DATE LIKE CONCAT(DATE_FORMAT(CURDATE(), '%Y%m'), '%') AND DLNG_CHRGR_NO  = #{ucn}) AS my_current_month_process_carry;									 
+	]]> 
+   </select>
+   
+   
+     <select id="dlalzList"  parameterType="egovframework.com.cmm.dsb.model.DashBoardVO" resultMap="DashBoardList">
+	     SELECT td.DLALZ_DATE , tc.CHRGR_NM 
+			FROM TB_DLALZ td , TB_CHARGER tc  , TB_USER tu 
+			WHERE td.DLALZ_DATE LIKE CONCAT(REPLACE(#{dlalzDate},'-',''), '%')
+			AND (td.ATEND_TIME IS NULL or LEOFC_TIME IS NULL) 
+			AND td.DLALZ_DSTNCT_CD ='1'
+			AND (td.OFFDAY_TYPE_CD IS NULL OR td.OFFDAY_TYPE_CD = '')
+			AND td.CHRGR_NO = tc.CHRGR_NO 
+			AND tc.CHRGR_NO = tu.CHRGR_NO
+			AND tu.USER_ID =  #{chrgrNm};											
+	   
+   	</select>
+   
+   
+   <!-- <select id="myServiceStatus"  parameterType="egovframework.com.cmm.dsb.model.DashBoardVO" resultMap="DashBoardList">
+	SELECT											    
+   	<![CDATA[
+   	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE '202105%' AND DLNG_CHRGR_NO  = #{ucn}) AS my_previous_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE '202106%' AND DLNG_CHRGR_NO  = #{ucn}) AS my_current_month_all,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE '202105%' AND DLNG_DATE LIKE '202105%' AND SR_PROG_STAT_CD = 3 AND DLNG_CHRGR_NO  = #{ucn}) AS my_previous_month_process,
+    (SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE LIKE '202106%' AND DLNG_DATE LIKE '202106%' AND SR_PROG_STAT_CD = 3 AND DLNG_CHRGR_NO  = #{ucn}) AS my_current_month_process,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE < '202105%' AND DLNG_DATE >= '202105%' AND DLNG_CHRGR_NO  = #{ucn} OR DLNG_DATE = '' AND REQ_DATE < '202105%' AND DLNG_CHRGR_NO  = #{ucn}) AS my_previous_month_carry,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE < '202106%' AND DLNG_DATE >= '202106%' AND DLNG_CHRGR_NO  = #{ucn} OR DLNG_DATE = '' AND REQ_DATE < '202106%' AND DLNG_CHRGR_NO  = #{ucn}) AS my_current_month_carry,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE < '202105%' AND DLNG_DATE LIKE '202105%' AND DLNG_CHRGR_NO  = #{ucn}) AS my_previous_month_process_carry,
+	(SELECT COUNT(*) FROM TB_SR_MASTER WHERE REQ_DATE < '202106%' AND DLNG_DATE LIKE '202106%' AND DLNG_CHRGR_NO  = #{ucn}) AS my_current_month_process_carry;
+											 
+	]]> 
+   </select> -->
+	<resultMap id="DashBoardOffdayList" type="egovframework.com.cmm.dsb.model.DashBoardOffdayVO">
+		<result property="offday_cd" column="offday_cd"/>
+		<result property="hlfday_cd" column="hlfday_cd"/>
+		<result property="chrgr_no" column="chrgr_no"/>
+		<result property="chrgr_nm" column="chrgr_nm"/>
+		<result property="offday_date" column="offday_date"/>
+    </resultMap>
+   
+   <select id="serviceOffday"  parameterType="egovframework.com.cmm.dsb.model.DashBoardOffdayVO" resultMap="DashBoardOffdayList">
+   	SELECT 
+    d.DLALZ_DSTNCT_CD AS offday_cd,
+    d.HLFDAY_OFFDAY_DSTNCT_CD AS hlfday_cd,
+    d.DLALZ_DATE AS offday_date,
+    d.CHRGR_NO AS chrgr_no,
+    c.CHRGR_NM AS chrgr_nm
+	FROM 
+    TB_DLALZ d
+    INNER JOIN TB_CHARGER c ON d.CHRGR_NO = c.CHRGR_NO
+	WHERE 
+    d.DLALZ_DATE BETWEEN #{mon_date} AND #{fri_date}
+    AND c.CHRGR_ROLE_CD NOT LIKE '04'
+    AND (
+        (d.DLALZ_DSTNCT_CD = '2') OR
+        (d.DLALZ_DSTNCT_CD = '3')
+    );
+   </select>
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="deptAuthorDAO">
+
+    <resultMap id="deptAuthor" type="egovframework.com.sec.drm.service.DeptAuthorVO">
+    	<result property="cmpnyNo" column="CMPNY_NO"/>
+        <result property="cmpnyNm" column="CMPNY_NM"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptNm" column="DEPT_NM"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="chrgrNm" column="CHRGR_NM"/>
+        <result property="authorCode" column="AUTHOR_CODE"/>
+        <result property="uniqId" column="ESNTL_ID"/>
+        <result property="regYn" column="REG_YN"/>
+    </resultMap>
+
+    <resultMap id="dept" type="egovframework.com.sec.drm.service.DeptAuthorVO">
+    	<result property="cmpnyNo" column="CMPNY_NO"/>
+    	<result property="cmpnyNm" column="CMPNY_NM"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptNm" column="DEPT_NM"/>
+    </resultMap>
+    
+     <select id="selectDeptAuthorList" parameterType="egovframework.com.sec.drm.service.DeptAuthorVO" resultMap="deptAuthor">
+            SELECT 
+            	CMPNY_NO,
+            	CMPNY_NM,
+				DEPT_NO, 
+            	DEPT_NM, 
+            	USER_ID, 
+            	CHRGR_NM, 
+            	AUTHOR_CODE, 
+            	ESNTL_ID, 
+            	(CASE WHEN B.SCRTY_DTRMN_TRGET_ID IS NULL 
+            	THEN 'N' ELSE 'Y'  END) AS REG_YN
+				FROM(SELECT 
+						td.CMPNY_NO,	
+						CMPNY_NM,
+						DEPT_NO, 
+						DEPT_NM, 
+						USER_ID, 
+						CHRGR_NM, 
+						ESNTL_ID 
+					FROM TB_COMPANY tc2, TB_DEPT td, TB_USER tu, TB_CHARGER tc
+					WHERE tc.POSIT_DEPT_NO = #{deptNo}
+					AND tc.POSIT_CMPNY_NO  = #{cmpnyNo}
+					AND td.DEPT_NO = tc.POSIT_DEPT_NO 
+					AND td.CMPNY_NO = tc.POSIT_CMPNY_NO  
+					AND tu.CHRGR_NO = tc.CHRGR_NO
+					AND tc2.CMPNY_NO = tc.POSIT_CMPNY_NO 
+					AND tu.USE_YN = 'Y' ) A LEFT OUTER JOIN COMTNEMPLYRSCRTYESTBS B
+                ON A.ESNTL_ID = B.SCRTY_DTRMN_TRGET_ID 
+          	WHERE 1=1
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+	<insert id="insertDeptAuthor" parameterType="egovframework.com.sec.drm.service.DeptAuthor">
+		
+			INSERT INTO COMTNEMPLYRSCRTYESTBS 
+				  ( SCRTY_DTRMN_TRGET_ID                  
+				  , AUTHOR_CODE)
+		   VALUES ( #{uniqId}                  
+                  , #{authorCode})
+		
+	</insert>
+
+	<update id="updateDeptAuthor" parameterType="egovframework.com.sec.drm.service.DeptAuthor">
+		
+			UPDATE COMTNEMPLYRSCRTYESTBS 
+			   SET AUTHOR_CODE=#{authorCode}
+		  	 WHERE SCRTY_DTRMN_TRGET_ID=#{uniqId}
+		
+	</update>
+
+	<delete id="deleteDeptAuthor">
+		
+			DELETE FROM COMTNEMPLYRSCRTYESTBS 
+			 WHERE SCRTY_DTRMN_TRGET_ID=#{uniqId}
+		
+	</delete>
+
+	<select id="selectDeptAuthorListTotCnt" parameterType="egovframework.com.sec.drm.service.DeptAuthorVO" resultType="int">
+            SELECT COUNT(*) AS totcnt
+              FROM(SELECT 
+              			td.CMPNY_NO,
+						CMPNY_NM,
+						DEPT_NO, 
+						DEPT_NM, 
+						USER_ID, 
+						CHRGR_NM, 
+						ESNTL_ID 
+					FROM TB_COMPANY tc2, TB_DEPT td, TB_USER tu, TB_CHARGER tc
+					WHERE tc.POSIT_DEPT_NO = #{deptNo}
+					AND tc.POSIT_CMPNY_NO  = #{cmpnyNo}
+					AND td.DEPT_NO = tc.POSIT_DEPT_NO 
+					AND td.CMPNY_NO = tc.POSIT_CMPNY_NO  
+					AND tu.CHRGR_NO = tc.CHRGR_NO
+					AND tc2.CMPNY_NO = tc.POSIT_CMPNY_NO 
+					AND tu.USE_YN = 'Y' ) A LEFT OUTER JOIN COMTNEMPLYRSCRTYESTBS B
+                ON A.ESNTL_ID = B.SCRTY_DTRMN_TRGET_ID 
+            WHERE 1=1
+	</select>
+
+    <select id="selectDeptList" parameterType="egovframework.com.sec.drm.service.DeptAuthorVO" resultMap="dept">
+			SELECT 
+				   td.CMPNY_NO,	
+            	   CMPNY_NM,	
+            	   DEPT_NO,
+                   DEPT_NM
+              FROM TB_DEPT td LEFT OUTER JOIN TB_COMPANY tc 
+              ON td.CMPNY_NO = tc.CMPNY_NO 
+              WHERE 1 = 1 
+            <if test="searchCondition == 1">AND
+                DEPT_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>             
+             LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectDeptListTotCnt" parameterType="egovframework.com.sec.drm.service.DeptAuthorVO" resultType="int">
+            SELECT COUNT(*) AS totcnt
+              FROM TB_DEPT td LEFT OUTER JOIN TB_COMPANY tc 
+              ON td.CMPNY_NO = tc.CMPNY_NO 
+              WHERE 1 = 1 
+            <if test="searchCondition == 1">AND
+                DEPT_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>                
+    </select>
+
+</mapper>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SrMasterMapper">
+	
+	<resultMap id="SrMasterList" type="truebon.com.opm.srm.model.SrMasterVO">
+		<result property="dlngDate" column="DLNG_DATE" />
+		<result property="dlngPrargDate" column="DLNG_PRARG_DATE" />
+		<result property="dlngChrgrNo" column="DLNG_CHRGR_NO" />
+		<result property="reqTitle" column="REQ_TITLE" />
+		<result property="dlngText" column="DLNG_TEXT" />
+		<result property="weekyReportTargtYn" column="WEEKY_REPORT_TARGT_YN" />
+		<result property="failrMngtNo" column="FAILR_MNGT_NO" />
+		<result property="monthyReportTargtYn" column="MONTHY_REPORT_TARGT_YN" />
+		<result property="reqDate" column="REQ_DATE" />
+		<result property="reqChrgrNo" column="REQ_CHRGR_NO" />
+		<result property="reqText" column="REQ_TEXT" />
+		<result property="bizSytmCd" column="BIZ_SYTM_CD" />
+		<result property="srProgStatCd" column="SR_PROG_STAT_CD" />
+		<result property="srTypeClasNm" column="SR_TYPE_CLAS_NM" />
+		<result property="srTypeClasCd" column="SR_TYPE_CLAS_CD" />
+		<result property="srMngtNo" column="SR_MNGT_NO" />
+		<result property="prodtWritYn" column="PRODT_WRIT_YN" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	
+	<insert id="insertSrMaster" parameterType="truebon.com.opm.srm.model.SrMaster">
+		<![CDATA[
+			INSERT INTO TB_SR_MASTER 
+				( DLNG_DATE
+					, DLNG_PRARG_DATE
+					, DLNG_CHRGR_NO
+					, REQ_TITLE
+					, DLNG_TEXT
+					, WEEKY_REPORT_TARGT_YN
+					, FAILR_MNGT_NO
+					, MONTHY_REPORT_TARGT_YN
+					, REQ_DATE
+					, REQ_CHRGR_NO
+					, REQ_TEXT
+					, BIZ_SYTM_CD
+					, SR_PROG_STAT_CD
+					, SR_TYPE_CLAS_CD
+					, SR_MNGT_NO
+					, PRODT_WRIT_YN
+					, REGSTR_ID
+					, RDTT
+					, AMNDR_ID
+					, MDTT )
+			VALUES ( REPLACE(#{dlngDate},'-','')
+				  	, REPLACE(#{dlngPrargDate},'-','')
+				  	, #{dlngChrgrNo}
+				  	, #{reqTitle}
+				  	, #{dlngText}
+				  	, #{weekyReportTargtYn}
+				  	, #{failrMngtNo}
+				  	, #{monthyReportTargtYn}
+				  	, REPLACE(#{reqDate},'-','')
+				  	, #{reqChrgrNo}
+				  	, #{reqText}
+				  	, #{bizSytmCd}
+				  	, #{srProgStatCd}
+				  	, #{srTypeClasCd}
+				  	, #{srMngtNo}
+				  	, #{prodtWritYn}
+				  	, #{regstrId}
+				  	, SYSDATE()
+				  	, #{amndrId}
+				  	, SYSDATE() )
+		]]>
+	</insert>
+	
+	<update id="updateSrMaster" parameterType="truebon.com.opm.srm.model.SrMaster">
+		<![CDATA[
+			UPDATE TB_SR_MASTER
+			SET  DLNG_PRARG_DATE=REPLACE(#{dlngPrargDate},'-','')
+					, DLNG_DATE=REPLACE(#{dlngDate},'-','')
+					, REQ_TITLE=#{reqTitle}
+					, DLNG_TEXT=#{dlngText}
+					, WEEKY_REPORT_TARGT_YN=#{weekyReportTargtYn}
+					, FAILR_MNGT_NO=#{failrMngtNo}
+					, MONTHY_REPORT_TARGT_YN=#{monthyReportTargtYn}
+					, REQ_DATE=REPLACE(#{reqDate},'-','')
+					, REQ_CHRGR_NO=#{reqChrgrNo}
+					, REQ_TEXT=#{reqText}
+					, BIZ_SYTM_CD=#{bizSytmCd}
+					, SR_PROG_STAT_CD=#{srProgStatCd}
+					, SR_TYPE_CLAS_CD=#{srTypeClasCd}
+					, PRODT_WRIT_YN=#{prodtWritYn}
+					, AMNDR_ID=#{amndrId}
+					, MDTT=sysdate()
+			WHERE SR_MNGT_NO = #{srMngtNo}
+			]]>
+	</update>
+	
+	<update id="updateSrMasterTargt" parameterType="truebon.com.opm.srm.model.SrMaster">
+			UPDATE TB_SR_MASTER
+			SET	AMNDR_ID=#{amndrId}
+				, MDTT=sysdate()
+			<if test="weekyReportTargtYn != '' and weekyReportTargtYn != null">
+				, WEEKY_REPORT_TARGT_YN=#{weekyReportTargtYn}
+			</if>
+			<if test="monthyReportTargtYn != '' and monthyReportTargtYn != null">
+				, MONTHY_REPORT_TARGT_YN=#{monthyReportTargtYn}
+			</if>
+			WHERE 1=1
+			<if test="srMngtNo != '' and srMngtNo != null">AND
+				SR_MNGT_NO = #{srMngtNo}
+			</if>
+			<choose>
+				<when test="arrSrMngtNo.size != 0">
+					AND SR_MNGT_NO IN
+					<foreach collection="arrSrMngtNo" item="item" separator="," open="(" close=")">
+						#{item}
+					</foreach>
+				</when>
+			</choose>
+	</update>
+	
+	<select id="selectSrMaster" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultType="truebon.com.opm.srm.model.SrMasterVO">
+		<![CDATA[
+			SELECT
+				ts.SR_MNGT_NO					AS SR_MNGT_NO
+				, CASE 
+					WHEN ts.DLNG_DATE != '' THEN  CONCAT(SUBSTRING(ts.DLNG_DATE,1,4),'-' ,SUBSTRING(ts.DLNG_DATE,5,2),'-' ,SUBSTRING(ts.DLNG_DATE,7,2)) 
+					ELSE ts.DLNG_DATE
+				  END AS DLNG_DATE	
+				, CASE 
+					WHEN ts.DLNG_PRARG_DATE != '' THEN  CONCAT(SUBSTRING(ts.DLNG_PRARG_DATE,1,4),'-' ,SUBSTRING(ts.DLNG_PRARG_DATE,5,2),'-' ,SUBSTRING(ts.DLNG_PRARG_DATE,7,2)) 
+					ELSE ts.DLNG_PRARG_DATE
+				  END AS DLNG_PRARG_DATE	
+				, ts.DLNG_CHRGR_NO				AS DLNG_CHRGR_NO
+				, ts.REQ_TITLE					AS REQ_TITLE
+				, ts.DLNG_TEXT					AS DLNG_TEXT
+				, ts.WEEKY_REPORT_TARGT_YN		AS WEEKY_REPORT_TARGT_YN
+				, ts.FAILR_MNGT_NO				AS FAILR_MNGT_NO
+				, ts.MONTHY_REPORT_TARGT_YN		AS MONTHY_REPORT_TARGT_YN
+				, CASE 
+					WHEN ts.REQ_DATE != '' THEN  CONCAT(SUBSTRING(ts.REQ_DATE,1,4),'-' ,SUBSTRING(ts.REQ_DATE,5,2),'-' ,SUBSTRING(ts.REQ_DATE,7,2)) 
+					ELSE ts.REQ_DATE
+				  END AS REQ_DATE			
+				, ts.REQ_CHRGR_NO				AS REQ_CHRGR_NO
+				, ts.REQ_TEXT					AS REQ_TEXT
+				, ts.BIZ_SYTM_CD				AS BIZ_SYTM_CD
+				, ts.SR_PROG_STAT_CD			AS SR_PROG_STAT_CD
+				, ts.SR_TYPE_CLAS_CD			AS SR_TYPE_CLAS_CD
+				, tc4.COMN_CD_NM				AS SR_TYPE_CLAS_NM				
+				, ts.PRODT_WRIT_YN				AS PRODT_WRIT_YN	
+				, ts.REGSTR_ID					AS REGSTR_ID
+				, ts.RDTT						AS RDTT
+				, ts.AMNDR_ID					AS AMNDR_ID
+				, ts.MDTT						AS MDTT
+				, td.DEPT_NM					AS POSIT_DEPT_NM
+				, tb.BIZ_SYTM_NM				AS BIZ_SYTM_NM
+				, tc.CHRGR_NM					AS REQ_CHRGR_NM
+				, (SELECT tc.CHRGR_NM
+				  		FROM TB_CHARGER tc
+				  		WHERE ts.DLNG_CHRGR_NO = tc.CHRGR_NO  ) AS DLNG_CHRGR_NM
+				, (SELECT tc3.COMN_CD_NM
+				  		FROM TB_COMN_DETL_CD tc3
+				  		WHERE tc3.COMN_CD = ts.SR_PROG_STAT_CD
+				  			AND tc3.COMN_CD_ID = 'ISM013' ) AS SR_PROG_STAT
+			FROM TB_SR_MASTER ts
+			INNER JOIN TB_CHARGER tc ON ts.REQ_CHRGR_NO = tc.CHRGR_NO 
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc.POSIT_DEPT_NO = td.DEPT_NO AND tc2.CMPNY_NO = td.CMPNY_NO
+			INNER JOIN TB_BIZ_SYSTEM tb ON ts.BIZ_SYTM_CD = tb.BIZ_SYTM_CD 
+			INNER JOIN TB_COMN_CD_NEW tc4 ON ts.SR_TYPE_CLAS_CD = tc4.NEW_COMN_CD 
+			WHERE SR_MNGT_NO = #{srMngtNo}
+			]]>
+	</select>
+	
+	<select id="selectSrMasterList" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultMap="SrMasterList">
+			SELECT
+				ts.SR_MNGT_NO					AS SR_MNGT_NO
+				, ts.DLNG_DATE					AS DLNG_DATE
+				, ts.DLNG_CHRGR_NO				AS DLNG_CHRGR_NO
+				, ts.REQ_TITLE					AS REQ_TITLE
+				, ts.REQ_TEXT					AS REQ_TEXT
+				, ts.DLNG_TEXT					AS DLNG_TEXT
+				, ts.REQ_DATE					AS REQ_DATE
+				, ts.REQ_CHRGR_NO				AS REQ_CHRGR_NO
+				, ts.SR_TYPE_CLAS_CD			AS SR_TYPE_CLAS_CD
+				, (SELECT tc4.COMN_CD_NM
+				  		FROM TB_COMN_CD_NEW tc4 
+				  		WHERE SUBSTRING(ts.SR_TYPE_CLAS_CD,1,7) = tc4.NEW_COMN_CD   ) AS SR_TYPE_CLAS_NM
+				, ts.BIZ_SYTM_CD				AS BIZ_SYTM_CD
+				, tb.BIZ_SYTM_NM				AS BIZ_SYTM_NM
+				, tc.CHRGR_NM					AS REQ_CHRGR_NM
+				, td.DEPT_NM					AS POSIT_DEPT_NM
+				, (SELECT tc.CHRGR_NM
+				  		FROM TB_CHARGER tc
+				  		WHERE ts.DLNG_CHRGR_NO = tc.CHRGR_NO  ) AS DLNG_CHRGR_NM
+				, ts.SR_PROG_STAT_CD				AS SR_PROG_STAT_CD
+				, (SELECT tc3.COMN_CD_NM
+				  		FROM TB_COMN_DETL_CD tc3
+				  		WHERE tc3.COMN_CD = ts.SR_PROG_STAT_CD
+				  			AND tc3.COMN_CD_ID = 'ISM013' ) AS SR_PROG_STAT
+				, IFNULL(NULLIF(ts.WEEKY_REPORT_TARGT_YN, ''), 'N')		AS WEEKY_REPORT_TARGT_YN
+				, IFNULL(NULLIF(ts.MONTHY_REPORT_TARGT_YN, ''), 'N')	AS MONTHY_REPORT_TARGT_YN
+			FROM TB_SR_MASTER ts
+			INNER JOIN TB_CHARGER tc ON ts.REQ_CHRGR_NO = tc.CHRGR_NO 
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc.POSIT_DEPT_NO = td.DEPT_NO AND tc2.CMPNY_NO = td.CMPNY_NO
+			INNER JOIN TB_BIZ_SYSTEM tb ON ts.BIZ_SYTM_CD = tb.BIZ_SYTM_CD 
+			WHERE 1=1
+			<if test="startDate != '' and startDate != null">
+				AND ts.REQ_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">
+				AND ts.REQ_DATE <![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+			<if test="searchSytmCd != null and searchSytmCd !=''">
+				AND ts.BIZ_SYTM_CD = #{searchSytmCd} 
+			</if>			
+			<if test="searchDeptCd != null and searchDeptCd !=''">
+				AND td.DEPT_NM = #{searchDeptCd} 
+			</if>	
+			<if test="searchName != null and searchName !='' and searchName !='showAll'">
+				AND ts.DLNG_CHRGR_NO = #{searchName} 
+			</if>			
+			<if test="searchSytmCdNm != null and searchSytmCdNm !=''">
+				AND tc.CHRGR_NM = #{searchSytmCdNm} 
+			</if>
+			<choose>
+				<when test="arrSrMngtNo.size != 0">
+					AND ts.SR_MNGT_NO IN
+					<foreach collection="arrSrMngtNo" item="item" separator="," open="(" close=")">
+						#{item}
+					</foreach>
+				</when>
+			</choose>
+			<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+				ORDER BY ts.SR_PROG_STAT_CD, ts.SR_MNGT_NO DESC
+				limit #{recordCountPerPage} offset #{firstIndex}
+			</if>
+			<!-- 업무보고서용 사용 -->
+			<if test="recordCountPerPage == 0">
+				ORDER BY ts.SR_PROG_STAT_CD DESC, ts.SR_MNGT_NO
+			</if>
+	</select>	
+	
+	<select id="selectSrMasterListTotCnt" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_SR_MASTER ts
+			INNER JOIN TB_CHARGER tc ON ts.REQ_CHRGR_NO = tc.CHRGR_NO 
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc.POSIT_DEPT_NO = td.DEPT_NO AND tc2.CMPNY_NO = td.CMPNY_NO
+			INNER JOIN TB_BIZ_SYSTEM tb ON ts.BIZ_SYTM_CD = tb.BIZ_SYTM_CD 
+			INNER JOIN TB_COMN_CD_NEW tc4 ON ts.SR_TYPE_CLAS_CD = tc4.NEW_COMN_CD 
+			WHERE 1=1
+			<if test="startDate != '' and startDate != null">
+				AND ts.REQ_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">
+				AND ts.REQ_DATE <![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+			<if test="searchSytmCd != null and searchSytmCd !=''">
+				AND ts.BIZ_SYTM_CD = #{searchSytmCd} 
+			</if>
+			<if test="searchDeptCd != null and searchDeptCd !=''">
+				AND td.DEPT_NM = #{searchDeptCd} 
+			</if>				
+			<if test="searchName != null and searchName !='' and searchName !='showAll'">
+				AND ts.DLNG_CHRGR_NO = #{searchName} 
+			</if>			
+			<if test="searchSytmCdNm != null and searchSytmCdNm !=''">
+				AND tc.CHRGR_NM = #{searchSytmCdNm} 
+			</if>	
+	</select>
+	
+	<delete id="deleteSrMaster" parameterType="truebon.com.opm.srm.model.SrMasterVO">
+		<![CDATA[
+			DELETE FROM TB_SR_MASTER
+			WHERE SR_MNGT_NO = #{srMngtNo}
+		]]>
+	</delete>
+	
+	<select id="selectSrMasterEgovMap" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultType="egovMap">
+			SELECT
+				ts.SR_MNGT_NO					AS SR_MNGT_NO
+				, ts.DLNG_DATE					AS DLNG_DATE
+				, ts.DLNG_CHRGR_NO				AS DLNG_CHRGR_NO
+				, ts.REQ_TITLE					AS REQ_TITLE
+				, ts.REQ_TEXT					AS REQ_TEXT
+				, ts.DLNG_TEXT					AS DLNG_TEXT
+				, ts.REQ_DATE					AS REQ_DATE
+				, ts.REQ_CHRGR_NO				AS REQ_CHRGR_NO
+				, ts.SR_TYPE_CLAS_CD			AS SR_TYPE_CLAS_CD
+				, (SELECT tc4.COMN_CD_NM
+				  		FROM TB_COMN_CD_NEW tc4 
+				  		WHERE SUBSTRING(ts.SR_TYPE_CLAS_CD,1,7) = tc4.NEW_COMN_CD   ) AS SR_TYPE_CLAS_NM
+				, ts.BIZ_SYTM_CD				AS BIZ_SYTM_CD
+				, tb.BIZ_SYTM_NM				AS BIZ_SYTM_NM
+				, tc.CHRGR_NM					AS REQ_CHRGR_NM
+				, td.DEPT_NM					AS POSIT_DEPT_NM
+				, (SELECT tc.CHRGR_NM
+				  		FROM TB_CHARGER tc
+				  		WHERE ts.DLNG_CHRGR_NO = tc.CHRGR_NO  ) AS DLNG_CHRGR_NM
+				, ts.SR_PROG_STAT_CD				AS SR_PROG_STAT_CD
+				, (SELECT tc3.COMN_CD_NM
+				  		FROM TB_COMN_DETL_CD tc3
+				  		WHERE tc3.COMN_CD = ts.SR_PROG_STAT_CD
+				  			AND tc3.COMN_CD_ID = 'ISM013' ) AS SR_PROG_STAT
+				, IFNULL(NULLIF(ts.WEEKY_REPORT_TARGT_YN, ''), 'N')		AS WEEKY_REPORT_TARGT_YN
+				, IFNULL(NULLIF(ts.MONTHY_REPORT_TARGT_YN, ''), 'N')	AS MONTHY_REPORT_TARGT_YN
+			FROM TB_SR_MASTER ts
+			INNER JOIN TB_CHARGER tc ON ts.REQ_CHRGR_NO = tc.CHRGR_NO 
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc.POSIT_DEPT_NO = td.DEPT_NO AND tc2.CMPNY_NO = td.CMPNY_NO
+			INNER JOIN TB_BIZ_SYSTEM tb ON ts.BIZ_SYTM_CD = tb.BIZ_SYTM_CD 
+			WHERE 1=1
+			<if test="startDate != '' and startDate != null">
+				AND ts.REQ_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">
+				AND ts.REQ_DATE <![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+			<if test="searchSytmCd != null and searchSytmCd !=''">
+				AND ts.BIZ_SYTM_CD = #{searchSytmCd} 
+			</if>			
+			<if test="searchDeptCd != null and searchDeptCd !=''">
+				AND td.DEPT_NM = #{searchDeptCd} 
+			</if>	
+			<if test="searchName != null and searchName !='' and searchName !='showAll'">
+				AND ts.DLNG_CHRGR_NO = #{searchName} 
+			</if>			
+			<if test="searchSytmCdNm != null and searchSytmCdNm !=''">
+				AND tc.CHRGR_NM = #{searchSytmCdNm} 
+			</if>
+			<choose>
+				<when test="arrSrMngtNo.size != 0">
+					AND ts.SR_MNGT_NO IN
+					<foreach collection="arrSrMngtNo" item="item" separator="," open="(" close=")">
+						#{item}
+					</foreach>
+				</when>
+			</choose>
+			<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+				ORDER BY ts.SR_PROG_STAT_CD, ts.SR_MNGT_NO DESC
+				limit #{recordCountPerPage} offset #{firstIndex}
+			</if>
+			<!-- 업무보고서용 사용 -->
+			<if test="recordCountPerPage == 0">
+				ORDER BY ts.SR_PROG_STAT_CD DESC, ts.SR_MNGT_NO
+			</if>
+	</select>	
+</mapper>

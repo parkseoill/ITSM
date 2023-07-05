@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="comnDateVO">
+			<field property="stdrDate" depends="required">
+        		<arg0 key="기준일자"/>
+			</field>
+			<field property="dyweekDstnctCd" depends="required">
+        		<arg0 key="요일구분코드"/>
+			</field>
+			<field property="hdayDstnctCd" depends="required">
+        		<arg0 key="공휴일구분코드"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

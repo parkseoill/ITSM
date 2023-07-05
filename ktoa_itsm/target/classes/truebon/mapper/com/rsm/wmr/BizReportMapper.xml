@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BizReportMapper">
+	
+	<resultMap id="BizReportList" type="truebon.com.rsm.wmr.model.BizReportVO">
+		<result property="bizReportId" column="BIZ_REPORT_ID" />
+		<result property="bizReportKindCd" column="BIZ_REPORT_KIND_CD" />
+		<result property="bizReportKindNm" column="BIZ_REPORT_KIND_NM" />
+		<result property="creatChrgrNo" column="CREAT_CHRGR_NO" />
+		<result property="creatChrgrNm" column="CREAT_CHRGR_NM" />
+		<result property="bizReportNm" column="BIZ_REPORT_NM" />
+		<result property="useYn" column="USE_YN" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	
+	<insert id="insertBizReport" parameterType="truebon.com.rsm.wmr.model.BizReport">
+		<![CDATA[
+			INSERT INTO TB_BIZ_REPORT 
+				( BIZ_REPORT_ID
+				  , BIZ_REPORT_KIND_CD
+				  , CREAT_CHRGR_NO
+				  , BIZ_REPORT_NM
+				  , USE_YN
+				  , REGSTR_ID
+				  , RDTT
+				  , AMNDR_ID
+				  , MDTT )
+			VALUES ( #{bizReportId}
+				  , #{bizReportKindCd}
+				  , #{creatChrgrNo}
+				  , #{bizReportNm}
+				  , 'Y'
+				  , #{regstrId}
+				  , SYSDATE()
+				  , #{amndrId}
+				  , SYSDATE() )
+		]]>
+	</insert>
+	
+	<update id="updateBizReport" parameterType="truebon.com.rsm.wmr.model.BizReport">
+		<![CDATA[
+			UPDATE TB_BIZ_REPORT
+			SET BIZ_REPORT_NM=#{bizReportNm}
+				, AMNDR_ID=#{amndrId}
+				, MDTT=sysdate()
+			WHERE BIZ_REPORT_ID = #{bizReportId}
+				AND BIZ_REPORT_KIND_CD = #{bizReportKindCd}
+		]]>
+	</update>
+	
+	<update id="deleteBizReport" parameterType="truebon.com.rsm.wmr.model.BizReport">
+		<![CDATA[
+			UPDATE TB_BIZ_REPORT 
+			SET USE_YN = 'N'
+				, AMNDR_ID = #{amndrId}
+				, MDTT = sysdate() 
+			WHERE BIZ_REPORT_ID = #{bizReportId}
+		]]>
+	</update>
+	
+	<select id="selectBizReport" parameterType="truebon.com.rsm.wmr.model.BizReportVO" resultType="truebon.com.rsm.wmr.model.BizReportVO">
+		<![CDATA[
+			SELECT TBR.BIZ_REPORT_ID
+				, TBR.BIZ_REPORT_KIND_CD
+				, TCDC.COMN_CD_NM AS BIZ_REPORT_KIND_NM
+				, TBR.CREAT_CHRGR_NO
+				, TC.CHRGR_NM AS CREAT_CHRGR_NM
+				, TBR.BIZ_REPORT_NM
+				, TBR.USE_YN
+				, TBR.REGSTR_ID
+				, DATE_FORMAT(TBR.RDTT, '%Y-%m-%d %H:%i:%s') AS RDTT
+				, TBR.AMNDR_ID
+				, DATE_FORMAT(TBR.MDTT, '%Y-%m-%d %H:%i:%s') AS MDTT
+			FROM TB_BIZ_REPORT TBR
+			INNER JOIN TB_COMN_DETL_CD TCDC ON TBR.BIZ_REPORT_KIND_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID = 'ISM015'
+			INNER JOIN TB_CHARGER TC ON TBR.CREAT_CHRGR_NO = TC.CHRGR_NO
+			WHERE TBR.USE_YN = 'Y'
+				AND TBR.BIZ_REPORT_ID = #{bizReportId}
+		]]>
+	</select>
+	
+	<select id="selectBizReportList" parameterType="truebon.com.rsm.wmr.model.BizReportVO" resultMap="BizReportList">
+			SELECT TBR.BIZ_REPORT_ID
+				, TBR.BIZ_REPORT_KIND_CD
+				, TCDC.COMN_CD_NM AS BIZ_REPORT_KIND_NM
+				, TBR.CREAT_CHRGR_NO
+				, TC.CHRGR_NM AS CREAT_CHRGR_NM
+				, TBR.BIZ_REPORT_NM
+				, TBR.USE_YN
+				, TBR.REGSTR_ID
+				, DATE_FORMAT(TBR.RDTT, '%Y-%m-%d %H:%i:%s') AS RDTT
+				, TBR.AMNDR_ID
+				, DATE_FORMAT(TBR.MDTT, '%Y-%m-%d %H:%i:%s') AS MDTT
+			FROM TB_BIZ_REPORT TBR
+			INNER JOIN TB_COMN_DETL_CD TCDC ON TBR.BIZ_REPORT_KIND_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID = 'ISM015'
+			INNER JOIN TB_CHARGER TC ON TBR.CREAT_CHRGR_NO = TC.CHRGR_NO
+			WHERE TBR.USE_YN = 'Y'
+			<if test="bizReportKindCd != null and bizReportKindCd != ''">AND
+				TBR.BIZ_REPORT_KIND_CD = #{bizReportKindCd}
+			</if>
+			<if test="creatChrgrNo != null and creatChrgrNo != ''">AND
+				TBR.CREAT_CHRGR_NO = #{creatChrgrNo}
+			</if>
+			<if test="startDate != '' and startDate != null">AND
+				TBR.RDTT <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">AND
+				((TBR.RDTT <![CDATA[<]]> REPLACE(#{endDate},'-','')) 
+				OR (TBR.RDTT LIKE CONCAT('%',#{endDate},'%')))
+			</if>
+				ORDER BY TBR.RDTT DESC
+				limit #{recordCountPerPage} offset #{firstIndex}	
+	</select>	
+	
+	<select id="selectBizReportListTotCnt" parameterType="truebon.com.rsm.wmr.model.BizReportVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_BIZ_REPORT
+			WHERE 1=1
+				AND USE_YN = 'Y'
+			<if test="bizReportKindCd != null and bizReportKindCd != ''">AND
+				BIZ_REPORT_KIND_CD = #{bizReportKindCd}
+			</if>
+			<if test="creatChrgrNo != null and creatChrgrNo != ''">AND
+				CREAT_CHRGR_NO = #{creatChrgrNo}
+			</if>
+			<if test="startDate != '' and startDate != null">AND
+				RDTT <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">AND
+				RDTT <![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+	</select>
+</mapper>

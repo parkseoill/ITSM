@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="bizReportVO">
+			<field property="bizReportNm" depends="required">
+        		<arg0 key="업무보고서명"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

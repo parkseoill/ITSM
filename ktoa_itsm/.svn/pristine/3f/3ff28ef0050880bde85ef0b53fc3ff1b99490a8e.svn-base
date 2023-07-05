@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="groupManageDAO">
+
+	<resultMap id="group" type="egovframework.com.sec.gmt.service.GroupManageVO">
+        <result property="cmpnyNo" column="CMPNY_NO"/>
+		<result property="cmpnyNm" column="CMPNY_NM"/>
+		<result property="rpsntvNm" column="RPSNTV_NM"/>
+		<result property="cmpnyAddr" column="CMPNY_ADDR"/>
+		<result property="cmpnyTelNo" column="CMPNY_TEL_NO"/>
+		<result property="rdtt" column="RDTT"/>
+		<result property="regstrId" column="REGSTR_ID"/>
+        <result property="mdtt" column="MDTT"/>
+        <result property="amndrId" column="AMNDR_ID"/>
+        <result property="useYn" column="USE_YN"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptNm" column="DEPT_NM"/>
+	</resultMap>
+
+    <select id="selectGroup" parameterType="egovframework.com.sec.gmt.service.GroupManageVO" resultMap="group">       
+            SELECT CMPNY_NO, CMPNY_NM, CMPNY_TEL_NO, MDTT, RPSNTV_NM, CMPNY_ADDR, REGSTR_ID, RDTT, AMNDR_ID, USE_YN
+              FROM TB_COMPANY 
+             WHERE CMPNY_NO=#{cmpnyNo}       
+    </select>
+
+    <select id="selectGroupList" parameterType="egovframework.com.sec.gmt.service.GroupManageVO" resultMap="group">
+            SELECT CMPNY_NO, CMPNY_NM, CMPNY_TEL_NO, MDTT, RPSNTV_NM, CMPNY_ADDR, REGSTR_ID, RDTT, AMNDR_ID, USE_YN
+              FROM TB_COMPANY
+             WHERE 1=1
+             AND USE_YN = 'Y'
+             AND
+                CMPNY_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            <!-- <if test="searchCondition == 1">AND
+                CMPNY_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if> -->
+            ORDER BY CMPNY_NO ASC
+    </select>
+
+	<insert id="insertGroup" >		
+			INSERT INTO TB_COMPANY 
+				  ( CMPNY_NO
+				  , CMPNY_NM
+				  , RPSNTV_NM
+				  , CMPNY_ADDR
+				  , CMPNY_TEL_NO
+				  , REGSTR_ID
+				  , RDTT
+				  , AMNDR_ID
+				  , MDTT
+				  , USE_YN )
+		   VALUES ( #{cmpnyNo}
+			      , #{cmpnyNm}
+			      , #{rpsntvNm}
+			      , #{cmpnyAddr}
+				  , #{cmpnyTelNo}
+				  , #{regstrId}
+				  , now()
+				  , #{amndrId}
+				  , now()
+				  ,'Y')		
+	</insert>
+	
+	<update id="updateGroup"  parameterType="egovframework.com.sec.gmt.service.GroupManage">
+			UPDATE TB_COMPANY 
+			   SET CMPNY_NM=#{cmpnyNm}
+				 , RPSNTV_NM=#{rpsntvNm}
+				 , CMPNY_ADDR=#{cmpnyAddr}
+				 , CMPNY_TEL_NO=#{cmpnyTelNo}
+				 , AMNDR_ID = #{amndrId} 
+				 , MDTT = SYSDATE()
+		  	 WHERE CMPNY_NO=#{cmpnyNo}
+	</update>
+	
+	<delete id="deleteGroup">
+			UPDATE TB_COMPANY 
+				SET USE_YN = 'N'
+			 WHERE CMPNY_NO=#{cmpnyNo}
+	</delete>
+	
+	<select id="selectGroupListTotCnt" parameterType="egovframework.com.sec.gmt.service.GroupManageVO" resultType="int">
+			SELECT COUNT(*) totcnt
+            FROM TB_COMPANY
+            WHERE 1=1
+            AND
+                CMPNY_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+    </select>
+
+</mapper>

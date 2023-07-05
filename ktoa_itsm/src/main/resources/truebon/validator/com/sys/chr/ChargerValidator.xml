@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="chargerVO">
+			<field property="chrgrNm" depends="required">
+        		<arg0 key="담당자명"/>
+			</field>
+			<field property="chrgrDstnctCd" depends="required">
+        		<arg0 key="담당자 구분"/>
+			</field>
+			<field property="positCmpnyNm" depends="required">
+        		<arg0 key="소속회사명"/>
+			</field>
+			<field property="positDeptNm" depends="required">
+        		<arg0 key="소속부서명"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

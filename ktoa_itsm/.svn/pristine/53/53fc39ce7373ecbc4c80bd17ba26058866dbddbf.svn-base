@@ -1,0 +1,416 @@
+package truebon.com.opm.srm.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+/**
+ * 서비스요청 처리를 위한 VO 클래스르를 정의한다
+ * @author 김도아
+ * @since 2022.07.28
+ * @version 1.0
+ * @see
+ *  
+  * <pre>
+ * << 개정이력(Modification Information) >>
+ *   
+ *  수정일               수정자            수정내용
+ *  ----------   --------   ---------------------------
+ *  2022.07.28       김도아          	 최초 생성
+ *
+ * </pre>
+ */
+@SuppressWarnings("serial")
+public class SrMasterVO extends SrMaster implements Serializable {
+
+	/** 검색조건 */
+    private String searchCondition = "";
+    
+    /** 검색Keyword */
+    private String searchKeyword = "";
+    
+    /** 검색사용여부 */
+    private String searchUseYn = "";
+    
+    /** 현재페이지 */
+    private int pageIndex = 1;
+    
+    /** 페이지갯수 */
+    private int pageUnit = 10;
+    
+    /** 페이지사이즈 */
+    private int pageSize = 10;
+
+    /** firstIndex */
+    private int firstIndex = 1;
+
+    /** lastIndex */
+    private int lastIndex = 1;
+
+    /** recordCountPerPage */
+    private int recordCountPerPage = 10;
+    
+    /** 멀티 삭제용(콤마로 이루어진 값) */
+    private String checkedValueForDel ="";
+    
+	/** 소속회사명 */
+    private String positCmpnyNm ="";
+    
+    /** 서비스요청 진행상태  */
+    private String srProgStat = "";
+    
+    /** 처리담당자이름   */
+    private String dlngChrgrNm = "";
+
+    /** 요청담당자이름  */
+    private String reqChrgrNm = "";
+    
+    /** 요청부서   */
+    private String positDeptNm = "";
+
+    /** 업무시스템명   */
+    private String bizSytmNm = "";
+    
+    /** 요청일 검색 시작일 */
+    private String startDate = "";
+    
+    /** 요청일 검색 마지막일  */
+    private String endDate = "";
+    
+    /** 요청대분류  */
+    private String srType = "";
+    
+    /** 요청중분류  */
+    private String srTypeClas = "";
+    
+    /** 요청소분류명  */
+    private String srTypeClasNm = "";
+    
+    /** 검색Keyword - 성명  */
+    private String searchName = "";
+    
+    /** 검색Keyword - 업무시스템명  */
+    private String searchSytmCdNm = "";
+    
+    /** 검색Keyword - 업무시스템코드  */
+    private String searchSytmCd = "";
+    
+    /** 검색Keyword - 요청부서명  */
+    private String searchDeptCd = "";
+    
+    /** 담당자구분코드 Array */
+    private List<String> arrChrgrDstnctCd = new ArrayList<String>();
+    
+    /** 서비스 요청 번호 Array */
+    private List<String> arrSrMngtNo = new ArrayList<String>();
+    
+    /** 업무보고서종류코드(주간보고서(01), 월간보고서(02)) */
+    private String bizReportKindCd ="";
+    
+    /** 요청건수 */
+    private String reqCnt = "";
+    
+    /** 처리건수 */
+    private String proCnt = "";
+
+    /** 미처리건수 */
+    private String unproCnt = "";
+    
+    /** 지연건수 */
+    private String delroCnt = "";
+    
+    /** 검색 날짜  */
+	private String selectedDate;
+    
+	/** 요청구분명  */
+    private String srTypeComNm = "";
+
+    
+	public int getFirstIndex() {
+		return firstIndex;
+	}
+
+	public void setFirstIndex(int firstIndex) {
+		this.firstIndex = firstIndex;
+	}
+
+	public int getLastIndex() {
+		return lastIndex;
+	}
+
+	public void setLastIndex(int lastIndex) {
+		this.lastIndex = lastIndex;
+	}
+
+	public int getRecordCountPerPage() {
+		return recordCountPerPage;
+	}
+
+	public void setRecordCountPerPage(int recordCountPerPage) {
+		this.recordCountPerPage = recordCountPerPage;
+	}
+
+	public String getSearchCondition() {
+        return searchCondition;
+    }
+
+    public void setSearchCondition(String searchCondition) {
+        this.searchCondition = searchCondition;
+    }
+
+    public String getSearchKeyword() {
+        return searchKeyword;
+    }
+
+    public void setSearchKeyword(String searchKeyword) {
+        this.searchKeyword = searchKeyword;
+    }
+
+    public String getSearchUseYn() {
+        return searchUseYn;
+    }
+
+    public void setSearchUseYn(String searchUseYn) {
+        this.searchUseYn = searchUseYn;
+    }
+
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
+    }
+
+    public int getPageUnit() {
+        return pageUnit;
+    }
+
+    public void setPageUnit(int pageUnit) {
+        this.pageUnit = pageUnit;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
+    
+    public String getCheckedValueForDel() {
+		return checkedValueForDel;
+	}
+
+	public void setCheckedValueForDel(String checkedValueForDel) {
+		this.checkedValueForDel = checkedValueForDel;
+	}
+	
+    public String getPositCmpnyNm() {
+		return positCmpnyNm;
+	}
+
+	public void setPositCmpnyNm(String positCmpnyNm) {
+		this.positCmpnyNm = positCmpnyNm;
+	}
+
+	public String getPositDeptNm() {
+		return positDeptNm;
+	}
+
+	public void setPositDeptNm(String positDeptNm) {
+		this.positDeptNm = positDeptNm;
+	}
+	
+	public List<String> getArrChrgrDstnctCd() {
+		return arrChrgrDstnctCd;
+	}
+
+	public void setArrChrgrDstnctCd(List<String> arrChrgrDstnctCd) {
+		this.arrChrgrDstnctCd = arrChrgrDstnctCd;
+	}
+
+	public String getSrProgStat() {
+		return srProgStat;
+	}
+
+	public void setSrProgStat(String srProgStat) {
+		this.srProgStat = srProgStat;
+	}
+
+	public String getDlngChrgrNm() {
+		return dlngChrgrNm;
+	}
+
+	public void setDlngChrgrNm(String dlngChrgrNm) {
+		this.dlngChrgrNm = dlngChrgrNm;
+	}
+
+	public String getReqChrgrNm() {
+		return reqChrgrNm;
+	}
+
+	public void setReqChrgrNm(String reqChrgrNm) {
+		this.reqChrgrNm = reqChrgrNm;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getSrType() {
+		return srType;
+	}
+
+	public void setSrType(String srType) {
+		this.srType = srType;
+	}
+
+	public String getSrTypeClas() {
+		return srTypeClas;
+	}
+
+	public void setSrTypeClas(String srTypeClas) {
+		this.srTypeClas = srTypeClas;
+	}
+
+	public String getBizSytmNm() {
+		return bizSytmNm;
+	}
+
+	public void setBizSytmNm(String bizSytmNm) {
+		this.bizSytmNm = bizSytmNm;
+	}
+
+	public String getSrTypeClasNm() {
+		return srTypeClasNm;
+	}
+
+	public void setSrTypeClasNm(String srTypeClasNm) {
+		this.srTypeClasNm = srTypeClasNm;
+	}
+
+	public String getSearchName() {
+		return searchName;
+	}
+
+	public void setSearchName(String searchName) {
+		this.searchName = searchName;
+	}
+
+	public String getSearchSytmCdNm() {
+		return searchSytmCdNm;
+	}
+
+	public void setSearchSytmCdNm(String searchSytmCdNm) {
+		this.searchSytmCdNm = searchSytmCdNm;
+	}
+
+	public String getSearchSytmCd() {
+		return searchSytmCd;
+	}
+
+	public void setSearchSytmCd(String searchSytmCd) {
+		this.searchSytmCd = searchSytmCd;
+	}
+	
+	public List<String> getArrSrMngtNo() {
+		return arrSrMngtNo;
+	}
+
+	public void setArrSrMngtNo(String pSrMngtNo) throws ParseException {
+		ArrayList<String> tmpSrMngtNo = new ArrayList<String>();
+		JSONParser parser = new JSONParser();
+		// 큰따옴표가 '&quot;' 값으로 변경되어 들어와 치환
+		String strSrMngtNoList = pSrMngtNo.toString().replaceAll("&quot;", "\"");
+		JSONArray arrSrMngtNoList = (JSONArray)parser.parse(strSrMngtNoList);
+		tmpSrMngtNo = arrSrMngtNoList;
+		this.arrSrMngtNo = tmpSrMngtNo;
+	}
+
+	public String getBizReportKindCd() {
+		return bizReportKindCd;
+	}
+
+	public void setBizReportKindCd(String bizReportKindCd) {
+		this.bizReportKindCd = bizReportKindCd;
+	}
+
+	public String getSelectedDate() {
+		return selectedDate;
+	}
+
+	public void setSelectedDate(String selectedDate) {
+		this.selectedDate = selectedDate;
+	}
+
+	public String getReqCnt() {
+		return reqCnt;
+	}
+
+	public void setReqCnt(String reqCnt) {
+		this.reqCnt = reqCnt;
+	}
+
+	public String getProCnt() {
+		return proCnt;
+	}
+
+	public void setProCnt(String proCnt) {
+		this.proCnt = proCnt;
+	}
+
+	public String getUnproCnt() {
+		return unproCnt;
+	}
+
+	public void setUnproCnt(String unproCnt) {
+		this.unproCnt = unproCnt;
+	}
+
+	public String getSrTypeComNm() {
+		return srTypeComNm;
+	}
+
+	public void setSrTypeComNm(String srTypeComNm) {
+		this.srTypeComNm = srTypeComNm;
+	}
+
+	public String getDelroCnt() {
+		return delroCnt;
+	}
+
+	public void setDelroCnt(String delroCnt) {
+		this.delroCnt = delroCnt;
+	}
+
+	public String getSearchDeptCd() {
+		return searchDeptCd;
+	}
+
+	public void setSearchDeptCd(String searchDeptCd) {
+		this.searchDeptCd = searchDeptCd;
+	}
+
+}

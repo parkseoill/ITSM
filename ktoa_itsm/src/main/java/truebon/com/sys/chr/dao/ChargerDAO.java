@@ -1,0 +1,161 @@
+package truebon.com.sys.chr.dao;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import truebon.com.sys.chr.model.Charger;
+import truebon.com.sys.chr.model.ChargerVO;
+
+/**
+ * 담당자에 대한 DAO 클래스를 정의한다
+ * @author 이태신
+ * @since 2022.05.04
+ * @version 1.0
+ * @see
+ *  
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *   
+ *  수정일               수정자            수정내용
+ *  ----------   --------   ---------------------------
+ *  2022.05.04   이태신           최초 생성
+ *
+ * </pre>
+ */
+
+@Repository("ChargerDAO")
+public class ChargerDAO extends EgovComAbstractDAO {
+
+	/**
+	 * tb_charger을 등록한다.
+	 * @param vo - 등록할 정보가 담긴 ChargerVO
+	 * @return 등록 결과
+	 * @exception Exception
+	 */
+    public void insertCharger(Charger vo) throws Exception {
+        insert("ChargerMapper.insertCharger", vo);
+    }
+
+    /**
+	 * tb_charger을 수정한다.
+	 * @param vo - 수정할 정보가 담긴 ChargerVO
+	 * @return void형
+	 * @exception Exception
+	 */
+    public void updateCharger(Charger vo) throws Exception {
+        update("ChargerMapper.updateCharger", vo);
+    }
+
+    /**
+	 * tb_charger을 삭제한다.
+	 * @param vo - 삭제할 정보가 담긴 ChargerVO
+	 * @return void형 
+	 * @exception Exception
+	 */
+    public void deleteCharger(Charger vo) throws Exception {
+        delete("ChargerMapper.deleteCharger", vo);
+    }
+
+    /**
+	 * tb_charger을 조회한다.
+	 * @param vo - 조회할 정보가 담긴 ChargerVO
+	 * @return 조회한 tb_charger
+	 * @exception Exception
+	 */
+    public ChargerVO selectCharger(Charger vo) throws Exception {
+        return (ChargerVO)selectOne("ChargerMapper.selectCharger", vo);
+    }
+
+    /**
+	 * tb_charger 목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_charger 목록
+	 * @exception Exception
+	 */
+    public List<ChargerVO> selectChargerList(ChargerVO searchVO) throws Exception {
+        return selectList("ChargerMapper.selectChargerList", searchVO);
+    }
+
+    /**
+	 * tb_charger 총 갯수를 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_charger 총 갯수
+	 * @exception
+	 */
+    public int selectChargerListTotCnt(ChargerVO searchVO) {
+        return (Integer)selectOne("ChargerMapper.selectChargerListTotCnt", searchVO);
+    }
+    
+    /**
+	 * tb_charger 목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_charger 목록
+	 * @exception Exception
+	 */
+    public List<ChargerVO> selectNameList(ChargerVO searchVO) throws Exception {
+        return selectList("ChargerMapper.selectNameList", searchVO);
+    }
+
+    /**
+	 * tb_charger 협력업체 목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_charger 목록
+	 * @exception Exception
+	 */
+	public List<ChargerVO> selectChargerVisitList(ChargerVO searchVO) {
+		 return selectList("ChargerMapper.selectCmpnyList", searchVO);
+	}
+	
+	/**
+	 *
+	 * tb_charger 협력업체 목록 총 갯수를 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_charger 목록
+	 * @exception Exception
+	 */
+	public int ChargerListPopTotCnt(ChargerVO searchVO) {
+		return (Integer)selectOne("ChargerMapper.ChargerListPopTotCnt", searchVO);
+	}
+	
+    /**
+	 * tb_charger ktoa,위탁운영자 목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_charger 목록
+	 * @exception Exception
+	 */
+	public List<ChargerVO> selectChargerSrList(ChargerVO searchVO) {
+		 return selectList("ChargerMapper.selectChargerSrList", searchVO);
+	}
+
+	/**
+	 * tb_charger ktoa,위탁운영자 목록 총 갯수를 조회한다.
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return tb_charger 총 갯수
+	 * @exception
+	 */
+	public int ChargerSrListPopTotCnt(ChargerVO searchVO) {
+		return (Integer)selectOne("ChargerMapper.ChargerSrListPopTotCnt", searchVO);
+	}
+	
+	/**
+	 * tb_charger 등록하려는 방문자 갯수를 조회한다.
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return tb_charger 총 갯수
+	 * @exception
+	 */
+	public int CheckVisitorsNmCmpny(ChargerVO searchVO) {
+		return (Integer)selectOne("ChargerMapper.CheckVisitorsNmCmpny", searchVO);
+	}
+	
+    /**
+	 * tb_charger sr요청부서목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_charger 목록
+	 * @exception Exception
+	 */
+	public List<ChargerVO> selectSrDeptList(ChargerVO searchVO) {
+		 return selectList("ChargerMapper.selectSrDeptList", searchVO);
+	}
+}

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RequestMapper">
+	
+	<resultMap id="SrMasterList" type="truebon.com.opm.srm.model.SrMasterVO">
+		<result property="dlngDate" column="DLNG_DATE" />
+		<result property="dlngPrargDate" column="DLNG_PRARG_DATE" />
+		<result property="dlngChrgrNo" column="DLNG_CHRGR_NO" />
+		<result property="reqTitle" column="REQ_TITLE" />
+		<result property="dlngText" column="DLNG_TEXT" />
+		<result property="weekyReportTargtYn" column="WEEKY_REPORT_TARGT_YN" />
+		<result property="failrMngtNo" column="FAILR_MNGT_NO" />
+		<result property="monthyReportTargtYn" column="MONTHY_REPORT_TARGT_YN" />
+		<result property="reqDate" column="REQ_DATE" />
+		<result property="reqChrgrNo" column="REQ_CHRGR_NO" />
+		<result property="reqText" column="REQ_TEXT" />
+		<result property="bizSytmCd" column="BIZ_SYTM_CD" />
+		<result property="srProgStatCd" column="SR_PROG_STAT_CD" />
+		<result property="srTypeClasNm" column="SR_TYPE_CLAS_NM" />
+		<result property="srTypeClasCd" column="SR_TYPE_CLAS_CD" />
+		<result property="srMngtNo" column="SR_MNGT_NO" />
+		<result property="prodtWritYn" column="PRODT_WRIT_YN" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+		<result property="selectedDate" column="SELECTED_DATE" />
+		<result property="reqCnt" column="REQ_CNT" />
+		<result property="proCnt" column="PRO_CNT" />
+		<result property="unproCnt" column="UNPRO_CNT" />
+	</resultMap>
+	
+	<select id="selectRequest" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultType="truebon.com.opm.srm.model.SrMasterVO">
+			SELECT
+				ts.SR_MNGT_NO					AS SR_MNGT_NO
+				, CASE 
+					WHEN ts.DLNG_DATE != '' THEN  CONCAT(SUBSTRING(ts.DLNG_DATE,1,4),'-' ,SUBSTRING(ts.DLNG_DATE,5,2),'-' ,SUBSTRING(ts.DLNG_DATE,7,2)) 
+					ELSE ts.DLNG_DATE
+				  END AS DLNG_DATE	
+				, CASE 
+					WHEN ts.DLNG_PRARG_DATE != '' THEN  CONCAT(SUBSTRING(ts.DLNG_PRARG_DATE,1,4),'-' ,SUBSTRING(ts.DLNG_PRARG_DATE,5,2),'-' ,SUBSTRING(ts.DLNG_PRARG_DATE,7,2)) 
+					ELSE ts.DLNG_PRARG_DATE
+				  END AS DLNG_PRARG_DATE	
+				, ts.DLNG_CHRGR_NO				AS DLNG_CHRGR_NO
+				, ts.REQ_TITLE					AS REQ_TITLE
+				, ts.DLNG_TEXT					AS DLNG_TEXT
+				, ts.FAILR_MNGT_NO				AS FAILR_MNGT_NO
+				, CASE 
+					WHEN ts.REQ_DATE != '' THEN  CONCAT(SUBSTRING(ts.REQ_DATE,1,4),'-' ,SUBSTRING(ts.REQ_DATE,5,2),'-' ,SUBSTRING(ts.REQ_DATE,7,2)) 
+					ELSE ts.REQ_DATE
+				  END AS REQ_DATE			
+				, ts.REQ_CHRGR_NO				AS REQ_CHRGR_NO
+				, ts.BIZ_SYTM_CD				AS BIZ_SYTM_CD
+				, ts.SR_PROG_STAT_CD			AS SR_PROG_STAT_CD
+				, ts.SR_TYPE_CLAS_CD			AS SR_TYPE_CLAS_CD
+				, tc4.COMN_CD_NM				AS SR_TYPE_CLAS_NM				
+				, ts.PRODT_WRIT_YN				AS PRODT_WRIT_YN	
+				, ts.REGSTR_ID					AS REGSTR_ID
+				, ts.RDTT						AS RDTT
+				, ts.AMNDR_ID					AS AMNDR_ID
+				, ts.MDTT						AS MDTT
+				, td.DEPT_NM					AS POSIT_DEPT_NM
+				, tb.BIZ_SYTM_NM				AS BIZ_SYTM_NM
+				, tc.CHRGR_NM					AS REQ_CHRGR_NM
+				, (SELECT tc.CHRGR_NM
+				  		FROM TB_CHARGER tc
+				  		WHERE ts.DLNG_CHRGR_NO = tc.CHRGR_NO  ) AS DLNG_CHRGR_NM
+				, (SELECT tc3.COMN_CD_NM
+				  		FROM TB_COMN_DETL_CD tc3
+				  		WHERE tc3.COMN_CD = ts.SR_PROG_STAT_CD
+				  			AND tc3.COMN_CD_ID = 'ISM013' ) AS SR_PROG_STAT
+			FROM TB_SR_MASTER ts
+			INNER JOIN TB_CHARGER tc ON ts.REQ_CHRGR_NO = tc.CHRGR_NO 
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc.POSIT_DEPT_NO = td.DEPT_NO AND tc2.CMPNY_NO = td.CMPNY_NO
+			INNER JOIN TB_BIZ_SYSTEM tb ON ts.BIZ_SYTM_CD = tb.BIZ_SYTM_CD 
+			INNER JOIN TB_COMN_CD_NEW tc4 ON ts.SR_TYPE_CLAS_CD = tc4.NEW_COMN_CD 
+			WHERE SR_MNGT_NO = #{srMngtNo}
+	</select>
+	
+	<select id="selectReqChrList" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultMap="SrMasterList">
+			<![CDATA[SELECT tc.CHRGR_NM AS DLNG_CHRGR_NM
+				, COUNT(tsm.DLNG_CHRGR_NO) AS REQ_CNT
+				, COUNT(IF(tsm.SR_PROG_STAT_CD = '3', tsm.SR_PROG_STAT_CD, NULL)) AS PRO_CNT
+				, COUNT(IF(tsm.SR_PROG_STAT_CD != '3', tsm.SR_PROG_STAT_CD, NULL)) AS UNPRO_CNT
+				, COUNT(IF(((tsm.DLNG_PRARG_DATE != '') && (((tsm.SR_PROG_STAT_CD = '3') && (tsm.DLNG_PRARG_DATE < tsm.DLNG_DATE)) || ((tsm.SR_PROG_STAT_CD != '3') 
+							&& (tsm.DLNG_PRARG_DATE < CONCAT(SUBSTRING(REPLACE(now(),'-',''),1,8)))))), tsm.SR_PROG_STAT_CD, NULL)) AS DELRO_CNT	]]>		
+			FROM ( 
+				SELECT DLNG_CHRGR_NO
+				, SR_PROG_STAT_CD
+				, REQ_DATE
+				, DLNG_DATE
+				, DLNG_PRARG_DATE
+				FROM TB_SR_MASTER
+				WHERE 1=1 
+				<if test="startDate != '' and startDate != null">
+					AND REQ_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+				</if>
+				<if test="endDate != '' and endDate != null">
+					AND REQ_DATE<![CDATA[<=]]> REPLACE(#{endDate},'-','')
+				</if>
+				) tsm
+			INNER JOIN (
+				SELECT CHRGR_NO
+				, CHRGR_NM
+				FROM TB_CHARGER
+				WHERE CHRGR_DSTNCT_CD = '2' AND CHRGR_ROLE_CD != '04' AND CHRGR_NM != '관리자'
+				) tc ON tsm.DLNG_CHRGR_NO = tc.CHRGR_NO
+			WHERE 1=1
+			GROUP BY tsm.DLNG_CHRGR_NO;
+	</select>	
+	
+	<select id="selectReqList" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultMap="SrMasterList">
+			<![CDATA[ SELECT tccn.COMN_CD_NM AS SR_TYPE_COM_NM
+				, COUNT(tsm.SR_TYPE_CLAS_CD) AS REQ_CNT
+				, COUNT(IF(tsm.SR_PROG_STAT_CD = '3', tsm.SR_PROG_STAT_CD, NULL)) AS PRO_CNT
+				, COUNT(IF(tsm.SR_PROG_STAT_CD != '3', tsm.SR_PROG_STAT_CD, NULL)) AS UNPRO_CNT
+				, COUNT(IF(((tsm.DLNG_PRARG_DATE != '') && (((tsm.SR_PROG_STAT_CD = '3') && (tsm.DLNG_PRARG_DATE < tsm.DLNG_DATE)) || ((tsm.SR_PROG_STAT_CD != '3') 
+							&& (tsm.DLNG_PRARG_DATE < CONCAT(SUBSTRING(REPLACE(now(),'-',''),1,8)))))), tsm.SR_PROG_STAT_CD, NULL)) AS DELRO_CNT	]]>		
+			FROM TB_SR_MASTER tsm
+			INNER JOIN TB_COMN_CD_NEW tccn ON tsm.SR_TYPE_CLAS_CD = tccn.NEW_COMN_CD
+			WHERE 1=1
+			<if test="startDate != '' and startDate != null">
+				AND tsm.REQ_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">
+				AND tsm.REQ_DATE<![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+			GROUP BY tsm.SR_TYPE_CLAS_CD;
+	</select>	
+	
+	<select id="selectReqDeptList" parameterType="truebon.com.opm.srm.model.SrMasterVO" resultMap="SrMasterList">
+			<![CDATA[ SELECT td.DEPT_NM AS POSIT_DEPT_NM
+				, COUNT(tsm.SR_TYPE_CLAS_CD) AS REQ_CNT
+				, COUNT(IF(tsm.SR_PROG_STAT_CD = '3', tsm.SR_PROG_STAT_CD, NULL)) AS PRO_CNT
+				, COUNT(IF(tsm.SR_PROG_STAT_CD != '3', tsm.SR_PROG_STAT_CD, NULL)) AS UNPRO_CNT
+				, COUNT(IF(((tsm.DLNG_PRARG_DATE != '') && (((tsm.SR_PROG_STAT_CD = '3') && (tsm.DLNG_PRARG_DATE < tsm.DLNG_DATE)) || ((tsm.SR_PROG_STAT_CD != '3') 
+							&& (tsm.DLNG_PRARG_DATE < CONCAT(SUBSTRING(REPLACE(now(),'-',''),1,8)))))), tsm.SR_PROG_STAT_CD, NULL)) AS DELRO_CNT	]]>		
+			FROM ktoa_itsm.TB_SR_MASTER tsm
+			INNER JOIN ktoa_itsm.TB_CHARGER tc ON tsm.REQ_CHRGR_NO = tc.CHRGR_NO
+			INNER JOIN ktoa_itsm.TB_DEPT td ON tc.POSIT_CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			WHERE 1=1
+			<if test="startDate != '' and startDate != null">
+				AND tsm.REQ_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">
+				AND tsm.REQ_DATE<![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+			GROUP BY td.DEPT_NO;
+	</select>	
+
+</mapper>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BizDetlReportMapper">
+	
+	<resultMap id="BizDetlReportList" type="truebon.com.rsm.wmr.model.BizDetlReportVO">
+		<result property="bizReportId" column="BIZ_REPORT_ID" />
+		<result property="bizSytmCd" column="BIZ_SYTM_CD" />
+		<result property="bizSytmNm" column="BIZ_SYTM_NM" />
+		<result property="bizDlngChrgrNo" column="BIZ_DLNG_CHRGR_NO" />
+		<result property="acrsltText" column="ACRSLT_TEXT" />
+		<result property="plnText" column="PLN_TEXT" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	 
+	<insert id="insertBizDetlReport" parameterType="truebon.com.rsm.wmr.model.BizDetlReport">
+		<![CDATA[
+			INSERT INTO TB_BIZ_DETL_REPORT 
+				( BIZ_REPORT_ID
+				  , BIZ_SYTM_CD
+				  , BIZ_DLNG_CHRGR_NO
+				  , ACRSLT_TEXT
+				  , PLN_TEXT
+				  , REGSTR_ID
+				  , RDTT
+				  , AMNDR_ID
+				  , MDTT )
+			VALUES ( #{bizReportId}
+				  , #{bizSytmCd}
+				  , #{bizDlngChrgrNo}
+				  , #{acrsltText}
+				  , #{plnText}
+				  , #{regstrId}
+				  , SYSDATE()
+				  , #{amndrId}
+				  , SYSDATE() )
+		]]>
+	</insert>
+	
+	<update id="updateBizDetlReport" parameterType="truebon.com.rsm.wmr.model.BizDetlReport">
+		<![CDATA[
+			UPDATE TB_BIZ_DETL_REPORT
+			SET ACRSLT_TEXT=#{acrsltText}
+				, PLN_TEXT=#{plnText}
+				, AMNDR_ID=#{amndrId}
+				, MDTT=sysdate()
+			WHERE BIZ_REPORT_ID = #{bizReportId}
+				AND BIZ_SYTM_CD = #{bizSytmCd}
+		]]>
+	</update>
+		
+	<select id="selectBizDetlReport" parameterType="truebon.com.rsm.wmr.model.BizDetlReportVO" resultType="truebon.com.rsm.wmr.model.BizDetlReportVO">
+		<![CDATA[
+			SELECT
+				BIZ_REPORT_ID
+				, BIZ_SYTM_CD
+				, BIZ_DLNG_CHRGR_NO
+				, ACRSLT_TEXT
+				, PLN_TEXT
+				, REGSTR_ID
+				, RDTT
+				, AMNDR_ID
+				, MDTT
+			FROM TB_BIZ_DETL_REPORT
+			WHERE BIZ_REPORT_ID = #{bizReportId}
+				AND BIZ_SYTM_CD = #{bizSytmCd}
+		]]>
+	</select>
+	
+	<delete id="deleteBizDetlReport" parameterType="truebon.com.rsm.wmr.model.BizDetlReportVO">
+		<![CDATA[
+			DELETE FROM TB_BIZ_DETL_REPORT
+			WHERE
+				BIZ_REPORT_ID = #{bizReportId}
+		]]>
+	</delete>
+	
+	<select id="selectBizDetlReportList" parameterType="truebon.com.rsm.wmr.model.BizDetlReportVO" resultMap="BizDetlReportList">
+			SELECT
+				a.BIZ_REPORT_ID
+				, a.BIZ_SYTM_CD
+				, b.BIZ_SYTM_NM
+				, a.BIZ_DLNG_CHRGR_NO
+				, a.ACRSLT_TEXT
+				, a.PLN_TEXT
+				, a.REGSTR_ID
+				, a.RDTT
+				, a.AMNDR_ID
+				, a.MDTT
+			FROM TB_BIZ_DETL_REPORT a
+			INNER JOIN TB_BIZ_SYSTEM b ON a.BIZ_SYTM_CD = b.BIZ_SYTM_CD AND b.BIZ_SYTM_CD_LVL = '2'
+			WHERE a.BIZ_REPORT_ID = #{bizReportId}
+			<if test="searchCondition == 1">AND
+				(a.PLN_TEXT != '' OR a.PLN_TEXT != NULL)
+			</if>
+			ORDER BY b.FRST_RANK*1
+	</select>	
+	
+	<select id="selectBizDetlReportListTotCnt" parameterType="truebon.com.rsm.wmr.model.BizDetlReportVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_BIZ_DETL_REPORT a
+			INNER JOIN TB_BIZ_SYSTEM b ON a.BIZ_SYTM_CD = b.BIZ_SYTM_CD AND b.BIZ_SYTM_CD_LVL = '2'
+			WHERE a.BIZ_REPORT_ID = #{bizReportId}
+	</select>
+	
+	<select id="RegBizDetlReport" parameterType="truebon.com.rsm.wmr.model.BizDetlReportVO" resultType="truebon.com.rsm.wmr.model.BizDetlReportVO">
+		<![CDATA[
+			SELECT
+				tbd.BIZ_REPORT_ID
+				, tbd.BIZ_SYTM_CD
+				, tbd.BIZ_DLNG_CHRGR_NO
+				, tbd.ACRSLT_TEXT
+				, tbd.PLN_TEXT
+				, tbd.REGSTR_ID
+				, tbd.RDTT
+				, tbd.AMNDR_ID
+				, tbd.MDTT
+				, tbs.BIZ_SYTM_NM
+			FROM TB_BIZ_DETL_REPORT tbd
+			LEFT OUTER JOIN TB_BIZ_REPORT tbr ON tbr.BIZ_REPORT_ID = tbd.BIZ_REPORT_ID 
+			LEFT OUTER JOIN TB_BIZ_SYSTEM tbs ON tbs.BIZ_SYTM_CD = tbd.BIZ_SYTM_CD 
+			WHERE tbd.BIZ_DLNG_CHRGR_NO = #{bizDlngChrgrNo}			
+			AND tbr.BIZ_REPORT_KIND_CD = #{bizReportKindCd}
+			AND tbr.USE_YN = 'Y'
+			ORDER BY tbd.BIZ_REPORT_ID DESC LIMIT 1
+		]]>
+	</select>
+	
+</mapper>

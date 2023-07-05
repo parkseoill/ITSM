@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="dlalzVO">
+			<field property="dlalzDate" depends="required">
+        		<arg0 key="출퇴근일"/>
+			</field>
+			<field property="chrgrNm" depends="required">
+        		<arg0 key="성명"/>
+			</field>
+			<field property="cmpnyNm" depends="required">
+        		<arg0 key="소속"/>
+			</field>
+			<field property="dlalzDstnctCd" depends="required">
+        		<arg0 key="근태 유형"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

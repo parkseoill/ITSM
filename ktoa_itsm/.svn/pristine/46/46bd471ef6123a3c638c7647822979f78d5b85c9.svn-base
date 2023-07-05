@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+<fontFamilies>
+  <fontFamily name="NanumGothic-Regular">
+    <normal>fonts/NanumGothic-Regular.ttf</normal>
+    <pdfEncoding>Identity-H</pdfEncoding>
+	<pdfEmbedded>true</pdfEmbedded>
+  </fontFamily>
+</fontFamilies>
+-->
+
+<fontFamilies>
+	<fontFamily name="나눔고딕">
+        <normal><![CDATA[truebon/jasper/fonts/nanum/NanumGothic.ttf]]></normal>
+        <bold><![CDATA[truebon/jasper/fonts/nanum/NanumGothicBold.ttf]]></bold>
+        <italic><![CDATA[truebon/jasper/fonts/nanum/NanumGothic.ttf]]></italic>
+        <boldItalic><![CDATA[truebon/jasper/fonts/nanum/NanumGothicBold.ttf]]></boldItalic>
+        <pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+        <pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+    </fontFamily>
+
+    <fontFamily name="나눔명조">
+        <normal><![CDATA[truebon/jasper/fonts/nanum/NanumMyeongjo.ttf]]></normal>
+        <bold><![CDATA[truebon/jasper/fonts/nanum/NanumMyeongjoBold.ttf]]></bold>
+        <italic><![CDATA[truebon/jasper/fonts/nanum/NanumMyeongjo.ttf]]></italic>
+        <boldItalic><![CDATA[truebon/jasper/fonts/nanum/NanumMyeongjoBold.ttf]]></boldItalic>
+        <pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+        <pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+    </fontFamily>
+	
+	<fontFamily name="맑은고딕">
+		<normal><![CDATA[truebon/jasper/fonts/malgun/MalgunGothic.ttf]]></normal>
+		<bold><![CDATA[truebon/jasper/fonts/malgun/MalgunGothicBold.ttf]]></bold>
+		<italic><![CDATA[truebon/jasper/fonts/malgun/MalgunGothic.ttf]]></italic>
+		<boldItalic><![CDATA[truebon/jasper/fonts/malgun/MalgunGothicBold.ttf]]></boldItalic>
+		<pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+		<pdfEmbedded>true</pdfEmbedded>
+	</fontFamily>
+</fontFamilies>

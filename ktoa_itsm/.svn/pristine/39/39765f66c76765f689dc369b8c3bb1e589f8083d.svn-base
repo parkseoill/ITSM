@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="VisitMapper">
+	
+
+	<resultMap id="VisitList" type="truebon.com.dlm.vis.model.VisitVO">
+		<result property="vstDate" column="VST_DATE" />
+		<result property="chrgrNo" column="CHRGR_NO" />
+		<result property="entofcTime" column="ENTOFC_TIME" />
+		<result property="levofcTime" column="LEVOFC_TIME" />
+		<result property="vstPurpsCd" column="VST_PURPS_CD" />
+		<result property="vstPurpsText" column="VST_PURPS_TEXT" />
+		<result property="confrId" column="CONFR_ID" />
+		<result property="hnphRstorYn" column="HNPH_RSTOR_YN" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+
+	<insert id="insertVisit" parameterType="truebon.com.dlm.vis.model.Visit">
+		<![CDATA[
+			INSERT INTO TB_VISIT
+				( VST_DATE
+				  , CHRGR_NO
+				  , ENTOFC_TIME
+				  , VST_PURPS_CD
+				  , VST_PURPS_TEXT
+				  , HNPH_RSTOR_YN
+				  , REGSTR_ID
+				  , RDTT
+				  , AMNDR_ID
+				  , MDTT )
+			VALUES ( REPLACE(#{vstDate},'-','')
+				  , #{chrgrNo}
+				  , SYSDATE()
+				  , #{vstPurpsCd}
+				  , #{vstPurpsText}
+				  , #{hnphRstorYn}
+				  , #{regstrId}
+				  , SYSDATE()
+				  , #{amndrId}
+				  , SYSDATE() )
+		]]>
+	</insert>
+	
+	<update id="updateVisit" parameterType="truebon.com.dlm.vis.model.Visit">
+		UPDATE TB_VISIT
+		SET VST_PURPS_CD=#{vstPurpsCd}
+			, VST_PURPS_TEXT=#{vstPurpsText}
+			<if test="confrId != null and confrId != ''">
+				, CONFR_ID=#{confrId}
+			</if>
+			, HNPH_RSTOR_YN=#{hnphRstorYn}
+			, AMNDR_ID=#{amndrId}
+			, MDTT=sysdate()
+		WHERE VST_DATE = REPLACE(#{vstDate},'-','') AND CHRGR_NO = #{chrgrNo};
+	</update>
+	
+	<update id="updateConfrSign"  parameterType="truebon.com.dlm.vis.model.Visit">
+		UPDATE TB_VISIT
+		SET CONFR_ID = #{confrId}
+			, AMNDR_ID=#{amndrId}
+			, MDTT=sysdate()
+		WHERE VST_DATE = REPLACE(#{vstDate},'-','') AND CHRGR_NO = #{chrgrNo};
+	</update>
+	
+	<update id="updateVisitExit" parameterType="truebon.com.dlm.vis.model.Visit">
+		UPDATE TB_VISIT
+		SET LEVOFC_TIME=sysdate()
+			, AMNDR_ID=#{amndrId}
+			, MDTT=sysdate()
+		WHERE VST_DATE = REPLACE(#{vstDate},'-','') AND CHRGR_NO = #{chrgrNo};
+	</update>
+
+	<select id="selectVisit" parameterType="truebon.com.dlm.vis.model.VisitVO" resultType="truebon.com.dlm.vis.model.VisitVO">
+		<![CDATA[
+			SELECT
+				  CONCAT(SUBSTRING(tv.VST_DATE, 1, 4), '-', SUBSTRING(tv.VST_DATE, 5, 2), '-', SUBSTRING(tv.VST_DATE, 7, 2)) AS VST_DATE
+				  , tv.CHRGR_NO
+				  , SUBSTRING(tv.ENTOFC_TIME, 1, 16)  AS entofcTime
+				  , SUBSTRING(tv.LEVOFC_TIME, 1, 16)  AS levofcTime
+				  , tv.VST_PURPS_CD
+				  , tv.VST_PURPS_TEXT
+				  , tv.CONFR_ID
+				  , tv.HNPH_RSTOR_YN
+				  , tv.REGSTR_ID
+				  , tv.RDTT
+				  , tv.AMNDR_ID
+				  , SUBSTRING(tv.MDTT,1,10) AS mdtt
+				  , tc.CHRGR_NM
+				  , tc.CHRGR_WIRELS_TEL_NO
+				  , tc2.CMPNY_NM	
+				  , (SELECT tc3.COMN_CD_NM
+				  		FROM TB_COMN_DETL_CD tc3
+				  		WHERE tc3.COMN_CD = tv.VST_PURPS_CD
+				  			AND tc3.COMN_CD_ID = 'ISM010' ) AS VST_PURPS
+				  , uc.USER_SIGN
+				  , uc.CHRGR_NM AS CONFR_NM
+				  , IFNULL(tc3.CHRGR_NM,'guest') AS AMNDR_NM
+			FROM TB_VISIT tv
+			INNER JOIN TB_CHARGER tc ON tc.CHRGR_NO = tv.CHRGR_NO
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			LEFT OUTER JOIN TB_USER tu ON tu.USER_ID = tv.AMNDR_ID
+			LEFT OUTER JOIN TB_CHARGER tc3 ON tu.CHRGR_NO = tc3.CHRGR_NO
+			LEFT OUTER JOIN (
+			SELECT
+				tu.USER_ID,
+				tu.USER_SIGN,
+				tc3.CHRGR_NM
+			FROM
+				TB_USER tu
+			INNER JOIN TB_CHARGER tc3 ON
+				tu.CHRGR_NO = tc3.CHRGR_NO) uc
+			ON tv.CONFR_ID = uc.USER_ID
+			WHERE VST_DATE = REPLACE(#{vstDate},'-','') AND tv.CHRGR_NO = #{chrgrNo}
+		]]>
+	</select>
+	
+	<select id="selectVisitList" parameterType="truebon.com.dlm.vis.model.VisitVO" resultMap="VisitList">
+			SELECT
+				 CONCAT(SUBSTRING(tv.VST_DATE, 1, 4), '-', SUBSTRING(tv.VST_DATE, 5, 2), '-', SUBSTRING(tv.VST_DATE, 7, 2)) AS VST_DATE
+				  , tv.CHRGR_NO
+				  , tv.ENTOFC_TIME
+				  , tv.LEVOFC_TIME
+				  , tv.VST_PURPS_CD
+				  , tv.VST_PURPS_TEXT
+				  , tv.CONFR_ID
+				  , CASE 
+				  		WHEN tv.HNPH_RSTOR_YN = 'Y' THEN 'O'
+				  		WHEN tv.HNPH_RSTOR_YN = 'N' THEN 'X'
+				  	END AS HNPH_RSTOR_YN
+				  , tv.REGSTR_ID
+				  , tv.RDTT
+				  , tv.AMNDR_ID
+				  , tv.MDTT
+				  , tc.CHRGR_NM
+				  , tc.CHRGR_WIRELS_TEL_NO
+				  , tc2.CMPNY_NM	
+				  , (SELECT tc3.COMN_CD_NM
+				  		FROM TB_COMN_DETL_CD tc3
+				  		WHERE tc3.COMN_CD = tv.VST_PURPS_CD
+				  			AND tc3.COMN_CD_ID = 'ISM010' ) AS VST_PURPS
+				  , SUBSTRING(uc.USER_SIGN, 27) AS USER_SIGN
+				  , uc.CHRGR_NM AS CONFR_NM
+			FROM TB_VISIT tv
+			INNER JOIN TB_CHARGER tc ON tc.CHRGR_NO = tv.CHRGR_NO
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			LEFT OUTER JOIN (
+			SELECT
+				tu.USER_ID,
+				tu.USER_SIGN,
+				tc3.CHRGR_NM
+			FROM
+				TB_USER tu
+			INNER JOIN TB_CHARGER tc3 ON
+				tu.CHRGR_NO = tc3.CHRGR_NO) uc
+			ON tv.CONFR_ID = uc.USER_ID
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			<if test="startDate != '' and startDate != null">
+				AND tv.VST_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">
+				AND tv.VST_DATE <![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+			<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+				ORDER BY tv.VST_DATE DESC, tv.ENTOFC_TIME DESC
+				limit #{recordCountPerPage} offset #{firstIndex}
+			</if>
+			<!-- Jasper Reports 사용 -->
+			<if test="recordCountPerPage == 0">
+				ORDER BY tv.VST_DATE, tv.ENTOFC_TIME
+			</if>
+	</select>	
+	
+	<select id="selectVisitListTotCnt" parameterType="truebon.com.dlm.vis.model.VisitVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_VISIT tv
+			INNER JOIN TB_CHARGER tc ON tc.CHRGR_NO = tv.CHRGR_NO
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			LEFT OUTER JOIN (
+			SELECT
+				tu.USER_ID,
+				tu.USER_SIGN,
+				tc3.CHRGR_NM
+			FROM
+				TB_USER tu
+			INNER JOIN TB_CHARGER tc3 ON
+				tu.CHRGR_NO = tc3.CHRGR_NO) uc
+			ON tv.CONFR_ID = uc.USER_ID
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			<if test="startDate != '' and startDate != null">
+				AND tv.VST_DATE <![CDATA[>=]]> REPLACE(#{startDate},'-','')
+			</if>
+			<if test="endDate != '' and endDate != null">
+				AND tv.VST_DATE <![CDATA[<=]]> REPLACE(#{endDate},'-','')
+			</if>
+			<if test="searchCondition == 4">AND
+					tc.CHRGR_NO LIKE CONCAT(#{chrgrNo})
+			</if>
+	</select>
+
+</mapper>

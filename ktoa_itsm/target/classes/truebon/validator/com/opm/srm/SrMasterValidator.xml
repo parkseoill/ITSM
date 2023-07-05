@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="srMasterVO">
+			<field property="reqChrgrNo" depends="required">
+        		<arg0 key="요청담당자번호"/>
+			</field>
+			<field property="dlngChrgrNo" depends="required">
+        		<arg0 key="처리담당자번호"/>
+			</field>
+			<field property="srTypeClasCd" depends="required">
+        		<arg0 key="서비스요청유형분류코드"/>
+			</field>
+			<field property="reqDate" depends="required">
+        		<arg0 key="요청일자"/>
+			</field>
+			<field property="srProgStatCd" depends="required">
+        		<arg0 key="서비스요청진행상태코드"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

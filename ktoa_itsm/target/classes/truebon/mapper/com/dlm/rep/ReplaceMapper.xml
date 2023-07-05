@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ReplaceMapper">
+   
+
+   <resultMap id="ReplaceList" type="truebon.com.dlm.rep.model.ReplaceVO">
+      <result property="chrgrNo" column="CHRGR_NO" />  
+      <result property="chrgrNm" column="CHRGR_NM" />  
+      <result property="replacOffdayDate" column="REPLAC_OFFDAY_DATE" />
+      <result property="replacOffdayCnt" column="REPLAC_OFFDAY_CNT" />
+      <result property="replacOffdayRsnCd" column="REPLAC_OFFDAY_RSN_CD" />
+      <result property="repSum" column="REP_SUM" />
+      <result property="dlalzDate" column="DLALZ_DATE" />
+      <result property="useRep" column="USE_REP" />
+      <result property="useSum" column="USE_SUM" />
+      
+   </resultMap>
+  
+   
+   <select id="selectReplaceList" parameterType="truebon.com.dlm.rep.model.ReplaceVO" resultMap="ReplaceList">
+       SELECT tro.REPLAC_OFFDAY_DATE
+             , tro.CHRGR_NO
+             , tc.CHRGR_NM
+             , tro.REPLAC_OFFDAY_CNT
+             , tro.REPLAC_OFFDAY_RSN_CD
+            , SUM(REPLAC_OFFDAY_CNT) OVER() as REP_SUM
+       FROM TB_REPLAC_OFFDAY tro, TB_CHARGER tc   
+       WHERE tro.CHRGR_NO = tc.CHRGR_NO 
+         AND tro.REPLAC_OFFDAY_DATE LIKE CONCAT(#{selectedDate},'%')
+          AND tc.CHRGR_NM = #{name}
+       ORDER BY REPLAC_OFFDAY_DATE ASC
+   </select>     
+   
+   <select id="selectReplaceUseList" parameterType="truebon.com.dlm.rep.model.ReplaceVO" resultMap="ReplaceList">
+        SELECT td.CHRGR_NO
+           , tc.CHRGR_NM
+           , td.DLALZ_DATE
+           , if(DLALZ_DSTNCT_CD = '2', 1, 0.5) as USE_REP 
+           , SUM(if(DLALZ_DSTNCT_CD = '2', 1, 0.5)) OVER() AS USE_SUM
+           FROM TB_DLALZ td, TB_CHARGER tc 
+         WHERE td.DLALZ_DATE LIKE CONCAT(#{selectedDate},'%')
+           AND td.OFFDAY_TYPE_CD ='2'
+           AND td.CHRGR_NO = tc.CHRGR_NO 
+           AND tc.CHRGR_NM  = #{name}
+         ORDER BY DLALZ_DATE ASC
+   </select> 
+    
+   <insert id="insertReOffday" parameterType="truebon.com.dlm.rep.model.ReplaceVO">
+  		INSERT INTO TB_REPLAC_OFFDAY (REPLAC_OFFDAY_DATE,CHRGR_NO, REPLAC_OFFDAY_CNT, REPLAC_OFFDAY_RSN_CD) 			
+	 		(
+		 		SELECT  DISTINCT REPLACE(#{selectedDate2},'-',''), tc.CHRGR_NO, Cast(#{insertCnt} AS FLOAT), #{replacOffdayRsnCd} 
+		 		FROM TB_CHARGER tc
+		 		WHERE tc.CHRGR_NM  = #{chrgrNm}
+		 	)	 	
+   </insert> 
+    
+</mapper>
+   
+   

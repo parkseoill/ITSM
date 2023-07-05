@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+	수정일          수정자                          수정내용
+  ===========      ========    =================================================
+  2011.10.06		이기하     	 	보안 취약점 점검사항 반영 $->#변경
+--><!--Converted at: Wed May 11 15:50:36 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CmmnClCodeManage">
+
+	<select id="selectCmmnClCodeList" parameterType="egovframework.com.sym.ccm.ccc.service.CmmnClCodeVO" resultType="egovframework.com.sym.ccm.ccc.service.CmmnClCodeVO">
+		
+		<![CDATA[
+			SELECT  COMN_CD_ID comnCdId
+			     ,  COMN_CD_ID_NM comnCdIdNm
+			     ,  COMN_CD_ID_DC comnCdIdDc
+			     ,  USE_YN useYn
+			  FROM  TB_COMN_CD
+			 WHERE  1 = 1
+			 AND USE_YN = 'Y'
+		]]>
+		
+			<if test="searchCondition == 1">	<![CDATA[	AND
+				COMN_CD_ID LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+			</if>
+			<if test="searchCondition == 2">	<![CDATA[	AND
+				COMN_CD_ID_NM LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+			</if>
+	</select>
+
+	<select id="selectCmmnClCodeListTotCnt" parameterType="egovframework.com.sym.ccm.ccc.service.CmmnClCodeVO" resultType="int">
+		
+		<![CDATA[
+			SELECT  COUNT(*) totcnt
+			  FROM  TB_COMN_CD
+			 WHERE  1 = 1
+			 AND USE_YN = 'Y'
+		]]>
+		
+			<if test="searchCondition == 1">	<![CDATA[	AND
+				COMN_CD_ID LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+			</if>
+			<if test="searchCondition == 2">	<![CDATA[	AND
+				COMN_CD_ID_NM LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+			</if>
+	</select>
+
+	<select id="selectCmmnClCodeDetail" parameterType="egovframework.com.sym.ccm.ccc.service.CmmnClCodeVO" resultType="egovframework.com.sym.ccm.ccc.service.CmmnClCodeVO">
+		
+		<![CDATA[
+            SELECT  COMN_CD_ID    comnCdId
+			     ,  COMN_CD_ID_NM comnCdIdNm
+                 ,  COMN_CD_ID_DC comnCdIdDc
+                 ,  USE_YN     useYn
+              FROM  TB_COMN_CD
+             WHERE  COMN_CD_ID    = #{comnCdId}
+         ]]>
+		
+	</select>
+
+	<insert id="insertCmmnClCode">
+		
+		<![CDATA[
+		    INSERT
+		      INTO  TB_COMN_CD
+		         (  COMN_CD_ID
+		         ,  COMN_CD_ID_NM
+		         ,  COMN_CD_ID_DC
+		         ,  USE_YN
+		         ,  REGSTR_ID
+		         ,  RDTT
+		         ,  AMNDR_ID
+		         ,  MDTT
+		         )
+		    VALUES
+		         (  #{comnCdId}
+		         ,  #{comnCdIdNm}
+		         ,  #{comnCdIdDc}
+		         ,  #{useYn}
+		         ,  #{frstRegisterId}
+		         ,  sysdate()
+		         ,  #{frstRegisterId}
+		         ,  sysdate()
+		         )
+		   ]]>
+		
+	</insert>
+
+	<update id="updateCmmnClCode">
+		
+		<![CDATA[
+            UPDATE  TB_COMN_CD
+               SET  COMN_CD_ID_NM        = #{comnCdIdNm}
+                 ,  COMN_CD_ID_DC        = #{comnCdIdDc}
+                 ,  USE_YN            = #{useYn}
+                 ,  MDTT = sysdate()
+                 ,  AMNDR_ID    = #{lastUpdusrId}
+             WHERE  COMN_CD_ID           = #{comnCdId}
+         ]]>
+		
+	</update>
+
+	<delete id="deleteCmmnClCode" >
+		
+		<![CDATA[
+            UPDATE  TB_COMN_CD
+               SET  USE_YN  = 'N'
+             WHERE  COMN_CD_ID = #{comnCdId}
+        ]]>     
+		
+	</delete>
+
+
+</mapper>

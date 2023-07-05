@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+.search_box-ul_top{
+	border-bottom:1px solid #dddddd; 
+	padding-bottom:10px; 
+	margin-bottom:10px; 
+}
+
+
+.search_box-ul_bottom{
+	background-image: url(/images/truebon/com/dlm/cod/dash_line.gif); 
+	background-position:40% top; 
+	background-repeat:no-repeat;
+}
+

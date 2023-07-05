@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userManageDAO">
+
+    <select id="selectUserList_S" resultType="egovMap">
+SELECT 
+    userId, useYn, chargerNo, uniqId, regstrId, rdtt, amndrId, mdtt, chrgrNm, chrgrWirelnTelNo
+FROM(
+    SELECT 
+		    	USER_ID                     userId, 
+		    	U.USE_YN                    useYn, 
+		    	U.CHRGR_NO                  chargerNo, 
+		    	ESNTL_ID                    uniqId, 
+		    	U.REGSTR_ID                 regstrId, 
+		    	U.RDTT                      rdtt, 
+		    	U.AMNDR_ID                  amndrId, 
+		    	U.MDTT                      mdtt, 
+		    	CHRGR_NM                    chrgrNm, 
+		    	CHRGR_WIRELN_TEL_NO         chrgrWirelnTelNo
+			FROM ktoa_itsm.TB_USER U 
+			LEFT JOIN ktoa_itsm.TB_CHARGER C 
+			ON U.CHRGR_NO = C.CHRGR_NO
+			UNION
+			SELECT 
+		    	USER_ID                     userId, 
+		    	U.USE_YN                    useYn, 
+		    	U.CHRGR_NO                  chargerNo, 
+		    	ESNTL_ID                    uniqId, 
+		    	U.REGSTR_ID                 regstrId, 
+		    	U.RDTT                      rdtt, 
+		    	U.AMNDR_ID                  amndrId, 
+		    	U.MDTT                      mdtt, 
+		    	CHRGR_NM                    chrgrNm, 
+		    	CHRGR_WIRELN_TEL_NO         chrgrWirelnTelNo
+			FROM ktoa_itsm.TB_CHARGER C 
+			RIGHT JOIN ktoa_itsm.TB_USER U 
+			ON U.CHRGR_NO = C.CHRGR_NO
+    ) A 
+        WHERE 1=1
+        
+	    <if test="searchCondition == 1">	<![CDATA[	AND
+			userId LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+		</if>
+		<if test="searchCondition == 2">	<![CDATA[	AND
+			chrgrNm LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+		</if>
+		<if test="searchCondition == 3">	<![CDATA[	AND
+			amndrId LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+		</if>
+	
+		<if test="searchCondition2 == 1">	<![CDATA[	AND
+			useYn = 'Y'	]]>
+		</if>
+		<if test="searchCondition2 == 2">	<![CDATA[	AND
+			useYn = 'N'	]]>
+		</if>
+		
+        ORDER BY userId
+        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+    
+    <select id="selectUserListTotCnt_S" resultType="int">
+            SELECT COUNT(1) totcnt
+            FROM(
+              SELECT 
+		    	USER_ID                     userId, 
+		    	U.USE_YN                    useYn, 
+		    	U.CHRGR_NO                  chargerNo, 
+		    	ESNTL_ID                    uniqId, 
+		    	U.REGSTR_ID                 regstrId, 
+		    	U.RDTT                      rdtt, 
+		    	U.AMNDR_ID                  amndrId, 
+		    	U.MDTT                      mdtt, 
+		    	CHRGR_NM                    chrgrNm, 
+		    	CHRGR_WIRELN_TEL_NO         chrgrWirelnTelNo
+			FROM ktoa_itsm.TB_USER U 
+			LEFT JOIN ktoa_itsm.TB_CHARGER C 
+			ON U.CHRGR_NO = C.CHRGR_NO
+			UNION
+			SELECT 
+		    	USER_ID                     userId, 
+		    	U.USE_YN                    useYn, 
+		    	U.CHRGR_NO                  chargerNo, 
+		    	ESNTL_ID                    uniqId, 
+		    	U.REGSTR_ID                 regstrId, 
+		    	U.RDTT                      rdtt, 
+		    	U.AMNDR_ID                  amndrId, 
+		    	U.MDTT                      mdtt, 
+		    	CHRGR_NM                    chrgrNm, 
+		    	CHRGR_WIRELN_TEL_NO         chrgrWirelnTelNo
+			FROM ktoa_itsm.TB_CHARGER C 
+			RIGHT JOIN ktoa_itsm.TB_USER U 
+			ON U.CHRGR_NO = C.CHRGR_NO
+            ) A
+        WHERE 1=1
+        
+  		<if test="searchCondition == 1">	<![CDATA[	AND
+			userId LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+		</if>
+		<if test="searchCondition == 2">	<![CDATA[	AND
+			chrgrNm LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+		</if>
+		<if test="searchCondition == 3">	<![CDATA[	AND
+			amndrId LIKE CONCAT ('%', #{searchKeyword},'%')	]]>
+		</if>
+		<if test="searchCondition2 == 1">	<![CDATA[	AND
+			useYn = 'Y'	]]>
+		</if>
+		<if test="searchCondition2 == 2">	<![CDATA[	AND
+			useYn = 'N'	]]>
+		</if>
+		ORDER BY userId
+    </select>
+    
+    <insert id="insertUser_S">
+        
+                INSERT INTO TB_USER 
+                (   USER_ID,        
+                	SCRT_NO,        
+			    	USE_YN,        
+			    	CHRGR_NO,         
+			        ESNTL_ID,          
+			        REGSTR_ID,       
+			        RDTT,               
+			        AMNDR_ID,           
+			        MDTT        )
+            VALUES (
+                    #{userId}          ,
+                    #{password}          ,
+                    #{useYn}          ,
+                    #{chargerNo}           ,
+                    #{uniqId}            ,
+                    #{regstrId}         ,
+                    sysdate()            ,                   
+                    #{regstrId}        ,
+                    sysdate()            )
+    </insert>
+    
+    <delete id="deleteUser_S">
+        	UPDATE TB_USER
+        	SET USE_YN    = 'N'
+            WHERE ESNTL_ID=#{delId}
+        
+    </delete>
+    
+    <select id="selectUser_S" resultType="egovframework.com.uss.umt.service.UserManageVO">
+         SELECT
+            	U.USE_YN useYn, 
+		    	ESNTL_ID uniqId,
+		    	USER_ID userId, 
+		    	U.CHRGR_NO chargerNo, 
+		    	CHRGR_NM chrgrNm,
+		    	U.USER_SIGN userSign,
+		    	U.REGSTR_ID regstrId, 
+		    	U.RDTT rdtt, 
+		    	U.AMNDR_ID amndrId, 
+		    	U.MDTT mdtt 
+        	FROM TB_USER U, TB_CHARGER C
+            WHERE ESNTL_ID=#{selectedId} 
+            AND U.CHRGR_NO = C.CHRGR_NO 
+    </select>
+    
+    <update id="updateUser_S">
+        
+            UPDATE TB_USER 
+            SET USER_ID		= #{userId}, 
+                USE_YN		= #{useYn},
+                CHRGR_NO	= #{chargerNo},
+                USER_SIGN	= #{userSign},
+                AMNDR_ID	= #{amndrId},
+                MDTT		= sysdate()         
+            WHERE ESNTL_ID=#{uniqId}
+        
+    </update>
+    
+     <select id="checkIdDplct_S" resultType="int">
+        
+            SELECT COUNT(1) usedCnt
+                FROM(
+	                SELECT
+	                USER_ID  userId
+	                FROM    TB_USER
+                ) A
+            WHERE userId = #{checkId}
+        
+    </select>
+    
+ 
+    
+    <update id="updatePassword_S">
+        
+            UPDATE TB_USER 
+            SET 
+                   SCRT_NO   =  #{password}
+                 , MDTT = sysdate()
+            WHERE  ESNTL_ID  = #{uniqId}
+        
+    </update>
+    
+    <select id="selectPassword_S" resultType="egovframework.com.uss.umt.service.UserManageVO">
+        
+            SELECT
+                    SCRT_NO          password 
+            FROM    TB_USER
+            WHERE   ESNTL_ID=#{uniqId}
+        
+    </select>
+    
+
+
+</mapper>

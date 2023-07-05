@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="bizSytmVO">
+			<field property="bizSytmCd" depends="required">
+        		<arg0 key="시스템코드"/>
+			</field>
+			<field property="bizSytmNm" depends="required">
+        		<arg0 key="시스템명"/>
+			</field>
+			<field property="bizSytmCdLvl" depends="required">
+        		<arg0 key="시스템코드 레벨"/>
+			</field>
+			<field property="frstRank" depends="required">
+        		<arg0 key="우선순위"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

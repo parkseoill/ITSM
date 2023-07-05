@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="deptManageDAO">
+
+    <resultMap id="deptManageVO" type="egovframework.com.uss.umt.service.DeptManageVO">
+        <result property="cmpnyNo" column="CMPNY_NO"/>
+        <result property="deptNo" column="DEPT_NO"/>
+        <result property="deptNm" column="DEPT_NM"/>
+        <result property="regstrId" column="REGSTR_ID"/>
+        <result property="rdtt" column="RDTT"/>
+        <result property="amndrId" column="AMNDR_ID"/>
+        <result property="mdtt" column="MDTT"/>
+        <result property="useYn" column="USE_YN"/>
+    </resultMap>
+	<resultMap id="group" type="egovframework.com.sec.gmt.service.GroupManageVO">
+        <result property="cmpnyNo" column="CMPNY_NO"/>
+		<result property="cmpnyNm" column="CMPNY_NM"/>
+		<result property="rpsntvNm" column="RPSNTV_NM"/>
+		<result property="cmpnyAddr" column="CMPNY_ADDR"/>
+		<result property="cmpnyTelNo" column="CMPNY_TEL_NO"/>
+		<result property="rdtt" column="RDTT"/>
+		<result property="regstrId" column="REGSTR_ID"/>
+        <result property="mdtt" column="MDTT"/>
+        <result property="amndrId" column="AMNDR_ID"/>
+	</resultMap>
+
+    <select id="selectDeptManageList" resultMap="deptManageVO">
+            SELECT 
+            	  a. CMPNY_NO ,
+            	  a. CMPNY_NM ,
+                  b. DEPT_NO ,
+                  b. DEPT_NM ,
+                  b. RDTT ,
+                  b. USE_YN
+              FROM TB_COMPANY a
+              LEFT OUTER JOIN TB_DEPT b ON a.CMPNY_NO = b.CMPNY_NO
+              WHERE b.USE_YN = 'Y'
+             	AND a.CMPNY_NO = #{cmpnyNo}  
+            <if test="searchCondition == 1">AND
+                DEPT_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>
+            ORDER BY CMPNY_NO
+    </select>
+    
+    <select id="selectDeptManageListPopUp" resultMap="deptManageVO">
+            SELECT 
+            	  a. CMPNY_NO ,
+            	  a. CMPNY_NM ,
+                  b. DEPT_NO ,
+                  b. DEPT_NM ,
+                  b. RDTT ,
+                  b. USE_YN
+              FROM TB_COMPANY a
+              LEFT OUTER JOIN TB_DEPT b
+              ON a.CMPNY_NO = b.CMPNY_NO
+             WHERE a.USE_YN = 'Y'
+             AND b.USE_YN = 'Y'
+            <if test="searchCondition == 1">AND
+                DEPT_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>
+            <![CDATA[
+            ORDER BY CMPNY_NM, DEPT_NM 
+            LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+            ]]>  
+    </select>
+
+    <select id="selectDeptManageListTotCnt" resultType="int">
+            SELECT COUNT(*) totcnt
+            FROM TB_DEPT
+            WHERE 1=1
+            <if test="searchCondition == 1">AND
+                DEPT_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>
+    </select>
+    
+    <select id="selectDeptManageListPopUpTotCnt" resultType="int">
+            SELECT COUNT(*) totcnt
+            FROM TB_COMPANY a
+            LEFT OUTER JOIN TB_DEPT b
+            ON a.CMPNY_NO = b.CMPNY_NO
+            WHERE a.USE_YN = 'Y'
+            AND b.USE_YN = 'Y'
+            <if test="searchCondition == 1">AND
+                DEPT_NM LIKE CONCAT('%' , #{searchKeyword}, '%')
+            </if>
+    </select>
+    
+    <select id="selectDeptManage" resultMap="deptManageVO">  
+            SELECT 
+            	  a. CMPNY_NO,
+            	  b. CMPNY_NM,
+                  a. DEPT_NO,
+                  a. DEPT_NM,
+                  a. REGSTR_ID,
+                  a. RDTT,
+                  a. AMNDR_ID,
+                  a. MDTT
+            FROM TB_DEPT a
+            LEFT OUTER JOIN TB_COMPANY b ON a.CMPNY_NO = b.CMPNY_NO
+            WHERE 1=1  
+              AND a.CMPNY_NO = #{cmpnyNo}  
+              AND DEPT_NO = #{deptNo}      
+    </select>  
+    
+    <insert id="insertDeptManage" parameterType="egovframework.com.uss.umt.service.DeptManageVO">    
+      <selectKey keyProperty="deptNo" order="BEFORE" resultType="string">
+        	SELECT 
+				LPAD(NVL(MAX(DEPT_NO)+1,1),4,'0')
+      		FROM TB_DEPT
+        		WHERE CMPNY_NO = #{cmpnyNo}  
+   		</selectKey>
+            INSERT INTO TB_DEPT
+                   (CMPNY_NO ,
+                  	DEPT_NO ,
+                  	DEPT_NM ,
+                  	REGSTR_ID ,
+                  	RDTT ,
+                  	AMNDR_ID ,
+                  	MDTT ,
+                  	USE_YN )
+            VALUES (#{cmpnyNo} ,
+                    #{deptNo} , 
+                    #{deptNm} , 
+                    #{regstrId} , 
+                    now() ,
+                    #{amndrId} ,
+                    now() ,
+                    'Y')   
+    </insert>     
+
+    <update id="updateDeptManage"  parameterType="egovframework.com.uss.umt.service.DeptManageVO">
+            UPDATE TB_DEPT
+                SET DEPT_NM = #{deptNm} ,
+               		AMNDR_ID = #{amndrId} ,
+               		MDTT = SYSDATE()
+             WHERE CMPNY_NO = #{cmpnyNo}  
+             	AND DEPT_NO = #{deptNo}             	
+    </update>    
+
+    <delete id="deleteDeptManage">      
+            UPDATE TB_DEPT
+           		SET USE_YN = 'N'
+             WHERE CMPNY_NO = #{cmpnyNo}  
+             	AND DEPT_NO = #{deptNo}      
+    </delete>  
+
+</mapper>

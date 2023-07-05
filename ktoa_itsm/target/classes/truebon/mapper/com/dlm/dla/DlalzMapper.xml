@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="DlalzMapper">
+   
+
+   <resultMap id="DlalzList" type="truebon.com.dlm.dla.model.DlalzVO">
+      <result property="dlalzDate" column="DLALZ_DATE" />
+      <result property="chrgrNo" column="CHRGR_NO" />
+      <result property="dlalzDstnctCd" column="DLALZ_DSTNCT_CD" />
+      <result property="wrkTypeCd" column="WRK_TYPE_CD" />
+      <result property="wrkTimeCd" column="WRK_TIME_CD" />
+      <result property="offdayTypeCd" column="OFFDAY_TYPE_CD" />
+      <result property="hlfdayOffdayDstnctCd" column="HLFDAY_OFFDAY_DSTNCT_CD" />
+      <result property="atendTime" column="ATEND_TIME" />
+      <result property="leofcTime" column="LEOFC_TIME" />
+      <result property="securBonduYn" column="SECUR_BONDU_YN" />
+      <result property="rmarkText" column="RMARK_TEXT" />
+      <result property="regstrId" column="REGSTR_ID" />
+      <result property="rdtt" column="RDTT" />
+      <result property="amndrId" column="AMNDR_ID" />
+      <result property="amndrNm" column="AMNDR_NM" />
+      <result property="mdtt" column="MDTT" />
+      <result property="chrgrNm" column="CHRGR_NM" />
+      <result property="chrgrRoleCd" column="CHRGR_ROLE_CD" />
+      <result property="cmpnyNm" column="CMPNY_NM" />
+      <result property="offdayWrkRsnCd" column="OFFDAY_WRK_RSN_CD" />
+   </resultMap>
+   
+   
+   <insert id="insertDlalz" parameterType="truebon.com.dlm.dla.model.Dlalz">
+      <![CDATA[
+         INSERT INTO TB_DLALZ 
+            ( DLALZ_DATE
+              , CHRGR_NO
+              , DLALZ_DSTNCT_CD
+              , WRK_TYPE_CD
+              , WRK_TIME_CD
+              , OFFDAY_TYPE_CD
+              , SECUR_BONDU_YN
+              , REGSTR_ID
+              , RDTT
+              , AMNDR_ID
+              , MDTT )
+         VALUES ( #{dlalzDate}
+              , #{chrgrNo}
+              , #{dlalzDstnctCd}
+              , #{wrkTypeCd}
+              , #{wrkTimeCd}
+              , #{offdayTypeCd}
+              , 'N'
+              , #{regstrId}
+              , SYSDATE()
+              , #{regstrId}
+              , SYSDATE() )
+      ]]>
+   </insert>
+
+   <update id="updateDlalz" parameterType="truebon.com.dlm.dla.model.Dlalz">
+      
+         UPDATE TB_DLALZ
+         SET DLALZ_DSTNCT_CD=#{dlalzDstnctCd}
+            , WRK_TYPE_CD=#{wrkTypeCd}
+            , WRK_TIME_CD=#{wrkTimeCd}
+            , OFFDAY_TYPE_CD=#{offdayTypeCd}
+            , HLFDAY_OFFDAY_DSTNCT_CD=#{hlfdayOffdayDstnctCd}
+            , OFFDAY_WRK_RSN_CD=#{offdayWrkRsnCd}
+            <choose>
+               <when test='atendTimeT == ""'>
+                  , ATEND_TIME= NULL
+               </when>
+               <when test='atendTimeD != "" and atendTimeT != ""'>
+                  , ATEND_TIME= CONCAT(#{atendTimeD}, ' ' ,#{atendTimeT})
+               </when>
+               <otherwise></otherwise>
+            </choose>
+            <choose>
+               <when test='leofcTimeT == ""'>
+                  , LEOFC_TIME=NULL
+               </when>
+               <when test='leofcTimeD != "" and leofcTimeT != ""'>
+                  , LEOFC_TIME=CONCAT(#{leofcTimeD},  ' ' ,#{leofcTimeT})
+               </when>
+               <otherwise></otherwise>
+            </choose>
+            , SECUR_BONDU_YN=#{securBonduYn}
+            , RMARK_TEXT=#{rmarkText}
+            , AMNDR_ID=#{amndrId}
+            , MDTT=sysdate()
+         WHERE CHRGR_NO = #{chrgrNo}
+         AND DLALZ_DATE = REPLACE(#{dlalzDate},'-','') 
+   </update>
+   
+   
+   <select id="selectDlalz" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultType="truebon.com.dlm.dla.model.DlalzVO">
+      <![CDATA[
+               SELECT 
+               CONCAT(SUBSTR(C.DLALZ_DATE,1,4),'-',SUBSTR(C.DLALZ_DATE,5,2),'-',SUBSTR(C.DLALZ_DATE,7,2)) AS DLALZ_DATE
+              , C.CHRGR_NO
+              , C.DLALZ_DSTNCT_CD
+              , C.WRK_TYPE_CD
+              , C.WRK_TIME_CD
+              , C.OFFDAY_TYPE_CD
+              , C.HLFDAY_OFFDAY_DSTNCT_CD
+              , C.OFFDAY_WRK_RSN_CD
+              , LEFT(C.ATEND_TIME,10) AS atendTimeD
+              , RIGHT(C.ATEND_TIME,8) AS atendTimeT
+              , LEFT(C.LEOFC_TIME,10) AS leofcTimeD
+              , RIGHT(C.LEOFC_TIME,8) AS leofcTimeT
+              , C.SECUR_BONDU_YN
+              , C.RMARK_TEXT
+              , C.REGSTR_ID
+              , C.RDTT
+              , C.AMNDR_ID
+              , SUBSTRING(C.MDTT,1,10) AS mdtt 
+              , C.CHRGR_NM 
+              , D.CMPNY_NM
+              , tc.CHRGR_NM AS AMNDR_NM
+         FROM (SELECT 
+               a.DLALZ_DATE
+              , a.CHRGR_NO
+              , a.DLALZ_DSTNCT_CD
+              , a.WRK_TYPE_CD
+              , a.WRK_TIME_CD
+              , a.OFFDAY_TYPE_CD
+              , a.HLFDAY_OFFDAY_DSTNCT_CD
+              , a.OFFDAY_WRK_RSN_CD
+              , a.ATEND_TIME
+              , a.LEOFC_TIME
+              , a.SECUR_BONDU_YN
+              , a.RMARK_TEXT
+              , a.REGSTR_ID
+              , a.RDTT
+              , a.AMNDR_ID
+              , a.MDTT 
+              , b.CHRGR_NM 
+              , b.POSIT_CMPNY_NO 
+             FROM TB_DLALZ a 
+             INNER JOIN TB_CHARGER b ON a.CHRGR_NO = b.CHRGR_NO) C 
+             INNER JOIN TB_COMPANY D ON C.POSIT_CMPNY_NO = D.CMPNY_NO
+             LEFT OUTER JOIN TB_USER tu ON tu.USER_ID = C.AMNDR_ID
+             LEFT OUTER JOIN TB_CHARGER tc ON tu.CHRGR_NO = tc.CHRGR_NO  
+            WHERE C.CHRGR_NO = #{chrgrNo}
+            AND DLALZ_DATE = #{dlalzDate}
+         ]]>
+   </select>
+   
+   <select id="selectDlalzList" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultMap="DlalzList">
+         SELECT 
+               C.DLALZ_DATE
+              , C.CHRGR_NO
+              , C.DLALZ_DSTNCT_CD
+              , C.WRK_TYPE_CD
+              , C.WRK_TIME_CD
+              , C.OFFDAY_TYPE_CD
+              , C.HLFDAY_OFFDAY_DSTNCT_CD
+              , C.ATEND_TIME
+              , C.LEOFC_TIME
+              , C.SECUR_BONDU_YN
+              , C.RMARK_TEXT
+              , C.REGSTR_ID
+              , C.RDTT
+              , C.AMNDR_ID
+              , C.MDTT 
+              , C.CHRGR_NM 
+              , C.CHRGR_ROLE_CD 
+              , D.CMPNY_NM
+              , tc.CHRGR_NM AS AMNDR_NM
+         FROM (SELECT 
+               a.DLALZ_DATE
+              , a.CHRGR_NO
+              , a.DLALZ_DSTNCT_CD
+              , a.WRK_TYPE_CD
+              , a.WRK_TIME_CD
+              , a.OFFDAY_TYPE_CD
+              , a.HLFDAY_OFFDAY_DSTNCT_CD
+              , a.ATEND_TIME
+              , a.LEOFC_TIME
+              , a.SECUR_BONDU_YN
+              , a.RMARK_TEXT
+              , a.REGSTR_ID
+              , a.RDTT
+              , a.AMNDR_ID
+              , a.MDTT 
+              , b.CHRGR_NM 
+              , b.CHRGR_ROLE_CD 
+              , b.POSIT_CMPNY_NO 
+             FROM TB_DLALZ a 
+             INNER JOIN TB_CHARGER b ON a.CHRGR_NO = b.CHRGR_NO) C 
+             INNER JOIN TB_COMPANY D ON C.POSIT_CMPNY_NO = D.CMPNY_NO
+             LEFT OUTER JOIN TB_USER tu ON tu.USER_ID = C.AMNDR_ID
+             LEFT OUTER JOIN TB_CHARGER tc ON tu.CHRGR_NO = tc.CHRGR_NO 
+         WHERE 1=1
+         <if test="searchKeyword !=null and searchKeyword !='' and searchKeyword !='showAll'">
+            AND C.CHRGR_NO = #{searchKeyword}
+         </if>
+         <if test="selectedDate !=null and selectedDate !=''">
+            AND C.DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%')
+         </if>
+         <if test="searchKeyword2 !=null and searchKeyword2 !=''">
+            <if test="searchKeyword2 == 1">   AND
+               C.DLALZ_DSTNCT_CD = '1'
+            </if>
+            <if test="searchKeyword2 == 2">   AND
+               (C.DLALZ_DSTNCT_CD = '2' OR C.DLALZ_DSTNCT_CD = '3')
+               AND NOT C.OFFDAY_TYPE_CD = '4'
+            </if>   
+         </if>
+         <if test="searchKeyword3 !=null and searchKeyword3 !=''">
+            AND C.WRK_TYPE_CD = #{searchKeyword3}
+         </if>
+           <if test="searchKeyword5 !=null and searchKeyword5 !=''">
+            AND C.OFFDAY_TYPE_CD = #{searchKeyword5}
+         </if>
+           <if test="searchKeyword6 !=null and searchKeyword6 !=''">
+            AND C.HLFDAY_OFFDAY_DSTNCT_CD = #{searchKeyword6}
+         </if>
+         ORDER BY C.DLALZ_DATE DESC
+         limit #{recordCountPerPage} offset #{firstIndex}   
+   </select>   
+   
+   <select id="selectDlalzListTotCnt" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultType="int">
+         SELECT COUNT(*) totcnt
+         FROM (SELECT 
+               a.DLALZ_DATE
+              , a.CHRGR_NO
+              , a.DLALZ_DSTNCT_CD
+              , a.WRK_TYPE_CD
+              , a.WRK_TIME_CD
+              , a.OFFDAY_TYPE_CD
+              , a.HLFDAY_OFFDAY_DSTNCT_CD
+              , a.ATEND_TIME
+              , a.LEOFC_TIME
+              , a.SECUR_BONDU_YN
+              , a.RMARK_TEXT
+              , a.REGSTR_ID
+              , a.RDTT
+              , a.AMNDR_ID
+              , a.MDTT 
+              , b.CHRGR_NM 
+              , b.CHRGR_ROLE_CD 
+              , b.POSIT_CMPNY_NO 
+             FROM TB_DLALZ a 
+             INNER JOIN TB_CHARGER b ON a.CHRGR_NO = b.CHRGR_NO) C 
+             INNER JOIN TB_COMPANY D ON C.POSIT_CMPNY_NO = D.CMPNY_NO 
+         WHERE 1=1
+         <if test="searchKeyword !=null and searchKeyword !='' and searchKeyword !='showAll'">
+            AND C.CHRGR_NO = #{searchKeyword}
+         </if>
+         <if test="selectedDate !=null and selectedDate !=''">
+            AND C.DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%')
+         </if>
+         <if test="searchKeyword2 !=null and searchKeyword2 !=''">
+            <if test="searchKeyword2 == 1">   AND
+               C.DLALZ_DSTNCT_CD = '1'
+            </if>
+            <if test="searchKeyword2 == 2">   AND
+               (C.DLALZ_DSTNCT_CD = '2' OR C.DLALZ_DSTNCT_CD = '3')
+               AND NOT C.OFFDAY_TYPE_CD = '4'
+            </if>   
+         </if>
+         <if test="searchKeyword3 !=null and searchKeyword3 !=''">
+            AND C.WRK_TYPE_CD = #{searchKeyword3}
+         </if>
+           <if test="searchKeyword5 !=null and searchKeyword5 !=''">
+            AND C.OFFDAY_TYPE_CD = #{searchKeyword5}
+         </if>
+           <if test="searchKeyword6 !=null and searchKeyword6 !=''">
+            AND C.HLFDAY_OFFDAY_DSTNCT_CD = #{searchKeyword6}
+         </if>
+   </select>
+   
+   <select id="selectNotExistChargerList" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultType="truebon.com.sys.chr.model.ChargerVO">
+         SELECT CHRGR_NO 
+               ,CHRGR_NM 
+               ,CHRGR_ROLE_CD
+         FROM TB_CHARGER tc 
+         WHERE CHRGR_DSTNCT_CD = '2' 
+         AND USE_YN = 'Y'
+         AND CHRGR_NM != '관리자'
+         AND NOT EXISTS (
+         SELECT CHRGR_NM 
+         FROM TB_DLALZ td
+         WHERE td.CHRGR_NO = tc.CHRGR_NO
+         AND DLALZ_DATE = REPLACE(#{checkDate},'-',''))
+   </select>
+   
+   <select id="selectNotExistChargerListTotCnt" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultType="int">
+            SELECT COUNT(1) notExistDate
+         FROM TB_CHARGER tc 
+         WHERE CHRGR_DSTNCT_CD = '2' 
+         AND USE_YN = 'Y'
+         AND CHRGR_NM != '관리자'
+         AND NOT EXISTS (
+         SELECT CHRGR_NM 
+         FROM TB_DLALZ td
+         WHERE td.CHRGR_NO = tc.CHRGR_NO
+         AND DLALZ_DATE = REPLACE(#{checkDate},'-',''))
+    </select>
+    
+    <insert id="insertReOffday" parameterType="truebon.com.dlm.dla.model.DlalzVO">
+       INSERT INTO TB_REPLAC_OFFDAY (REPLAC_OFFDAY_DATE,CHRGR_NO, REPLAC_OFFDAY_CNT, REPLAC_OFFDAY_RSN_CD) VALUES(REPLACE(#{dlalzDate},'-',''), #{chrgrNo}, '1', #{offdayWrkRsnCd})
+    </insert>
+    
+    <update id="updateReOffday" parameterType="truebon.com.dlm.dla.model.Dlalz">
+      UPDATE TB_REPLAC_OFFDAY
+         SET REPLAC_OFFDAY_RSN_CD = #{offdayWrkRsnCd}
+      WHERE REPLAC_OFFDAY_DATE = REPLACE(#{dlalzDate},'-','')
+      AND CHRGR_NO = #{chrgrNo}
+    </update>
+    
+    <delete id="deleteReOffday" parameterType="truebon.com.dlm.dla.model.Dlalz">
+       DELETE FROM TB_REPLAC_OFFDAY 
+      WHERE REPLAC_OFFDAY_DATE = REPLACE(#{dlalzDate},'-','')
+      AND CHRGR_NO = #{chrgrNo}
+    </delete>
+    
+</mapper>
+   
+   
+   

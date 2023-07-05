@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SecureMapper">
+	<resultMap type="truebon.com.sys.scu.model.SecureVO" id="SecureList">
+		<result property="inspDate" column="INSP_DATE"/>
+		<result property="securInspLoacatCd" column="SECUR_INSP_LOCAT_CD"/>
+		<result property="inspTime" column="INSP_TIME"/>
+		<result property="isprId" column="ISPR_ID"/>
+		<result property="confrId" column="CONFR_ID"/>
+		<result property="pcPwrSecurInspResltCd" column="PC_PWR_SECUR_INSP_RESLT_CD"/>
+		<result property="etcPwrSecurInspResltCd" column="ETC_PWR_SECUR_INSP_RESLT_CD"/>
+		<result property="paperSecurInspResltCd" column="PAPER_SECUR_INSP_RESLT_CD"/>
+		<result property="frcntlSecurInspResltCd" column="FRCNTL_SECUR_INSP_RESLT_CD"/>
+		<result property="ltoutLckdSecurInspResltCd" column="LTOUT_LCKD_SECUR_INSP_RESLT_CD"/>
+		<result property="regstrId" column="REGSTR_ID"/>
+		<result property="rdtt" column="RDTT"/>
+		<result property="amndrId" column="AMNDR_ID"/>
+		<result property="mdtt" column="MDTT"/>
+		<result property="isprName" column="ISPR_NAME"/>
+		<result property="confrName" column="CONFR_NAME"/>
+		<result property="silc" column="SILC"/>
+		<result property="ppsirc" column="PPSIRC"/>
+		<result property="psirc" column="PSIRC"/>
+		<result property="epsirc" column="EPSIRC"/>
+		<result property="fsirc" column="FSIRC"/>
+		<result property="lsirc" column="LSIRC"/>
+		<result property="rmarkText" column="RMARK_TEXT"/>
+		<result property="userSign" column="CHRGR_SIGN"/>
+	</resultMap>
+	
+	
+	<select id="selectSecureList" parameterType="truebon.com.sys.scu.model.SecureVO" resultMap="SecureList">
+		SELECT
+			CONCAT(SUBSTRING(ts.INSP_DATE, 1, 4), '-', SUBSTRING(ts.INSP_DATE, 5, 2), '-', SUBSTRING(ts.INSP_DATE, 7, 2)) AS INSP_DATE,
+			ts.INSP_TIME,
+			ts.SECUR_INSP_LOCAT_CD,
+			SUBSTRING(tu.USER_SIGN, 27) AS CHRGR_SIGN,
+			tc.CHRGR_NM AS ISPR_NAME,
+			tc2.CHRGR_NM AS CONFR_NAME,
+			tcdc.COMN_CD_NM AS SILC,
+			tcdc2.COMN_CD_NM AS PPSIRC,
+			tcdc3.COMN_CD_NM AS PSIRC,
+			tcdc4.COMN_CD_NM AS EPSIRC,
+			tcdc5.COMN_CD_NM AS FSIRC,
+			tcdc6.COMN_CD_NM AS LSIRC
+		FROM TB_SECURE ts 
+		LEFT OUTER JOIN TB_USER tu ON CONFR_ID = tu.CHRGR_NO
+		LEFT OUTER JOIN TB_CHARGER tc ON ISPR_ID = tc.CHRGR_NO
+		LEFT OUTER JOIN TB_CHARGER tc2 ON CONFR_ID = tc2.CHRGR_NO
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc ON SECUR_INSP_LOCAT_CD = tcdc.COMN_CD AND tcdc.COMN_CD_ID = 'ISM011' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc2 ON PC_PWR_SECUR_INSP_RESLT_CD = tcdc2.COMN_CD AND tcdc2.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc3 ON ETC_PWR_SECUR_INSP_RESLT_CD = tcdc3.COMN_CD AND tcdc3.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc4 ON PAPER_SECUR_INSP_RESLT_CD = tcdc4.COMN_CD AND tcdc4.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc5 ON FRCNTL_SECUR_INSP_RESLT_CD = tcdc5.COMN_CD AND tcdc5.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc6 ON LTOUT_LCKD_SECUR_INSP_RESLT_CD = tcdc6.COMN_CD AND tcdc6.COMN_CD_ID = 'ISM012'
+		WHERE INSP_DATE LIKE CONCAT(#{dateSearch},'%')
+		<if test="inspLocatSearch != null and inspLocatSearch != ''">
+			AND SECUR_INSP_LOCAT_CD = #{inspLocatSearch}
+		</if>
+		ORDER BY ts.INSP_DATE DESC
+	</select>
+
+	<insert id="insertSecure" parameterType="truebon.com.sys.scu.model.SecureVO">
+		<![CDATA[
+			INSERT into TB_SECURE 
+			(INSP_DATE, 
+			SECUR_INSP_LOCAT_CD, 
+			INSP_TIME, 
+			ISPR_ID, 
+			CONFR_ID, 
+			PC_PWR_SECUR_INSP_RESLT_CD, 
+			ETC_PWR_SECUR_INSP_RESLT_CD, 
+			PAPER_SECUR_INSP_RESLT_CD, 
+			FRCNTL_SECUR_INSP_RESLT_CD, 
+			LTOUT_LCKD_SECUR_INSP_RESLT_CD, 
+			REGSTR_ID, 
+			RDTT, 
+			AMNDR_ID, 
+			MDTT,
+			RMARK_TEXT)
+			values 
+			(
+			#{inspDate},
+			#{securInspLoacatCd},
+			#{inspTime},
+			(select CHRGR_NO from TB_CHARGER WHERE CHRGR_NM = #{isprId}),
+			(select CHRGR_NO from TB_CHARGER WHERE CHRGR_NM = #{confrId}),
+			#{pcPwrSecurInspResltCd},
+			#{etcPwrSecurInspResltCd},
+			#{paperSecurInspResltCd},
+			#{frcntlSecurInspResltCd},
+			#{ltoutLckdSecurInspResltCd},
+			#{regstrId},
+			SYSDATE(),
+			#{amndrId},
+			SYSDATE(),
+			#{rmarkText}
+			) 
+		]]>
+	</insert>
+
+	<select id="selectSecure" parameterType="truebon.com.sys.scu.model.SecureVO" resultType="truebon.com.sys.scu.model.SecureVO">
+		<![CDATA[
+		SELECT
+			CONCAT(SUBSTRING(ts.INSP_DATE, 1, 4), '-', SUBSTRING(ts.INSP_DATE, 5, 2), '-', SUBSTRING(ts.INSP_DATE, 7, 2)) AS INSP_DATE,
+			ts.SECUR_INSP_LOCAT_CD AS securInspLoacatCd,
+			ts.INSP_TIME,
+			ts.ISPR_ID,
+			ts.CONFR_ID,
+			ts.RMARK_TEXT,
+			ts.PC_PWR_SECUR_INSP_RESLT_CD,
+			ts.ETC_PWR_SECUR_INSP_RESLT_CD,
+			ts.PAPER_SECUR_INSP_RESLT_CD,
+			ts.FRCNTL_SECUR_INSP_RESLT_CD,
+			ts.LTOUT_LCKD_SECUR_INSP_RESLT_CD,
+			tc.CHRGR_NM AS ISPR_NAME,
+			tc2.CHRGR_NM AS CONFR_NAME,
+			tu.USER_SIGN AS userSign,
+			ts.AMNDR_ID AS amndrId,
+			SUBSTRING(ts.MDTT,1,10) AS mdtt,
+			IFNULL(tc3.CHRGR_NM,'guest') AS AMNDR_NM
+		FROM TB_SECURE ts 
+		LEFT OUTER JOIN TB_USER tu ON CONFR_ID = tu.CHRGR_NO
+		LEFT OUTER JOIN TB_CHARGER tc ON ISPR_ID = tc.CHRGR_NO
+		LEFT OUTER JOIN TB_CHARGER tc2 ON CONFR_ID = tc2.CHRGR_NO
+		LEFT OUTER JOIN TB_USER tu2 ON tu2.USER_ID = ts.AMNDR_ID
+		LEFT OUTER JOIN TB_CHARGER tc3 ON tu2.CHRGR_NO = tc3.CHRGR_NO
+		WHERE INSP_DATE = REPLACE(#{inspDate},'-','') AND SECUR_INSP_LOCAT_CD = ${securInspLoacatCd}
+		]]>
+	</select>
+	
+	<delete id="deleteSecure" parameterType="truebon.com.sys.scu.model.Secure">
+		<![CDATA[
+		DELETE FROM TB_SECURE WHERE INSP_DATE = #{inspDate} AND SECUR_INSP_LOCAT_CD = #{securInspLoacatCd}
+		]]>
+	</delete>
+	
+	<update id="updateSecure"  parameterType="truebon.com.sys.scu.model.SecureVO">
+		<![CDATA[
+		UPDATE TB_SECURE SET
+		INSP_TIME = #{inspTime},
+		RMARK_TEXT = #{rmarkText},
+		PC_PWR_SECUR_INSP_RESLT_CD = #{pcPwrSecurInspResltCd},
+		ETC_PWR_SECUR_INSP_RESLT_CD = #{etcPwrSecurInspResltCd},
+		PAPER_SECUR_INSP_RESLT_CD = #{paperSecurInspResltCd},
+		FRCNTL_SECUR_INSP_RESLT_CD = #{frcntlSecurInspResltCd},
+		LTOUT_LCKD_SECUR_INSP_RESLT_CD = #{ltoutLckdSecurInspResltCd},
+		ISPR_ID = (select CHRGR_NO from TB_CHARGER WHERE CHRGR_NM = #{isprName}),
+		AMNDR_ID=#{amndrId},
+		MDTT=sysdate()
+		WHERE INSP_DATE = #{inspDate} AND SECUR_INSP_LOCAT_CD = #{securInspLoacatCd}
+		]]>
+	</update>
+	
+	<update id="updateConfrSign"  parameterType="truebon.com.sys.scu.model.SecureVO">
+		UPDATE TB_SECURE SET
+		CONFR_ID = #{confrId},
+		AMNDR_ID=#{amndrId}, 
+		MDTT=sysdate()
+		WHERE INSP_DATE = REPLACE(#{inspDate},'-','') AND SECUR_INSP_LOCAT_CD = ${securInspLoacatCd}
+	</update>
+	
+	<select id="selectSecureCnt" parameterType="truebon.com.sys.scu.model.SecureVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM TB_SECURE ts 
+		LEFT OUTER JOIN TB_USER tu ON CONFR_ID = tu.CHRGR_NO
+		LEFT OUTER JOIN TB_CHARGER tc ON ISPR_ID = tc.CHRGR_NO
+		LEFT OUTER JOIN TB_CHARGER tc2 ON CONFR_ID = tc2.CHRGR_NO
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc ON SECUR_INSP_LOCAT_CD = tcdc.COMN_CD AND tcdc.COMN_CD_ID = 'ISM011' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc2 ON PC_PWR_SECUR_INSP_RESLT_CD = tcdc2.COMN_CD AND tcdc2.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc3 ON ETC_PWR_SECUR_INSP_RESLT_CD = tcdc3.COMN_CD AND tcdc3.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc4 ON PAPER_SECUR_INSP_RESLT_CD = tcdc4.COMN_CD AND tcdc4.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc5 ON FRCNTL_SECUR_INSP_RESLT_CD = tcdc5.COMN_CD AND tcdc5.COMN_CD_ID = 'ISM012' 
+		LEFT OUTER JOIN TB_COMN_DETL_CD tcdc6 ON LTOUT_LCKD_SECUR_INSP_RESLT_CD = tcdc6.COMN_CD AND tcdc6.COMN_CD_ID = 'ISM012'
+		WHERE 1=1 
+		AND ts.INSP_DATE = REPLACE(#{inspDate},'-','') AND ts.SECUR_INSP_LOCAT_CD = ${securInspLoacatCd}
+		
+	</select>
+	
+</mapper>
+

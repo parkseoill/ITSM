@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ComnCdNewMapper">
+	
+	<resultMap id="ComnCdNewList" type="truebon.com.opm.com.model.ComnCdNewVO">
+		<result property="newComnCd" column="NEW_COMN_CD" />
+		<result property="comnCdNm" column="COMN_CD_NM" />
+		<result property="comnCdDc" column="COMN_CD_DC" />
+		<result property="comnCdLvl" column="COMN_CD_LVL" />
+		<result property="useYn" column="USE_YN" />
+		<result property="sortOrde" column="SORT_ORDE" />
+		<result property="upprNewComnCd" column="UPPR_NEW_COMN_CD" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	
+	
+	<select id="selectComnCdNew" parameterType="truebon.com.opm.com.model.ComnCdNewVO" resultType="truebon.com.opm.com.model.ComnCdNewVO">
+		<![CDATA[
+			SELECT
+				NEW_COMN_CD
+				, COMN_CD_NM
+				, COMN_CD_DC
+				, COMN_CD_LVL
+				, USE_YN
+				, SORT_ORDE
+				, UPPR_NEW_COMN_CD
+				, REGSTR_ID
+				, RDTT
+				, AMNDR_ID
+				, MDTT
+			FROM TB_COMN_CD_NEW
+			WHERE UPPR_NEW_COMN_CD = #{upprNewComnCd}
+			]]>
+	</select>
+	
+</mapper>
