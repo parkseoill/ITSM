@@ -203,7 +203,7 @@ function closePop() {
 
 
 //엑셀로 내보내기
-function fnExcelReport(id, title) {
+function fnExcelReport(id, id2, title) {
     var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
     tab_text = tab_text + '<head><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
     tab_text = tab_text + '<xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
@@ -211,10 +211,17 @@ function fnExcelReport(id, title) {
     tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>';
     tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>';
     tab_text = tab_text + "<table border='1px'>";
+    
     var exportTable = $('#' + id).clone();
     exportTable.find('input').each(function (index, elem) { $(elem).remove(); });
+    
+    var exportTable2 = $('#' + id2).clone();
+    exportTable.find('input').each(function (index, elem) { $(elem).remove(); });
+    
     tab_text = tab_text + exportTable.html();
+    tab_text = tab_text + exportTable2.html();
     tab_text = tab_text + '</table></body></html>';
+    
     var data_type = 'data:application/vnd.ms-excel';
     var ua = window.navigator.userAgent;
     var msie = ua.indexOf("MSIE ");
@@ -286,7 +293,7 @@ $(function() {
          <input type="radio" class="pln" id="pln" name="plnresselect" value="계획" onclick="javascript:WorkScheduleMng()">계획</input>       
        </li>
          <li style="padding-right:4%;">
-            <button style="float: right;" type="button" onclick="fnExcelReport('table','${month}월 근무편성표');">Excel 다운로드</button>
+            <button style="float: right;" type="button" onclick="fnExcelReport('table','rmark', '${month}월 근무편성표-현황');">Excel 다운로드</button>
          </li>
       </ul>
    </div> 		 			 
@@ -414,20 +421,20 @@ $(function() {
        
            <%-- 특이사항 --%>      
            <div><br>
-             <table class="rmark">
-                 <tr>
-                    <th class="rmark_name">성명</th>
-                    <th class="rmark_rmark">특이사항</th>
-                 </tr>
-                  <c:forEach var="result" items="${rmarkList}" varStatus="status"   > 
-                  <c:if test="${result.sumOffdayRmark != null && result.chrgrNm !='관리자'}">
-                    <tr>                   
-                       <td><c:out value="${result.chrgrNm}" /></td>
-                       <td class="rmark_rmark_td"><c:out value="${result.sumOffdayRmark}" /></td>
-                    </tr>
-                  </c:if>
-                  </c:forEach>  
-              </table><br>
+             <table class="rmark" id="rmark">
+		        <tr>
+	               <th class="rmark_name">성명</th>
+	               <th class="rmark_rmark" colspan="31">특이사항</th>
+	            </tr>
+	            <c:forEach var="result" items="${rmarkList}" varStatus="status"   > 
+	               <c:if test="${result.sumPlnOffdayRmark != null && result.chrgrNm !='관리자'}">
+	                  <tr>                   
+	                     <td><c:out value="${result.chrgrNm}" /></td>
+	                     <td class="rmark_rmark_td" colspan="31"><c:out value="${result.sumPlnOffdayRmark}" /></td>
+	                  </tr>
+	               </c:if>                   
+	            </c:forEach>  
+	         </table> <br>
            </div> <br>
         </div>
       </c:if> 

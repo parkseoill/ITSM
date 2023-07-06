@@ -107,7 +107,7 @@ public class WorkScheduleController {
           }     
  
          LocalDate currentdate = LocalDate.now();
-         String nowDate =(currentdate.format(DateTimeFormatter.ofPattern("yyyy-MM")));
+         String nowDate =(currentdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
          
          model.addAttribute("nowDate", nowDate); 
          model.addAttribute("emptyData", emptyData); 
