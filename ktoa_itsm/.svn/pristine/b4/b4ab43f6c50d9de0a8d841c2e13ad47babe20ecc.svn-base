@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="SvclifeCodeMapper">
+   <resultMap id="SvclifeCodeList" type="truebon.com.crm.slc.model.SvclifeCodeMngVO">
+   		<result property="svcLifeId" column="SVCLIFE_ID" />
+   		<result property="hwType" column="HW_TYPE" />
+   		<result property="hwTypeDtl" column="HW_TYPE_DTL" />
+   		<result property="pblprSrvcPdctNm" column="PBLPR_SRVC_PDCT_NM" />
+   		<result property="textYearCo" column="TEXT_YEAR_CO" />
+   		<result property="rmarkText" column="RMARK_TEXT" />
+   		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+   </resultMap>
+   
+	 <select id="selectSvclifeCodeList" parameterType="truebon.com.crm.slc.model.SvclifeCodeMngVO" resultMap="SvclifeCodeList">
+	  SELECT 
+           tdy.SVCLIFE_ID
+           ,tccn1.COMN_CD_NM AS HW_TYPE
+           ,tccn2.COMN_CD_NM AS HW_TYPE_DTL
+           ,tdy.PBLPR_SRVC_PDCT_NM 
+           ,tdy.TEXT_YEAR_CO
+           ,tdy.RMARK_TEXT  
+       FROM TB_DUR_YEAR tdy 
+           LEFT JOIN TB_COMN_CD_NEW AS tccn1 ON tdy.HW_TYPE_CD = tccn1.NEW_COMN_CD
+           LEFT JOIN TB_COMN_CD_NEW AS tccn2 ON tdy.HW_TYPE_DTL_CD = tccn2.NEW_COMN_CD
+       WHERE 1=1
+       <if test="searchKeyword1 !=null and searchKeyword1 !=''">
+				AND tdy.HW_TYPE_CD = #{searchKeyword1}
+	   </if>
+	   ORDER BY tdy.SVCLIFE_ID DESC 
+	   limit #{recordCountPerPage} offset #{firstIndex} 
+	 </select>
+	 
+	 
+	 <select id="selectSvclifeCode" parameterType="truebon.com.crm.slc.model.SvclifeCodeMngVO" resultType="truebon.com.crm.slc.model.SvclifeCodeMngVO">
+	 SELECT 
+           tdy.SVCLIFE_ID
+           ,tccn1.COMN_CD_NM AS HW_TYPE
+           ,tccn2.COMN_CD_NM AS HW_TYPE_DTL
+           ,tdy.PBLPR_SRVC_PDCT_NM 
+           ,tdy.TEXT_YEAR_CO
+           ,tdy.RMARK_TEXT  
+       FROM TB_DUR_YEAR tdy 
+           LEFT JOIN TB_COMN_CD_NEW AS tccn1 ON tdy.HW_TYPE_CD = tccn1.NEW_COMN_CD
+           LEFT JOIN TB_COMN_CD_NEW AS tccn2 ON tdy.HW_TYPE_DTL_CD = tccn2.NEW_COMN_CD
+       WHERE tdy.SVCLIFE_ID = #{svcLifeId}
+	 </select>
+	 
+	 
+	 <select id="selectSvclifeCodeListTotCnt" parameterType="truebon.com.crm.slc.model.SvclifeCodeMngVO" resultType="int">
+	 SELECT COUNT(*) totcnt
+	 FROM TB_DUR_YEAR tdy 
+	 WHERE 1=1
+	 <if test="searchKeyword1 !=null and searchKeyword1 !=''">
+				AND tdy.HW_TYPE_CD = #{searchKeyword1}
+	 </if>
+	 </select>
+	 
+	 
+	 <update id="updateSvclifeCode" parameterType="truebon.com.crm.slc.model.SvclifeCodeMngVO">
+	 <![CDATA[
+	 UPDATE TB_DUR_YEAR
+	 SET
+	      HW_TYPE_CD = #{hwType}
+		, HW_TYPE_DTL_CD = #{hwTypeDtl}
+		, PBLPR_SRVC_PDCT_NM = #{pblprSrvcPdctNm}
+		, TEXT_YEAR_CO = #{textYearCo}
+		, RMARK_TEXT = #{rmarkText}
+		, AMNDR_ID= #{amndrId}
+		, MDTT=sysdate()
+	 WHERE SVCLIFE_ID = #{svcLifeId}
+	 ]]>
+	 </update>
+	 
+	 
+	 <insert id="registSvclifeCode" parameterType="truebon.com.crm.slc.model.SvclifeCodeMngVO">
+	 <![CDATA[
+	 INSERT INTO TB_DUR_YEAR
+	 (
+	     SVCLIFE_ID
+	    ,HW_TYPE_CD
+	    ,HW_TYPE_DTL_CD
+	    ,PBLPR_SRVC_PDCT_NM
+	    ,TEXT_YEAR_CO
+	    ,RMARK_TEXT
+	    ,REGSTR_ID
+		,RDTT
+		,AMNDR_ID
+		,MDTT 
+	 )
+	 VALUES (
+	     #{svcLifeId} 
+	    ,#{hwType}
+	    ,#{hwTypeDtl}
+	    ,#{pblprSrvcPdctNm}
+	    ,#{textYearCo}
+	    ,#{rmarkText}
+	    ,#{regstrId}
+		,sysdate() 
+		,#{amndrId}
+		,sysdate() 
+	 )
+	 ]]>
+	 </insert>
+	 
+</mapper>

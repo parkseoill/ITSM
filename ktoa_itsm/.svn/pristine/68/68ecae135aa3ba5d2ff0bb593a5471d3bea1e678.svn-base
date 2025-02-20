@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+ /**
+  * @Class Name : GrdMngList.jsp
+  * @Description : 장애등급관리 조회 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.10.26   이정하               최초 생성
+  *
+  *  @author 이정하
+  *  @since 2023.10.26
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>장애등급관리</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+
+<script type="text/javaScript">
+$(document).ready(function() {
+	$('td').click(function (e) {
+		e.preventDefault();
+	});
+});
+
+
+/**** 테이블 선택 함수 */
+function selectItem(failrInfldgCd, failrEmgdgrCd) {
+    var pagetitle = $(this).attr("title");
+    var page = "<c:url value='/fai/grd/GrdUpdt.do'/>?failrInfldgCd=" + failrInfldgCd + "&failrEmgdgrCd=" + failrEmgdgrCd;
+    var $dialog = $('<div style="overflow:hidden;padding: 0px 0px 0px 0px;"></div>')
+    .html('<iframe style="border: 0px; " src="' + page + '" width="100%" height="100%"></iframe>')
+    .dialog({
+    	autoOpen: false,
+        modal: true,
+        width: 500,
+        height: 400,
+        title: pagetitle,
+        resizable: false
+	});
+	$dialog.dialog('open');
+}
+
+</script>
+<c:if test="${!empty resultMsg}"><script>alert("${resultMsg}");</script></c:if>
+
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+
+<div class="board">
+	<h1>장애등급관리</h1>
+	<form name="grdMngForm" id="grdMngForm" action ="<c:url value='/fai/grd/GrdMngList.do' />" method="post">
+<%-- 	<input type="hidden" name=failrInfldgCd value="<c:out value='${searchVO.failrInfldgCd}'/>">
+	<input type="hidden" name=failrEmgdgrCd value="<c:out value='${searchVO.failrEmgdgrCd}'/>">
+	 --%>
+	<div class="search_box" style="height: 20px;">
+	
+	</div>
+	<p style="margin-top: 10px;">장애 영향도와 긴급도에 따른 등급을 산출합니다. (각 항목 클릭 시 수정 가능) </p>
+	<table class="board_list" title="등급수정">
+		<colgroup>
+			<col style="width: 10%" />
+			<col style="width: 15%" />
+			<col style="width: 15%" />
+			<col style="width: 15%" />
+			<col style="width: 45%" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th scope="col">영향도 / 긴급도</th>
+				<th scope="col">상</th>
+				<th scope="col">중</th>
+				<th scope="col">하</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach var="result" items="${resultList}" varStatus="status">
+			<tr>
+				<td><c:out value="${result.failrInfldgNm}" /></td>
+				<td title="등급수정" onclick="selectItem('<c:out value="${result.failrInfldgCd}"/>', '<c:out value="FLR0401"/>'); return false;"><c:out value="${result.g1}" /></td>
+				<td title="등급수정" onclick="selectItem('<c:out value="${result.failrInfldgCd}"/>', '<c:out value="FLR0402"/>'); return false;"><c:out value="${result.g2}" /></td>
+				<td title="등급수정" onclick="selectItem('<c:out value="${result.failrInfldgCd}"/>', '<c:out value="FLR0403"/>'); return false;"><c:out value="${result.g3}" /></td>
+				<td></td>
+			</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+	</form>
+</div>
+</body>
+</html>

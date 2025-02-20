@@ -1,0 +1,177 @@
+package truebon.com.dlm.rep.model;
+
+import java.io.Serializable;
+
+@SuppressWarnings("serial")
+public class ReplaceVO implements Serializable{
+   
+    /** 검색 날짜  */
+    private String selectedDate = "";
+   
+    /** 대휴 날짜  */
+    private String replacOffdayDate; 
+   
+    /** 대휴 로그인 담당자 번호  */
+    private String loginchrgrNo;
+   
+    /** NO  */
+    private String chrgrNo;
+   
+    /** 이름  */
+    private String chrgrNm;
+   
+    /** 대휴 수  */
+    private String replacOffdayCnt;
+   
+    /** 대휴 사유  */
+    private String replacOffdayRsnCd;
+   
+    /** 대휴 날짜  */
+    private String dlalzDate;
+   
+    /** 대휴 입력수 */
+    private String insertCnt;
+   
+    /** 대휴 입력 선택 날짜 */
+    private String selectedDate2 = "";
+    
+    /** 대휴 발생 합계  */
+    private float repSum;
+    
+    /** 대휴 사용 합계  */
+    private float useSum;
+    
+    /** 개인별 대휴 발생 합계  */
+    private String indvRepSum;
+    
+    /** 개인별 대휴 사용 합계  */
+    private String indvUseSum;
+   
+    /** 대휴 사용 수  */
+    private String useRep;
+
+    
+    
+	public String getSelectedDate() {
+		return selectedDate;
+	}
+
+	public void setSelectedDate(String selectedDate) {
+		this.selectedDate = selectedDate;
+	}
+
+	public String getReplacOffdayDate() {
+		return replacOffdayDate;
+	}
+
+	public void setReplacOffdayDate(String replacOffdayDate) {
+		this.replacOffdayDate = replacOffdayDate;
+	}
+
+	public String getLoginchrgrNo() {
+		return loginchrgrNo;
+	}
+
+	public void setLoginchrgrNo(String loginchrgrNo) {
+		this.loginchrgrNo = loginchrgrNo;
+	}
+
+	public String getChrgrNo() {
+		return chrgrNo;
+	}
+
+	public void setChrgrNo(String chrgrNo) {
+		this.chrgrNo = chrgrNo;
+	}
+
+	public String getChrgrNm() {
+		return chrgrNm;
+	}
+
+	public void setChrgrNm(String chrgrNm) {
+		this.chrgrNm = chrgrNm;
+	}
+
+	public String getReplacOffdayCnt() {
+		return replacOffdayCnt;
+	}
+
+	public void setReplacOffdayCnt(String replacOffdayCnt) {
+		this.replacOffdayCnt = replacOffdayCnt;
+	}
+
+	public String getReplacOffdayRsnCd() {
+		return replacOffdayRsnCd;
+	}
+
+	public void setReplacOffdayRsnCd(String replacOffdayRsnCd) {
+		this.replacOffdayRsnCd = replacOffdayRsnCd;
+	}
+
+	public String getDlalzDate() {
+		return dlalzDate;
+	}
+
+	public void setDlalzDate(String dlalzDate) {
+		this.dlalzDate = dlalzDate;
+	}
+
+	public String getInsertCnt() {
+		return insertCnt;
+	}
+
+	public void setInsertCnt(String insertCnt) {
+		this.insertCnt = insertCnt;
+	}
+
+	public String getSelectedDate2() {
+		return selectedDate2;
+	}
+
+	public void setSelectedDate2(String selectedDate2) {
+		this.selectedDate2 = selectedDate2;
+	}
+
+	public float getRepSum() {
+		return repSum;
+	}
+
+	public void setRepSum(float repSum) {
+		this.repSum = repSum;
+	}
+
+	public float getUseSum() {
+		return useSum;
+	}
+
+	public void setUseSum(float useSum) {
+		this.useSum = useSum;
+	}
+
+	public String getIndvRepSum() {
+		return indvRepSum;
+	}
+
+	public void setIndvRepSum(String indvRepSum) {
+		this.indvRepSum = indvRepSum;
+	}
+
+	public String getIndvUseSum() {
+		return indvUseSum;
+	}
+
+	public void setIndvUseSum(String indvUseSum) {
+		this.indvUseSum = indvUseSum;
+	}
+
+	public String getUseRep() {
+		return useRep;
+	}
+
+	public void setUseRep(String useRep) {
+		this.useRep = useRep;
+	}
+
+
+}
+   

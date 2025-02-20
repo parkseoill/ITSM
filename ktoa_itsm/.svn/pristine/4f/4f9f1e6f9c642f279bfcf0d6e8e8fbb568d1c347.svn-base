@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="DlalzQRMapper">
+	
+
+	<resultMap id="DlalzList" type="truebon.com.dlm.dla.model.DlalzVO">
+		<result property="dlalzDate" column="DLALZ_DATE" />
+		<result property="chrgrNo" column="CHRGR_NO" />
+		<result property="dlalzDstnctCd" column="DLALZ_DSTNCT_CD" />
+		<result property="wrkTypeCd" column="WRK_TYPE_CD" />
+		<result property="offdayTypeCd" column="OFFDAY_TYPE_CD" />
+		<result property="hlfdayOffdayDstnctCd" column="HLFDAY_OFFDAY_DSTNCT_CD" />
+		<result property="atendTime" column="ATEND_TIME" />
+		<result property="leofcTime" column="LEOFC_TIME" />
+		<result property="securBonduYn" column="SECUR_BONDU_YN" />
+		<result property="rmarkText" column="RMARK_TEXT" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	
+	<update id="updateDlalzQR" parameterType="truebon.com.dlm.dla.model.Dlalz">
+		UPDATE TB_DLALZ
+		SET DLALZ_DSTNCT_CD=#{dlalzDstnctCd}
+			,AMNDR_ID=#{amndrId}
+		<if test="wrkTypeCd != null and wrkTypeCd != ''">
+			, WRK_TYPE_CD=#{wrkTypeCd}
+		</if>
+		<if test="wrkTimeCd != null and wrkTimeCd != ''">
+			, WRK_TIME_CD=#{wrkTimeCd}
+		</if>
+		<if test="offdayTypeCd != ''">
+			, OFFDAY_TYPE_CD=#{offdayTypeCd}
+		</if>
+		<if test="hlfdayOffdayDstnctCd != null and hlfdayOffdayDstnctCd != ''">
+			, HLFDAY_OFFDAY_DSTNCT_CD=#{hlfdayOffdayDstnctCd}
+		</if>
+		<if test="atendTime != null and atendTime != ''">
+			, ATEND_TIME=#{atendTime}
+		</if>
+		<if test="leofcTime != null and leofcTime != ''">
+			, LEOFC_TIME=#{leofcTime}
+		</if>
+		<if test="securBonduYn != null and securBonduYn != ''">
+			, SECUR_BONDU_YN=#{securBonduYn}
+		</if>
+		<if test="rmarkText != null and rmarkText != ''">
+			, RMARK_TEXT=#{rmarkText}
+		</if>
+		WHERE CHRGR_NO = #{chrgrNo}
+			AND DLALZ_DATE = DATE_FORMAT(#{dlalzDate}, '%Y%m%d')
+	</update>
+	
+	
+	<select id="selectDlalzQR" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultType="truebon.com.dlm.dla.model.DlalzVO">
+		<![CDATA[
+			SELECT 
+				  a.DLALZ_DATE
+				  , a.CHRGR_NO
+				  , a.DLALZ_DSTNCT_CD
+				  , a.WRK_TYPE_CD
+				  , a.OFFDAY_TYPE_CD
+				  , a.HLFDAY_OFFDAY_DSTNCT_CD
+				  , a.ATEND_TIME
+				  , a.LEOFC_TIME
+				  , a.SECUR_BONDU_YN
+				  , a.RMARK_TEXT
+				  , a.REGSTR_ID
+				  , a.RDTT
+				  , a.AMNDR_ID
+				  , a.MDTT 
+				  , b.CHRGR_NM 
+				  , b.CHRGR_ROLE_CD
+				 FROM TB_DLALZ a 
+				 INNER JOIN TB_CHARGER b ON a.CHRGR_NO = b.CHRGR_NO
+			WHERE a.CHRGR_NO = #{chrgrNo}
+				AND a.DLALZ_DATE = DATE_FORMAT(#{dlalzDate}, '%Y%m%d')
+			]]>
+	</select>
+	
+	<select id="selectDlalzQRList" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultMap="DlalzList">
+			SELECT 
+				  DATE_FORMAT(a.DLALZ_DATE, '%Y-%m-%d') AS DLALZ_DATE
+				  , a.CHRGR_NO
+				  , a.DLALZ_DSTNCT_CD
+				  , a.WRK_TYPE_CD
+				  , a.OFFDAY_TYPE_CD
+				  , a.HLFDAY_OFFDAY_DSTNCT_CD
+				  , DATE_FORMAT(a.ATEND_TIME, '%Y-%m-%d %H:%i:%s') AS ATEND_TIME
+				  , DATE_FORMAT(a.LEOFC_TIME, '%Y-%m-%d %H:%i:%s') AS LEOFC_TIME
+				  , IF (a.ATEND_TIME IS NOT NULL, '출근', '') AS ATEND_TIME_YN
+				  , IF (a.LEOFC_TIME IS NOT NULL, '퇴근', '') AS LEOFC_TIME_YN
+				  , a.SECUR_BONDU_YN
+				  , a.RMARK_TEXT
+				  , a.REGSTR_ID
+				  , a.RDTT
+				  , a.AMNDR_ID
+				  , a.MDTT
+				  , b.CHRGR_NM
+				  , c.CMPNY_NM
+				  , b.CHRGR_ROLE_CD
+				 FROM TB_DLALZ a 
+				 INNER JOIN TB_CHARGER b ON a.CHRGR_NO = b.CHRGR_NO
+				 INNER JOIN TB_COMPANY c ON b.POSIT_CMPNY_NO = c.CMPNY_NO
+			WHERE 1=1
+			<if test="dlalzDate != null and dlalzDate != ''">
+				AND	a.DLALZ_DATE = DATE_FORMAT(#{dlalzDate}, '%Y%m%d')
+        	</if>
+        	<if test="atLeGubun == null or atLeGubun == '' or atLeGubun == 'AT'">
+        		ORDER BY (CASE WHEN a.ATEND_TIME IS NULL THEN 2 WHEN a.ATEND_TIME = '0000-00-00' THEN 1 ELSE 0 END), a.ATEND_TIME, b.CHRGR_NM
+        	</if>
+        	<if test="atLeGubun == 'LE'">
+        		ORDER BY (CASE WHEN a.LEOFC_TIME IS NULL THEN 2 WHEN a.LEOFC_TIME = '0000-00-00' THEN 1 ELSE 0 END), a.LEOFC_TIME, b.CHRGR_NM
+        	</if>
+	</select>	
+	
+	<select id="selectDlalzQRListTotCnt" parameterType="truebon.com.dlm.dla.model.DlalzVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_DLALZ a
+				 INNER JOIN TB_CHARGER b ON a.CHRGR_NO = b.CHRGR_NO
+				 INNER JOIN TB_COMPANY c ON b.POSIT_CMPNY_NO = c.CMPNY_NO
+			WHERE 1=1
+			<if test="dlalzDate != null and dlalzDate != ''">
+				AND	a.DLALZ_DATE = DATE_FORMAT(#{dlalzDate}, '%Y%m%d')
+        	</if>
+	</select>
+	
+</mapper>
+	
+	
+	

@@ -1,0 +1,236 @@
+package truebon.com.dlm.rep.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.com.cmm.ComDefaultCodeVO;
+import egovframework.com.cmm.EgovMessageSource;
+import egovframework.com.cmm.service.EgovCmmUseService;
+import truebon.com.dlm.rep.model.ReplaceVO;
+import truebon.com.dlm.rep.service.ReplaceService;
+
+@Controller
+public class ReplaceController {
+
+	/* Validator */
+	@Autowired
+	private DefaultBeanValidator beanValidator;
+
+	/** EgovMessageSource */
+	@Resource(name = "egovMessageSource")
+	EgovMessageSource egovMessageSource;
+
+	@Resource(name = "ReplaceService")
+	private ReplaceService replaceService;
+
+	/** 공통코드 Service */
+	@Resource(name = "EgovCmmUseService")
+	private EgovCmmUseService cmmUseService;
+	
+	/**
+	 * 대휴 목록 조회
+	 */
+
+	@RequestMapping(value = "/dlm/rep/ReplaceOffdayMng.do")
+	public String ReplaceOffdayMng(@ModelAttribute("searchVO") ReplaceVO searchVO, ModelMap model) throws Exception {
+		
+		List<ReplaceVO> replaceList = replaceService.selectReplaceList(searchVO);        
+
+		float totRep = 0;
+		float totUseRep = 0;
+		float totRemainingRep = 0;
+		 
+		for(int i = 0; i < replaceList.size(); i++) {
+			totRep += replaceList.get(i).getRepSum();
+			totUseRep += replaceList.get(i).getUseRepSum();
+			totRemainingRep += replaceList.get(i).getRemainingRep();
+		}
+		
+		model.addAttribute("totRep", totRep);
+		model.addAttribute("totUseRep", totUseRep);
+		model.addAttribute("totRemainingRep", totRemainingRep);	
+		model.addAttribute("replaceList", replaceList);
+		model.addAttribute("searchVO", searchVO);
+
+		return "/truebon/com/dlm/rep/ReplaceOffdayMng";
+
+	}
+	
+	/**
+	 * 대휴 상세 목록 조회
+	 * @param replaceVO   
+	 * @param model
+	 * @param status
+	 * @return 
+	 * @exception Exception
+	 */
+	@RequestMapping(value="/dlm/rep/ReplaceOffdayList.do")
+	public ModelAndView ReplaceOffdayList(@ModelAttribute("replaceVO") ReplaceVO replaceVO, ModelMap model, @RequestParam("selectNm") String selectNm, @RequestParam("selectedDate") String selectedDate) throws Exception {
+		ModelAndView mav = new ModelAndView("jsonView");
+		replaceVO.setSelectNm(selectNm);
+		replaceVO.setSelectedDate(selectedDate);
+        List<ReplaceVO> replaceList = replaceService.selectDetailReplaceList(replaceVO);
+        mav.addObject("replaceList", replaceList);
+        return mav;
+	}
+	
+	/**
+	 * 대휴 사용 상세 목록 조회
+	 * @param replaceVO   
+	 * @param model
+	 * @param status
+	 * @return 
+	 * @exception Exception
+	 */
+	@RequestMapping(value="/dlm/rep/ReplaceOffdayUseList.do")
+	public ModelAndView ReplaceOffdayUseList(@ModelAttribute("replaceVO") ReplaceVO replaceVO, ModelMap model, @RequestParam("selectNm") String selectNm, @RequestParam("selectedDate") String selectedDate) throws Exception {
+		ModelAndView mav = new ModelAndView("jsonView");
+		replaceVO.setSelectNm(selectNm);
+		replaceVO.setSelectedDate(selectedDate);
+        List<ReplaceVO> replaceUseList = replaceService.selectDetailReplaceUseList(replaceVO);
+        mav.addObject("replaceUseList", replaceUseList);
+        
+        for(int i = 0; i < replaceUseList.size(); i++) {
+        	System.out.println(replaceUseList.get(i).getDlalzDate());
+        	System.out.println(replaceUseList.get(i).getUseRep());
+        }
+        return mav;
+	}
+	
+
+	/**
+	 * 대휴 등록화면
+	 * 
+	 * @param replaceVO
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/dlm/rep/RepalceOffdayRegist.do")
+	public String RepalceOffdayRegist(@ModelAttribute("replaceVO") ReplaceVO replaceVO, @ModelAttribute("searchVO") ReplaceVO searchVO, Model model) throws Exception {
+
+		// 휴일근무사유코드
+		ComDefaultCodeVO vo = new ComDefaultCodeVO();
+		vo.setComnCdId("ISM017");
+		List<?> offdayWrkRsnCdList = cmmUseService.selectCmmCodeDetail(vo);
+		List<ReplaceVO> chrgrNameList = replaceService.selectChrgrName(replaceVO);
+		List<ReplaceVO> offdayWrkList = replaceService.selectOffdayWrk(replaceVO);
+
+		model.addAttribute("chrgrNameList", chrgrNameList);
+		model.addAttribute("offdayWrkList", offdayWrkList);
+		model.addAttribute("offdayWrkRsnCdList", offdayWrkRsnCdList);
+		model.addAttribute("searchVO", searchVO);
+		
+		return "/truebon/com/dlm/rep/ReplaceOffdayRegist";
+	}
+
+	/**
+	 * 일반 대휴 등록
+	 */
+	@RequestMapping(value = "/dlm/rep/ReplaceOffdayInsert.do")
+	public String ReplaceOffdayInsert(@ModelAttribute("replaceVO") ReplaceVO replaceVO, ModelMap model,
+			@RequestParam List<String> chk, BindingResult bindingResult) throws Exception {
+
+		String sLocationUrl = "";
+		String resultMsg = "";
+		String selectedDate2 = "";
+		
+		selectedDate2 = replaceVO.getSelectedDate2().replace("-", "");
+		
+		// 유효성 검사
+		beanValidator.validate(replaceVO, bindingResult);
+		if (bindingResult.hasErrors()) {
+			sLocationUrl = "/truebon/com/dlm/rep/RepalceOffdayRegist";
+			return sLocationUrl;
+		} else {
+			
+			for (String insertchkname : chk) {
+				replaceVO.setSelectedDate(selectedDate2);
+				replaceVO.setSelectNm(insertchkname);
+				
+				List<ReplaceVO> replaceList = replaceService.selectDetailReplaceList(replaceVO);
+				
+				if(!replaceList.isEmpty()){ //대휴 테이블에 중복된 데이터가 있는 경우
+					resultMsg = replaceVO.getSelectedDate2() + " " + insertchkname + "의 대휴 생성이 중복되었습니다.";
+					model.addAttribute("resultMsg", resultMsg);
+					return "forward:/dlm/rep/RepalceOffdayRegist.do";
+				}else {
+					replaceVO.setDlalzDate(selectedDate2);
+					replaceVO.setChrgrNm(insertchkname);
+					replaceService.insertReOffday(replaceVO);
+					resultMsg = egovMessageSource.getMessage("success.common.insert");
+					sLocationUrl = "forward:/dlm/rep/ReplaceOffdayMng.do";
+					model.addAttribute("resultMsg", resultMsg);
+				}
+			}
+		}
+		return sLocationUrl;
+	}
+
+	/**
+	 * MNP 당직 대휴 등록
+	 */
+	@RequestMapping(value = "/dlm/rep/insertMnpReplaceOffday.do")
+	public String insertMnpReplaceOffday(@ModelAttribute("replaceVO") ReplaceVO replaceVO, ModelMap model,
+			@RequestParam List<String> mnpChkField) throws Exception {
+		
+		String sLocationUrl = "";
+		String resultMsg = "";
+
+		for (String mnpChkkval : mnpChkField) {
+			String[] mnpChkArr = mnpChkkval.split(",");
+
+			replaceVO.setSelectedDate(mnpChkArr[0].replace("-", ""));
+			replaceVO.setSelectNm(mnpChkArr[1]);
+
+			List<ReplaceVO> replaceList = replaceService.selectDetailReplaceList(replaceVO);
+
+			if (!replaceList.isEmpty()) { //대휴 테이블에 중복된 데이터가 있는 경우
+				resultMsg = replaceVO.getSelectedDate() + " " + replaceVO.getSelectNm() + "의 대휴 생성이 중복되었습니다.";
+				model.addAttribute("resultMsg", resultMsg);
+				return "forward:/dlm/rep/RepalceOffdayRegist.do";
+			}else {
+				replaceVO.setDlalzDate(mnpChkArr[0].replace("-", ""));
+				replaceVO.setChrgrNm(mnpChkArr[1]);
+				replaceService.insertReOffday(replaceVO);
+				resultMsg = egovMessageSource.getMessage("success.common.insert");
+				sLocationUrl = "forward:/dlm/rep/ReplaceOffdayMng.do";
+				model.addAttribute("resultMsg", resultMsg);
+			}
+		}
+		return sLocationUrl;
+	}
+
+	/**
+	 * 대휴 삭제
+	 */
+	@RequestMapping(value = "/dlm/rep/ReplaceOffdaydelete.do")
+	public String ReplaceOffdaydelete(@ModelAttribute("searchVO") ReplaceVO searchVO, ModelMap model,
+			@RequestParam List<String> deletechk) throws Exception {
+
+		String resultMsg = "";
+		
+		for (String deletechkval : deletechk) {
+			String[] deletechkArr = deletechkval.split(",");
+			searchVO.setChrgrNo(deletechkArr[0]);
+			searchVO.setRepOffdayDate(deletechkArr[1]);
+			replaceService.deleteReOffday(searchVO);
+			resultMsg = egovMessageSource.getMessage("success.common.delete");
+		}
+
+		model.addAttribute("resultMsg", resultMsg);
+		return "forward:/dlm/rep/ReplaceOffdayMng.do";
+	}
+}

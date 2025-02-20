@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="CompuSytmMapper">
+   <resultMap id="CompuSytmList" type="truebon.com.crm.csc.model.CompuSytmVO">
+   		<result property="bizSytm" column="BIZ_SYTM" />
+   		<result property="vrType" column="VR_TYPE" />
+   		<result property="hwTypeServer" column="HW_TYPE_SERVER" />
+   		<result property="hwTypeNtwrk" column="HW_TYPE_NTWRK" />
+   		<result property="hwTypeSecurity" column="HW_TYPE_SECURITY" />
+   		<result property="hwTypeStorage" column="HW_TYPE_STORAGE" />
+   		<result property="hwTypeBackup" column="HW_TYPE_BACKUP" />
+   		<result property="hwTypeBase" column="HW_TYPE_BASE" />
+   		<result property="hwTypeEtc" column="HW_TYPE_ETC" />
+   		<result property="swTypeCount" column="SW_TYPE_COUNT" />
+   		<result property="totalTypeCount" column="TOTAL_TYPE_COUNT" />
+   		<result property="vrTypeSt" column="VR_TYPE_STOTAL" />
+   		<result property="hwTypeServerSt" column="HW_TYPE_SERVER_STOTAL" />
+   		<result property="hwTypeNtwrkSt" column="HW_TYPE_NTWRK_STOTAL" />
+   		<result property="hwTypeSecuritySt" column="HW_TYPE_SECURITY_STOTAL" />
+   		<result property="hwTypeStorageSt" column="HW_TYPE_STORAGE_STOTAL" />
+   		<result property="hwTypeBackupSt" column="HW_TYPE_BACKUP_STOTAL" />
+   		<result property="hwTypeBaseSt" column="HW_TYPE_BASE_STOTAL" />
+   		<result property="hwTypeEtcSt" column="HW_TYPE_ETC_STOTAL" />
+   		<result property="swTypeCountSt" column="SW_TYPE_COUNT_STOTAL" />
+   		<result property="totalTypeCountSt" column="TOTAL_TYPE_COUNT_STOTAL" />
+   		<result property="totalHwTypeSt" column="TOTAL_HW_TYPE_STOTAL" />
+   </resultMap>
+   
+<select id="selectCompuSytmList" parameterType="truebon.com.crm.csc.model.CompuSytmVO" resultMap="CompuSytmList">
+SELECT 
+    BIZ_SYTM_NM AS BIZ_SYTM, 
+    COALESCE(tha.HW_TYPE_SERVER, 0) AS HW_TYPE_SERVER,
+    COALESCE(tha.HW_TYPE_NTWRK, 0) AS HW_TYPE_NTWRK,
+    COALESCE(tha.HW_TYPE_SECURITY, 0) AS HW_TYPE_SECURITY,
+    COALESCE(tha.HW_TYPE_STORAGE, 0) AS HW_TYPE_STORAGE,
+    COALESCE(tha.HW_TYPE_BACKUP, 0) AS HW_TYPE_BACKUP,
+    COALESCE(tha.HW_TYPE_BASE, 0) AS HW_TYPE_BASE,
+    COALESCE(tha.HW_TYPE_ETC, 0) AS HW_TYPE_ETC,
+    COALESCE(tsa.SW_TYPE_COUNT, 0) AS SW_TYPE_COUNT,
+    COALESCE(tha.VR_TYPE, 0) AS VR_TYPE,
+    COALESCE(tha.VR_TYPE, 0) + 
+    COALESCE(tha.HW_TYPE_SERVER, 0) + 
+    COALESCE(tha.HW_TYPE_NTWRK, 0) + 
+    COALESCE(tha.HW_TYPE_SECURITY, 0) + 
+    COALESCE(tha.HW_TYPE_STORAGE, 0) + 
+    COALESCE(tha.HW_TYPE_BACKUP, 0) + 
+    COALESCE(tha.HW_TYPE_BASE, 0) + 
+    COALESCE(tha.HW_TYPE_ETC, 0) + 
+    COALESCE(tsa.SW_TYPE_COUNT, 0) AS TOTAL_TYPE_COUNT
+FROM (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        tbs.BIZ_SYTM_NM,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0901%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SERVER,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0902%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_NTWRK,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0903%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SECURITY,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0904%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_STORAGE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0905%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BACKUP,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0906%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BASE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0907%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_ETC,
+        COUNT(CASE WHEN tha.VRTLZ_DSTNCT_CD LIKE 'ITA0102%' THEN tha.VRTLZ_DSTNCT_CD END) AS VR_TYPE
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_HW_ASSET AS tha ON tbs.BIZ_SYTM_CD = tha.BIZ_SYTM_CD
+    WHERE tha.ASSET_STAT_CD != 'ITA0304' AND tha.DEL_YN = 'N'
+		<if test="searchKeyword !=null and searchKeyword !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword}
+	    </if>
+    GROUP BY tbs.BIZ_SYTM_CD, tbs.BIZ_SYTM_NM
+) AS tha
+LEFT JOIN (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        COUNT(CASE WHEN tsa.SW_TYPE_CD LIKE 'ITA10%' THEN tsa.SW_TYPE_CD END) AS SW_TYPE_COUNT
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_SW_ASSET AS tsa ON tbs.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+    WHERE tsa.ASSET_STAT_CD != 'ITA0304' AND tsa.DEL_YN = 'N'
+    GROUP BY tbs.BIZ_SYTM_CD
+) AS tsa ON tha.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+UNION
+SELECT 
+    "소계", 
+    NVL(SUM(COALESCE(tha.HW_TYPE_SERVER, 0)), "") AS HW_TYPE_SERVER_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_NTWRK, 0)), "") AS HW_TYPE_NTWRK_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_SECURITY, 0)), "") AS HW_TYPE_SECURITY_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_STORAGE, 0)), "") AS HW_TYPE_STORAGE_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_BACKUP, 0)), "") AS HW_TYPE_BACKUP_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_BASE, 0)), "") AS HW_TYPE_BASE_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_ETC, 0)), "") AS HW_TYPE_ETC_STOTAL,
+    NVL(SUM(COALESCE(tsa.SW_TYPE_COUNT, 0)), "") AS SW_TYPE_COUNT_STOTAL,
+    NVL(SUM(COALESCE(tha.VR_TYPE, 0)), "") AS VR_TYPE_STOTAL,
+    COALESCE(SUM(COALESCE(tha.VR_TYPE, 0) + COALESCE(tha.HW_TYPE_SERVER, 0) + COALESCE(tha.HW_TYPE_NTWRK, 0) + COALESCE(tha.HW_TYPE_SECURITY, 0) + COALESCE(tha.HW_TYPE_STORAGE, 0) + COALESCE(tha.HW_TYPE_BACKUP, 0) + COALESCE(tha.HW_TYPE_BASE, 0) + COALESCE(tha.HW_TYPE_ETC, 0) + COALESCE(tsa.SW_TYPE_COUNT, 0)), "") AS TOTAL_TYPE_COUNT_STOTAL
+FROM (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        tbs.BIZ_SYTM_NM,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0901%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SERVER,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0902%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_NTWRK,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0903%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SECURITY,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0904%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_STORAGE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0905%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BACKUP,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0906%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BASE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0907%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_ETC,
+        COUNT(CASE WHEN tha.VRTLZ_DSTNCT_CD LIKE 'ITA0102%' THEN tha.VRTLZ_DSTNCT_CD END) AS VR_TYPE
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_HW_ASSET AS tha ON tbs.BIZ_SYTM_CD = tha.BIZ_SYTM_CD
+    WHERE tha.ASSET_STAT_CD != 'ITA0304' AND tha.DEL_YN = 'N'
+		<if test="searchKeyword !=null and searchKeyword !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword}
+	    </if>
+    GROUP BY tbs.BIZ_SYTM_CD, tbs.BIZ_SYTM_NM
+) AS tha
+LEFT JOIN (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        COUNT(CASE WHEN tsa.SW_TYPE_CD LIKE 'ITA10%' THEN tsa.SW_TYPE_CD END) AS SW_TYPE_COUNT
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_SW_ASSET AS tsa ON tbs.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+    WHERE tsa.ASSET_STAT_CD != 'ITA0304' AND tsa.DEL_YN = 'N'
+    GROUP BY tbs.BIZ_SYTM_CD
+) AS tsa ON tha.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+</select> 
+
+
+
+
+<select id="selectCompuSytmSumList" parameterType="truebon.com.crm.csc.model.CompuSytmVO" resultMap="CompuSytmList">
+SELECT 
+    HW_TYPE_SERVER_STOTAL + HW_TYPE_NTWRK_STOTAL + HW_TYPE_SECURITY_STOTAL + HW_TYPE_STORAGE_STOTAL + HW_TYPE_BACKUP_STOTAL + HW_TYPE_BASE_STOTAL + HW_TYPE_ETC_STOTAL AS TOTAL_HW_TYPE_STOTAL,
+    SW_TYPE_COUNT_STOTAL
+FROM (
+    SELECT 
+        "소계",
+        NVL(SUM(COALESCE(tha.HW_TYPE_SERVER, 0)),"") AS HW_TYPE_SERVER_STOTAL,
+        NVL(SUM(COALESCE(tha.HW_TYPE_NTWRK, 0)),"") AS HW_TYPE_NTWRK_STOTAL,
+        NVL(SUM(COALESCE(tha.HW_TYPE_SECURITY, 0)),"") AS HW_TYPE_SECURITY_STOTAL,
+        NVL(SUM(COALESCE(tha.HW_TYPE_STORAGE, 0)),"") AS HW_TYPE_STORAGE_STOTAL,
+        NVL(SUM(COALESCE(tha.HW_TYPE_BACKUP, 0)),"") AS HW_TYPE_BACKUP_STOTAL,
+        NVL(SUM(COALESCE(tha.HW_TYPE_BASE, 0)),"") AS HW_TYPE_BASE_STOTAL,
+        NVL(SUM(COALESCE(tha.HW_TYPE_ETC, 0)),"") AS HW_TYPE_ETC_STOTAL,
+        NVL(SUM(COALESCE(tsa.SW_TYPE_COUNT, 0)),"") AS SW_TYPE_COUNT_STOTAL,
+        SUM(
+            COALESCE(tha.HW_TYPE_SERVER, 0) +
+            COALESCE(tha.HW_TYPE_NTWRK, 0) +
+            COALESCE(tha.HW_TYPE_SECURITY, 0) +
+            COALESCE(tha.HW_TYPE_STORAGE, 0) +
+            COALESCE(tha.HW_TYPE_BACKUP, 0) +
+            COALESCE(tha.HW_TYPE_BASE, 0) +
+            COALESCE(tha.HW_TYPE_ETC, 0) +
+            COALESCE(tsa.SW_TYPE_COUNT, 0)
+        ) AS TOTAL_TYPE_COUNT_STOTAL
+    FROM (
+        SELECT 
+            tbs.BIZ_SYTM_CD,
+            tbs.BIZ_SYTM_NM,
+            COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0901%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SERVER,
+            COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0902%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_NTWRK,
+            COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0903%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SECURITY,
+            COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0904%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_STORAGE,
+            COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0905%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BACKUP,
+            COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0906%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BASE,
+            COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0907%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_ETC
+        FROM TB_BIZ_SYSTEM tbs
+        LEFT JOIN TB_HW_ASSET AS tha ON tbs.BIZ_SYTM_CD = tha.BIZ_SYTM_CD
+        WHERE tha.ASSET_STAT_CD != 'ITA0304' AND tha.DEL_YN = 'N'
+        <if test="searchKeyword !=null and searchKeyword !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword}
+	    </if>
+        GROUP BY tbs.BIZ_SYTM_CD, tbs.BIZ_SYTM_NM
+    ) AS tha
+    LEFT JOIN (
+        SELECT 
+            tbs.BIZ_SYTM_CD,
+            COUNT(CASE WHEN tsa.SW_TYPE_CD LIKE 'ITA10%' THEN tsa.SW_TYPE_CD END) AS SW_TYPE_COUNT
+        FROM TB_BIZ_SYSTEM tbs
+        LEFT JOIN TB_SW_ASSET AS tsa ON tbs.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+        WHERE tsa.ASSET_STAT_CD != 'ITA0304' AND tsa.DEL_YN = 'N'
+        GROUP BY tbs.BIZ_SYTM_CD
+    ) AS tsa ON tha.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+) AS total
+</select>
+
+
+
+<select id="selectCompuSytmEgoMap" parameterType="truebon.com.crm.csc.model.CompuSytmVO" resultType="egovMap">
+SELECT 
+    BIZ_SYTM_NM AS BIZ_SYTM, 
+    CAST(COALESCE(tha.HW_TYPE_SERVER, 0) AS CHAR) AS HW_TYPE_SERVER,
+    CAST(COALESCE(tha.HW_TYPE_NTWRK, 0) AS CHAR) AS HW_TYPE_NTWRK,
+    CAST(COALESCE(tha.HW_TYPE_SECURITY, 0) AS CHAR) AS HW_TYPE_SECURITY,
+    CAST(COALESCE(tha.HW_TYPE_STORAGE, 0) AS CHAR) AS HW_TYPE_STORAGE,
+    CAST(COALESCE(tha.HW_TYPE_BACKUP, 0) AS CHAR) AS HW_TYPE_BACKUP,
+    CAST(COALESCE(tha.HW_TYPE_BASE, 0) AS CHAR) AS HW_TYPE_BASE,
+    CAST(COALESCE(tha.HW_TYPE_ETC, 0) AS CHAR) AS HW_TYPE_ETC,
+    CAST(COALESCE(tsa.SW_TYPE_COUNT, 0) AS CHAR) AS SW_TYPE_COUNT,
+    CAST(COALESCE(tha.VR_TYPE, 0) AS CHAR) AS VR_TYPE,
+    CAST(COALESCE(tha.VR_TYPE, 0) + 
+    COALESCE(tha.HW_TYPE_SERVER, 0) + 
+    COALESCE(tha.HW_TYPE_NTWRK, 0) + 
+    COALESCE(tha.HW_TYPE_SECURITY, 0) + 
+    COALESCE(tha.HW_TYPE_STORAGE, 0) + 
+    COALESCE(tha.HW_TYPE_BACKUP, 0) + 
+    COALESCE(tha.HW_TYPE_BASE, 0) + 
+    COALESCE(tha.HW_TYPE_ETC, 0) + 
+    COALESCE(tsa.SW_TYPE_COUNT, 0) AS CHAR) AS TOTAL_TYPE_COUNT
+FROM (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        tbs.BIZ_SYTM_NM,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0901%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SERVER,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0902%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_NTWRK,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0903%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SECURITY,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0904%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_STORAGE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0905%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BACKUP,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0906%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BASE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0907%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_ETC,
+        COUNT(CASE WHEN tha.VRTLZ_DSTNCT_CD LIKE 'ITA0102%' THEN tha.VRTLZ_DSTNCT_CD END) AS VR_TYPE
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_HW_ASSET AS tha ON tbs.BIZ_SYTM_CD = tha.BIZ_SYTM_CD
+    WHERE tha.ASSET_STAT_CD != 'ITA0304' AND tha.DEL_YN = 'N'
+		<if test="searchKeyword !=null and searchKeyword !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword}
+	    </if>
+    GROUP BY tbs.BIZ_SYTM_CD, tbs.BIZ_SYTM_NM
+) AS tha
+LEFT JOIN (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        COUNT(CASE WHEN tsa.SW_TYPE_CD LIKE 'ITA10%' THEN tsa.SW_TYPE_CD END) AS SW_TYPE_COUNT
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_SW_ASSET AS tsa ON tbs.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+    WHERE tsa.ASSET_STAT_CD != 'ITA0304' AND tsa.DEL_YN = 'N'
+    GROUP BY tbs.BIZ_SYTM_CD
+) AS tsa ON tha.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+UNION
+SELECT 
+    "소계", 
+    NVL(SUM(COALESCE(tha.HW_TYPE_SERVER, 0)), "") AS HW_TYPE_SERVER_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_NTWRK, 0)), "") AS HW_TYPE_NTWRK_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_SECURITY, 0)), "") AS HW_TYPE_SECURITY_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_STORAGE, 0)), "") AS HW_TYPE_STORAGE_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_BACKUP, 0)), "") AS HW_TYPE_BACKUP_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_BASE, 0)), "") AS HW_TYPE_BASE_STOTAL,
+    NVL(SUM(COALESCE(tha.HW_TYPE_ETC, 0)), "") AS HW_TYPE_ETC_STOTAL,
+    NVL(SUM(COALESCE(tsa.SW_TYPE_COUNT, 0)), "") AS SW_TYPE_COUNT_STOTAL,
+    NVL(SUM(COALESCE(tha.VR_TYPE, 0)), "") AS VR_TYPE_STOTAL,
+    COALESCE(SUM(COALESCE(tha.VR_TYPE, 0) + COALESCE(tha.HW_TYPE_SERVER, 0) + COALESCE(tha.HW_TYPE_NTWRK, 0) + COALESCE(tha.HW_TYPE_SECURITY, 0) + COALESCE(tha.HW_TYPE_STORAGE, 0) + COALESCE(tha.HW_TYPE_BACKUP, 0) + COALESCE(tha.HW_TYPE_BASE, 0) + COALESCE(tha.HW_TYPE_ETC, 0) + COALESCE(tsa.SW_TYPE_COUNT, 0)), "") AS TOTAL_TYPE_COUNT_STOTAL
+FROM (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        tbs.BIZ_SYTM_NM,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0901%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SERVER,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0902%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_NTWRK,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0903%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_SECURITY,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0904%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_STORAGE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0905%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BACKUP,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0906%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_BASE,
+        COUNT(CASE WHEN tha.HW_TYPE_CD LIKE 'ITA0907%' THEN tha.HW_TYPE_CD END) AS HW_TYPE_ETC,
+        COUNT(CASE WHEN tha.VRTLZ_DSTNCT_CD LIKE 'ITA0102%' THEN tha.VRTLZ_DSTNCT_CD END) AS VR_TYPE
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_HW_ASSET AS tha ON tbs.BIZ_SYTM_CD = tha.BIZ_SYTM_CD
+    WHERE tha.ASSET_STAT_CD != 'ITA0304' AND tha.DEL_YN = 'N'
+		<if test="searchKeyword !=null and searchKeyword !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword}
+	    </if>
+    GROUP BY tbs.BIZ_SYTM_CD, tbs.BIZ_SYTM_NM
+) AS tha
+LEFT JOIN (
+    SELECT 
+        tbs.BIZ_SYTM_CD,
+        COUNT(CASE WHEN tsa.SW_TYPE_CD LIKE 'ITA10%' THEN tsa.SW_TYPE_CD END) AS SW_TYPE_COUNT
+    FROM TB_BIZ_SYSTEM tbs
+    LEFT JOIN TB_SW_ASSET AS tsa ON tbs.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+    WHERE tsa.ASSET_STAT_CD != 'ITA0304' AND tsa.DEL_YN = 'N'
+    GROUP BY tbs.BIZ_SYTM_CD
+) AS tsa ON tha.BIZ_SYTM_CD = tsa.BIZ_SYTM_CD
+</select>
+</mapper>

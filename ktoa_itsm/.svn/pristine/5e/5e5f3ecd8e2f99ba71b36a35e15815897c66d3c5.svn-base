@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="swMngVO">
+			<field property="ntwrkDstnctCd" depends="required">
+        		<arg0 key="네트워크"/>
+			</field>
+			<field property="swTypeCd" depends="required">
+        		<arg0 key="SW유형"/>
+			</field>
+			<field property="assetOwnCd" depends="required">
+        		<arg0 key="자산소유코드"/>
+			</field>
+			<field property="assetStatCd" depends="required">
+        		<arg0 key="자산상태코드"/>
+			</field>
+			<field property="bizSytmCd" depends="required">
+        		<arg0 key="업무시스템코드"/>
+			</field>
+			<field property="prodCoQty" depends="required">
+        		<arg0 key="제품수량"/>
+			</field>
+			<field property="prodPurp" depends="required">
+        		<arg0 key="제품용도"/>
+			</field>
+			<field property="ctrlYn" depends="required">
+        		<arg0 key="관제여부"/>
+			</field>
+			<field property="svcDupCnvrConfgYn" depends="required">
+        		<arg0 key="서비스이중화구성여부"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

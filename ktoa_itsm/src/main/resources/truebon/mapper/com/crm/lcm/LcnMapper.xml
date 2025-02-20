@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="LcnMapper">
+
+	<resultMap id="LcnList" type="truebon.com.crm.lcm.model.LcnVO" >
+		<result property="lcnId" column="LCN_ID"/>
+		<result property="prodNm" column="PROD_NM"/>
+		<result property="lcnNo" column="LCN_NO"/>
+		<result property="lcnText" column="LCN_TEXT"/>
+		<result property="lcnFileNm" column="LCN_FILE_NM"/>
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="amndrNm" column="AMNDR_NM" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	
+	<select id="selectLcnList" parameterType="truebon.com.crm.lcm.model.LcnVO" resultMap="LcnList">
+    	SELECT 	
+    		tl.LCN_ID
+    		, tl.PROD_NM
+    		, tl.LCN_NO
+    		, tl.LCN_TEXT
+    		, tl.LCN_FILE_NM
+			FROM TB_LICENSE tl 
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tl.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tl.LCN_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			<!-- 페이징 -->
+			<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+				ORDER BY tl.LCN_ID DESC
+				limit #{recordCountPerPage} offset #{firstIndex}
+			</if>
+	</select>
+	
+	<select id="selectLcnListTotCnt" parameterType="truebon.com.crm.lcm.model.LcnVO" resultType="int">
+		SELECT COUNT(*) totcnt
+			FROM TB_LICENSE tl	
+	</select>
+	
+	<insert id="insertLcn" parameterType="truebon.com.crm.lcm.model.LcnVO">
+		INSERT INTO TB_LICENSE 
+				( LCN_ID	
+				, PROD_NM	
+				, LCN_NO	
+				, LCN_TEXT	
+				, LCN_FILE_NM	
+				, REGSTR_ID	
+				, RDTT	
+				, AMNDR_ID	
+				, MDTT	)
+		VALUES(  #{lcnId}
+				,#{prodNm}
+				,#{lcnNo}
+				,#{lcnText}
+				,#{lcnFileNm}
+				,#{regstrId}
+				,SYSDATE()
+				,#{amndrId}
+				,SYSDATE()	)
+	</insert>
+	
+	<select id="selectLcn" parameterType="truebon.com.crm.lcm.model.LcnVO" resultMap="LcnList">
+    	SELECT 	
+    		tl.LCN_ID
+    		, tl.PROD_NM
+    		, tl.LCN_NO
+    		, tl.LCN_TEXT
+    		, tl.LCN_FILE_NM
+    		, SUBSTRING(tl.MDTT,1,10)	AS MDTT
+			, tl.AMNDR_ID 
+			, tc.CHRGR_NM 				AS AMNDR_NM
+			FROM TB_LICENSE tl 
+			LEFT OUTER JOIN TB_USER tu ON tu.USER_ID = tl.AMNDR_ID
+			LEFT OUTER JOIN TB_CHARGER tc ON tu.CHRGR_NO = tc.CHRGR_NO
+			WHERE tl.LCN_ID = #{lcnId}
+	</select>
+	
+	<update id="updateLcn" parameterType="truebon.com.crm.lcm.model.LcnVO">
+		UPDATE TB_LICENSE 
+		SET LCN_ID = #{lcnId}
+    		, PROD_NM = #{prodNm}
+    		, LCN_NO = #{lcnNo}
+    		, LCN_TEXT = #{lcnText}
+    		, LCN_FILE_NM = #{lcnFileNm}
+    		, MDTT = SYSDATE()
+			, AMNDR_ID = #{amndrId}
+		WHERE LCN_ID = #{lcnId}
+	</update>
+	
+	<delete id="deleteLcn" parameterType="truebon.com.crm.lcm.model.LcnVO">
+		DELETE FROM TB_LICENSE
+		WHERE LCN_ID = #{lcnId}
+	</delete>
+	
+</mapper>

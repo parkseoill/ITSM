@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ReplaceMapper">
+   <resultMap id="ReplaceList" type="truebon.com.dlm.rep.model.ReplaceVO">
+      <result property="chrgrNo" column="CHRGR_NO" />  
+      <result property="chrgrNm" column="CHRGR_NM" />  
+      <result property="repOffdayDate" column="REPLAC_OFFDAY_DATE" />
+      <result property="repOffdayCnt" column="REPLAC_OFFDAY_CNT" />
+      <result property="repOffdayRsnCd" column="REPLAC_OFFDAY_RSN_CD" />
+      <result property="repOffdayRsn" column="REPLAC_OFFDAY_RSN" />
+      <result property="repSum" column="REP_SUM" />
+      <result property="dlalzDate" column="DLALZ_DATE" />
+      <result property="useRep" column="USE_REP" />
+      <result property="useRepSum" column="USE_REP_SUM" />
+      <result property="remainingRep" column="REMAINING_REP" />
+      <result property="offdayWrkRsnCd" column="OFFDAY_WRK_RSN_CD" />
+      <result property="remarkText" column="RMARK_TEXT"/>
+   </resultMap>
+  
+   <!-- 대휴 현황 조회  --> 
+   <select id="selectReplaceList" parameterType="truebon.com.dlm.rep.model.ReplaceVO" resultMap="ReplaceList">
+    		SELECT tc.CHRGR_NM
+            	, IFNULL(B.REP_SUM, 0) AS REP_SUM
+            	, IFNULL(B.USE_REP_SUM, 0) AS USE_REP_SUM
+             	, IFNULL(B.REP_SUM - B.USE_REP_SUM, 0) AS REMAINING_REP
+            FROM TB_CHARGER tc 
+            LEFT OUTER JOIN 
+            (	SELECT
+                   	td.CHRGR_NO
+                   	, IFNULL(A.REP_SUM, 0) AS REP_SUM
+                   	, IFNULL(SUM(if(td.OFFDAY_TYPE_CD = '2', if(td.DLALZ_DSTNCT_CD = '2',1 ,0.5), NULL)), 0) as USE_REP_SUM 
+                   	, A.REPLAC_OFFDAY_DATE
+             	FROM TB_DLALZ td
+             	LEFT OUTER JOIN 
+             	( 	SELECT 
+             			tro.CHRGR_NO
+             			,SUM(tro.REPLAC_OFFDAY_CNT) AS REP_SUM
+             			,tro.REPLAC_OFFDAY_DATE
+             		FROM TB_REPLAC_OFFDAY tro 
+             		WHERE tro.REPLAC_OFFDAY_DATE LIKE CONCAT(#{selectedDate},'%')
+             		GROUP BY tro.CHRGR_NO
+             	)A
+					ON td.CHRGR_NO = A.CHRGR_NO
+	             	WHERE td.DLALZ_DATE LIKE CONCAT(#{selectedDate},'%')
+	             	GROUP BY td.CHRGR_NO
+             )B
+			ON tc.CHRGR_NO = B.CHRGR_NO 
+			WHERE tc.COSN_CMPNY_NO = '0001' AND USE_YN = 'Y' AND CHRGR_ROLE_CD != '02' AND CHRGR_ROLE_CD != '04'
+			<if test='loginchrgrNo != "0072"'>
+				<if test='loginchrgrNo != "0001"'>
+	           		AND B.CHRGR_NO  = #{loginchrgrNo}
+	           	</if>
+        	</if>
+			GROUP BY tc.CHRGR_NO 
+			ORDER BY FIELD(tc.CHRGR_ROLE_CD, 10,01,05,06,07,08), tc.CHRGR_NO, B.REPLAC_OFFDAY_DATE
+   </select> 
+   
+   <!-- 대휴 발생 현황 상세 조회  --> 
+   <select id="selectDetailReplaceList" parameterType="truebon.com.dlm.rep.model.ReplaceVO" resultMap="ReplaceList"> 
+            SELECT tro.CHRGR_NO
+        		, tc.CHRGR_NM
+        		, CONCAT(SUBSTR(tro.REPLAC_OFFDAY_DATE,1,4),'-',SUBSTR(tro.REPLAC_OFFDAY_DATE,5,2),'-',SUBSTR(tro.REPLAC_OFFDAY_DATE,7,2)) AS REPLAC_OFFDAY_DATE
+             	, tro.REPLAC_OFFDAY_CNT
+             	, tro.REPLAC_OFFDAY_RSN_CD 
+             	, tcdc.COMN_CD_NM AS REPLAC_OFFDAY_RSN
+            FROM TB_CHARGER tc , TB_REPLAC_OFFDAY tro
+            LEFT OUTER JOIN TB_COMN_DETL_CD tcdc 
+            ON tro.REPLAC_OFFDAY_RSN_CD = tcdc.COMN_CD 
+            WHERE tcdc.COMN_CD_ID = 'ISM017'
+	       	AND tc.CHRGR_NO = tro.CHRGR_NO
+           	AND tc.COSN_CMPNY_NO = '0001' AND tc.USE_YN = 'Y' AND tc.CHRGR_ROLE_CD != '02' AND tc.CHRGR_ROLE_CD != '04'
+           	AND tro.REPLAC_OFFDAY_DATE LIKE CONCAT(#{selectedDate},'%')
+            <if test="selectNm != '' and selectNm != null">
+	        	AND tc.CHRGR_NM = #{selectNm}
+	        </if>
+        	ORDER BY FIELD(tc.CHRGR_ROLE_CD, 10,01,05,06,07,08), tc.CHRGR_NO, tro.REPLAC_OFFDAY_DATE
+   </select>   
+   
+   <!-- 대휴 사용 현황 상세 조회  --> 
+   <select id="selectDetailReplaceUseList" parameterType="truebon.com.dlm.rep.model.ReplaceVO" resultMap="ReplaceList">
+			SELECT tc.CHRGR_NM
+				, IFNULL(CONCAT(SUBSTR(td.DLALZ_DATE,1,4),'-',SUBSTR(td.DLALZ_DATE,5,2),'-',SUBSTR(td.DLALZ_DATE,7,2)), '') AS DLALZ_DATE
+				, IFNULL(if(DLALZ_DSTNCT_CD = '1' OR DLALZ_DSTNCT_CD IS NULL, NULL, if(DLALZ_DSTNCT_CD = '2',1 ,0.5)), 0) as USE_REP 
+				, IFNULL(td.RMARK_TEXT , '') AS RMARK_TEXT
+			FROM TB_DLALZ td, TB_CHARGER tc 
+			WHERE td.CHRGR_NO = tc.CHRGR_NO 
+			AND td.DLALZ_DSTNCT_CD !='1' AND td.OFFDAY_TYPE_CD ='2' 
+			AND td.DLALZ_DATE LIKE CONCAT(#{selectedDate},'%')
+			AND tc.CHRGR_ROLE_CD != '02' AND tc.CHRGR_ROLE_CD != '04' AND tc.COSN_CMPNY_NO = '0001' AND tc.USE_YN = 'Y'
+			<if test="selectNm != '' and selectNm != null">
+				AND tc.CHRGR_NM = #{selectNm}
+			</if>
+			ORDER BY FIELD(tc.CHRGR_ROLE_CD, 10,01,05,06,07,08),tc.CHRGR_NO, td.DLALZ_DATE
+   </select> 
+   
+   <!-- 담당자 성명 가져오기  --> 
+   <select id="selectChrgrName" parameterType="truebon.com.dlm.rep.model.ReplaceVO" resultMap="ReplaceList">
+	     SELECT CHRGR_NM
+	     	FROM TB_CHARGER tc 
+	     	WHERE COSN_CMPNY_NO	= '0001'
+	     	AND USE_YN = 'Y'
+	     	AND CHRGR_ROLE_CD NOT IN ('04', '02')
+   </select>
+   
+   <!-- 휴일 근무 조회  --> 
+   <select id="selectOffdayWrk" parameterType="truebon.com.dlm.rep.model.ReplaceVO" resultMap="ReplaceList">
+		SELECT  CONCAT(SUBSTR(td.DLALZ_DATE,1,4),'-',SUBSTR(td.DLALZ_DATE,5,2),'-',SUBSTR(td.DLALZ_DATE,7,2)) AS DLALZ_DATE
+			, tc.CHRGR_NM
+			, OFFDAY_WRK_RSN_CD
+			, SUBSTR(td.ATEND_TIME,12,5) AS atendTimeT
+			, SUBSTR(td.LEOFC_TIME,12,5) AS leofcTimeT
+			FROM TB_DLALZ td , TB_CHARGER tc 
+			WHERE OFFDAY_WRK_RSN_CD IS NOT NULL
+			AND td.CHRGR_NO = tc.CHRGR_NO 
+			AND DLALZ_DATE LIKE CONCAT(REPLACE(#{offdayWrkDate},'-',''), '%')
+			ORDER BY DLALZ_DATE DESC
+   </select>
+    
+   <!-- 대휴 등록  --> 
+   <insert id="insertReOffday" parameterType="truebon.com.dlm.rep.model.ReplaceVO">
+        INSERT INTO TB_REPLAC_OFFDAY (REPLAC_OFFDAY_DATE,CHRGR_NO, REPLAC_OFFDAY_CNT, REPLAC_OFFDAY_RSN_CD)          
+          (
+             SELECT  DISTINCT REPLACE(#{dlalzDate},'-',''), tc.CHRGR_NO, Cast(#{insertCnt} AS FLOAT), #{repOffdayRsnCd} 
+             FROM TB_CHARGER tc
+             WHERE tc.CHRGR_NM  = #{chrgrNm}
+             AND USE_YN = 'Y'
+          )
+   </insert> 
+   
+   <!-- 대휴 삭제  --> 
+   <delete id="deleteReOffday" parameterType="truebon.com.dlm.rep.model.ReplaceVO">
+		DELETE FROM TB_REPLAC_OFFDAY 
+		WHERE REPLAC_OFFDAY_DATE = REPLACE(#{repOffdayDate},'-','')
+		AND CHRGR_NO = #{chrgrNo}
+   </delete> 
+    
+</mapper>
+   
+   

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="BizSytmMapper">
+	
+	<resultMap id="BizSytmList" type="truebon.com.opm.biz.model.BizSytmVO">
+		<result property="bizSytmCd"     column="BIZ_SYTM_CD" />
+		<result property="bizSytmNm"     column="BIZ_SYTM_NM" />
+		<result property="bizSytmCdLvl"  column="BIZ_SYTM_CD_LVL" />
+		<result property="upprBizSytmCd" column="UPPR_BIZ_SYTM_CD" />
+		<result property="useYn"         column="USE_YN" />
+		<result property="frstRank"      column="FRST_RANK" />
+		<result property="regstrId"      column="REGSTR_ID" />
+		<result property="rdtt"          column="RDTT" />
+		<result property="amndrId"       column="AMNDR_ID" />
+		<result property="mdtt"          column="MDTT" />
+	</resultMap>
+
+	<select id="selectBizSytmList" parameterType="truebon.com.opm.biz.model.BizSytmVO" resultMap="BizSytmList">
+		SELECT 
+			BIZ_SYTM_CD
+			,BIZ_SYTM_NM
+			,BIZ_SYTM_CD_LVL
+			,UPPR_BIZ_SYTM_CD
+			,USE_YN
+			,FRST_RANK
+			,REGSTR_ID
+			,RDTT
+			,AMNDR_ID
+			,MDTT
+		FROM TB_BIZ_SYSTEM
+		WHERE USE_YN = 'Y'
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<if test="searchCondition == 1">AND
+				BIZ_SYTM_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 2">AND
+				BIZ_SYTM_NM LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 3">AND
+				UPPR_BIZ_SYTM_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+		</if>
+		limit #{recordCountPerPage} offset #{firstIndex}
+	</select>
+	
+	<select id="selectBizSytmListTotCnt" parameterType="truebon.com.opm.biz.model.BizSytmVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM TB_BIZ_SYSTEM
+		WHERE USE_YN = 'Y'
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<if test="searchCondition == 1">AND
+				BIZ_SYTM_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 2">AND
+				BIZ_SYTM_NM LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 3">AND
+				UPPR_BIZ_SYTM_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+		</if>
+	</select>
+	
+	<insert id="insertBizSytm" parameterType="truebon.com.opm.biz.model.BizSytm">
+		INSERT INTO TB_BIZ_SYSTEM
+			(BIZ_SYTM_CD
+			,BIZ_SYTM_NM
+			,BIZ_SYTM_CD_LVL
+			,UPPR_BIZ_SYTM_CD
+			,USE_YN
+			,FRST_RANK
+			,REGSTR_ID
+			,RDTT,
+			AMNDR_ID
+			,MDTT )
+		VALUES (#{bizSytmCd}
+			, #{bizSytmNm}
+			, #{bizSytmCdLvl}
+			, #{upprBizSytmCd}
+			, #{useYn}
+			, #{frstRank}
+			, #{regstrId}
+			, SYSDATE()
+			, #{regstrId}
+			, SYSDATE())
+	</insert>
+	
+	<select id="selectBizSytm" parameterType="truebon.com.opm.biz.model.BizSytmVO" resultType="truebon.com.opm.biz.model.BizSytmVO">
+		SELECT 
+			BIZ_SYTM_CD
+			,BIZ_SYTM_NM
+			,BIZ_SYTM_CD_LVL
+			,UPPR_BIZ_SYTM_CD
+			,USE_YN
+			,FRST_RANK
+			,REGSTR_ID
+			,RDTT
+			,AMNDR_ID
+			,MDTT
+		FROM TB_BIZ_SYSTEM
+		WHERE BIZ_SYTM_CD = #{bizSytmCd}
+	</select>
+	
+	<update id="updateBizSytm" parameterType="truebon.com.opm.biz.model.BizSytm">
+		<![CDATA[
+			UPDATE TB_BIZ_SYSTEM
+			SET BIZ_SYTM_NM=#{bizSytmNm}
+				, BIZ_SYTM_CD_LVL=#{bizSytmCdLvl}
+				, UPPR_BIZ_SYTM_CD=#{upprBizSytmCd}
+				, USE_YN=#{useYn}
+				, FRST_RANK=#{frstRank}
+				, AMNDR_ID=#{amndrId}
+				, MDTT=sysdate()
+			WHERE BIZ_SYTM_CD = #{bizSytmCd};
+		]]>
+	</update>
+	
+	<select id="selectBizSytmNmList" parameterType="truebon.com.opm.biz.model.BizSytmVO" resultMap="BizSytmList">
+		SELECT 
+			BIZ_SYTM_CD
+			,BIZ_SYTM_NM
+			,BIZ_SYTM_CD_LVL
+			,UPPR_BIZ_SYTM_CD
+			,USE_YN
+			,FRST_RANK
+			,REGSTR_ID
+			,RDTT
+			,AMNDR_ID
+			,MDTT
+		FROM TB_BIZ_SYSTEM
+		WHERE BIZ_SYTM_CD_LVL = '2' AND USE_YN = 'Y'
+		ORDER BY BIZ_REPORT_OTPUT_ORDE*1;
+	</select>
+	
+	<select id="selectFailBizSytmList" parameterType="truebon.com.opm.biz.model.BizSytmVO" resultMap="BizSytmList">
+		SELECT DISTINCT BIZ.BIZ_SYTM_CD, BIZ.BIZ_SYTM_NM
+			FROM ktoa_itsm.TB_BIZ_SYSTEM BIZ
+			WHERE BIZ.BIZ_SYTM_CD_LVL = 2 
+			AND BIZ.BIZ_SYTM_CD != 'SYS24'
+			AND BIZ.USE_YN = 'Y'
+			AND BIZ.BIZ_SYTM_CD NOT IN (SELECT DISTINCT BIZ_SYTM_CD FROM ktoa_itsm.TB_FAIL_PERIOD);
+	</select>
+</mapper>
+
+	
+	
+		

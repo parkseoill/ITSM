@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 11 15:49:39 KST 2016-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CmmUseDAO">
+
+	<resultMap id="CmmCodeDetail" type="egovframework.com.cmm.service.CmmnDetailCode">
+		<result property="comnCdId" column="COMN_CD_ID"/>
+		<result property="comnCd" column="COMN_CD"/>
+		<result property="comnCdNm" column="COMN_CD_NM"/>
+		<result property="comnCdDc" column="COMN_CD_DC"/>
+	</resultMap>
+
+	<select id="selectCmmCodeDetail" parameterType="ComDefaultCodeVO" resultMap="CmmCodeDetail">
+		 
+			SELECT 
+			COMN_CD_ID, COMN_CD, COMN_CD_NM, COMN_CD_DC
+			FROM 
+			TB_COMN_DETL_CD
+			WHERE
+			USE_YN = 'Y'
+			AND COMN_CD_ID = #{comnCdId}
+			ORDER BY SORT_ORDE
+		
+	</select>
+	
+	<select id="selectCmmCodeNewDetail" parameterType="ComDefaultCodeVO" resultMap="CmmCodeDetail">
+	
+			SELECT 
+			NEW_COMN_CD COMN_CD_ID, COMN_CD_NM, COMN_CD_DC
+			FROM 
+			TB_COMN_CD_NEW
+			WHERE
+			USE_YN = 'Y'
+			AND NEW_COMN_CD LIKE CONCAT(#{comnCdId}, '%')
+			AND NEW_COMN_CD != #{comnCdId}
+			<if test="detailCondition !=null and detailCondition !=''">
+			AND COMN_CD_LVL = #{detailCondition}
+		</if>
+			ORDER BY SORT_ORDE
+		
+	</select>
+
+    <select id="selectOgrnztIdDetail" parameterType="ComDefaultCodeVO" resultMap="CmmCodeDetail">
+             
+            SELECT 
+                #{tableNm}     CODE_ID, 
+                DEPT_NO     CODE, 
+                DEPT_NM     CODE_NM
+            FROM 
+                TB_DEPT
+            WHERE 1=1
+            
+            <if test='haveDetailCondition == "Y"'>AND
+                DEPT_NO  LIKE  #{detailConditionValue}
+            </if>
+    </select>
+    
+    <select id="selectGroupIdDetail" parameterType="ComDefaultCodeVO" resultMap="CmmCodeDetail">
+             
+            SELECT 
+                #{tableNm}     CODE_ID, 
+                CMPNY_NO     CODE, 
+                CMPNY_NM     CODE_NM
+            FROM 
+                TB_COMPANY
+            WHERE 1=1
+            
+            <if test='haveDetailCondition == "Y"'>AND
+                CMPNY_NO  LIKE  #{detailConditionValue}
+            </if>
+    </select>
+    
+
+</mapper>

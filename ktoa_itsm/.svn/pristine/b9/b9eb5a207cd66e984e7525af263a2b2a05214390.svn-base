@@ -1,0 +1,2952 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.19.1.final using JasperReports Library version 6.19.1-867c00bf88cd4d784d404379d6c05e1b419e8a4c  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4_Landscape" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="621b64fe-51a4-4b7a-ada8-e03174be4ceb">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="테스트.jrdax"/>
+	<style name="Style1" mode="Opaque" backcolor="#C4C4C4">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{HDAY_DSTNCT_CD}.equals( "2" )]]></conditionExpression>
+			<style mode="Opaque" backcolor="#A1A1A1"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="ChrgrNm" uuid="8214e32a-d57f-49e9-bf4a-37e7625594f3">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<parameter name="paramChrgrRoleNum" class="java.lang.String"/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT DISTINCT C.CHRGR_NM 
+FROM (
+   SELECT CHRGR_ROLE_NM
+   , SORT_ORDE
+   , CHRGR_NM 
+   , CHRGR_NO
+   FROM(
+      SELECT CHRGR_NM
+      , TC.CHRGR_NO 
+      , TCDC.COMN_CD_NM AS CHRGR_ROLE_NM
+      , TCDC.SORT_ORDE AS SORT_ORDE
+      FROM ktoa_itsm.TB_DLALZ TD
+      INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+      RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+       WHERE   TD.DLALZ_DATE  LIKE concat($P{jrParam1} , '%')
+   ) A
+   GROUP BY A.CHRGR_NM
+   UNION ALL
+   SELECT CHRGR_ROLE_NM
+   , SORT_ORDE
+   , CHRGR_NM
+   ,CHRGR_NO
+   FROM(
+      SELECT CHRGR_NM
+      , TCDC.COMN_CD_NM AS CHRGR_ROLE_NM
+      , TCDC.SORT_ORDE AS SORT_ORDE
+      ,TC.CHRGR_NO 
+      FROM ktoa_itsm.TB_DLALZ TD
+      INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+      RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+       WHERE   TD.DLALZ_DATE  LIKE concat($P{jrParam1} , '%')
+   ) B
+   GROUP BY B.CHRGR_NM
+) C WHERE C.CHRGR_ROLE_NM =  $P{paramChrgrRoleNum} ORDER BY FIELD(CHRGR_NO, 0002, 0003 )DESC, C.SORT_ORDE, FIELD(C.CHRGR_NM, '박래준','박서일','김승현','최호용')]]>
+		</queryString>
+		<field name="CHRGR_NM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CHRGR_NM"/>
+			<property name="com.jaspersoft.studio.field.label" value="CHRGR_NM"/>
+		</field>
+	</subDataset>
+	<subDataset name="DlalzTime" uuid="cb76a1c2-0579-4b8b-82cf-c499bc2d1b6f">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="107"/>
+		<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="888"/>
+		<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="724"/>
+		<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="266"/>
+		<parameter name="paramChrgrNm" class="java.lang.String"/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT *
+FROM (
+   SELECT CHRGR_ROLE_NM
+   ,ROWNUM
+   , DLALZ_DATE
+   , SORT_ORDE
+   , CHRGR_NM 
+   , '출근' AS AT_LE_NM
+	,MAX(IF(ROWNUM='01', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY01
+	,MAX(IF(ROWNUM='02', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY02
+	,MAX(IF(ROWNUM='03', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY03
+	,MAX(IF(ROWNUM='04', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY04
+	,MAX(IF(ROWNUM='05', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY05
+	,MAX(IF(ROWNUM='06', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY06
+	,MAX(IF(ROWNUM='07', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY07
+	,MAX(IF(ROWNUM='08', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY08
+	,MAX(IF(ROWNUM='09', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY09
+	,MAX(IF(ROWNUM='10', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY10
+	,MAX(IF(ROWNUM='11', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY11
+	,MAX(IF(ROWNUM='12', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY12
+	,MAX(IF(ROWNUM='13', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY13
+	,MAX(IF(ROWNUM='14', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY14
+	,MAX(IF(ROWNUM='15', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY15
+	,MAX(IF(ROWNUM='16', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY16
+	,MAX(IF(ROWNUM='17', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY17
+	,MAX(IF(ROWNUM='18', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY18
+	,MAX(IF(ROWNUM='19', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY19
+	,MAX(IF(ROWNUM='20', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY20
+	,MAX(IF(ROWNUM='21', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY21
+	,MAX(IF(ROWNUM='22', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY22
+	,MAX(IF(ROWNUM='23', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY23
+	,MAX(IF(ROWNUM='24', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY24
+	,MAX(IF(ROWNUM='25', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY25
+	,MAX(IF(ROWNUM='26', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY26
+	,MAX(IF(ROWNUM='27', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY27
+	,MAX(IF(ROWNUM='28', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY28
+	,MAX(IF(ROWNUM='29', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY29
+	,MAX(IF(ROWNUM='30', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY30
+	,MAX(IF(ROWNUM='31', (IF( (DLALZ_DSTNCT_CD='2' or DLALZ_DSTNCT_CD='3') and OFFDAY_TYPE_CD!='4' and CHRGR_ROLE_NM!='OP', (IF(HLFDAY_OFFDAY_DSTNCT_CD='1', '오전' , (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='1', '연차', (IF(DLALZ_DSTNCT_CD='2' and OFFDAY_TYPE_CD='2', '대휴', (IF(OFFDAY_TYPE_CD='3','공가',ATEND_TIME)))))))) , (IF(WRK_TYPE_CD='2','재택',(IF(WRK_TYPE_CD='3','외근',ATEND_TIME)))))) , '-'))AS WORKDAY31
+   , HDAY_DSTNCT_CD
+   FROM(
+   SELECT CHRGR_NM
+      , CONCAT(SUBSTRING(DLALZ_DATE,5,2),'.',SUBSTRING(DLALZ_DATE,7,2))
+      , SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+      , IFNULL(DATE_FORMAT(ATEND_TIME, '%H:%i'), '') AS ATEND_TIME
+      , TCDC.COMN_CD_NM AS CHRGR_ROLE_NM
+      , TCDC.SORT_ORDE AS SORT_ORDE
+      , TCD.HDAY_DSTNCT_CD AS HDAY_DSTNCT_CD
+      , DLALZ_DATE
+      , OFFDAY_TYPE_CD
+      , HLFDAY_OFFDAY_DSTNCT_CD
+      , DLALZ_DSTNCT_CD
+      , WRK_TYPE_CD
+      FROM ktoa_itsm.TB_DLALZ TD
+      INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+      RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+      left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+      WHERE CHRGR_DSTNCT_CD='2'
+      AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1}  , '%')
+   ) A
+   GROUP BY A.CHRGR_NM
+   UNION ALL
+   SELECT CHRGR_ROLE_NM
+   ,ROWNUM
+   , DLALZ_DATE
+   , SORT_ORDE
+   , CHRGR_NM
+   , '퇴근' AS AT_LE_NM
+   , MAX(IF(ROWNUM='01' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY01
+   , MAX(IF(ROWNUM='02' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY02
+   , MAX(IF(ROWNUM='03' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY03
+   , MAX(IF(ROWNUM='04' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY04
+   , MAX(IF(ROWNUM='05' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY05
+   , MAX(IF(ROWNUM='06' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY06
+   , MAX(IF(ROWNUM='07' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY07
+   , MAX(IF(ROWNUM='08' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY08
+   , MAX(IF(ROWNUM='09' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY09
+   , MAX(IF(ROWNUM='10' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY10
+   , MAX(IF(ROWNUM='11' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY11
+   , MAX(IF(ROWNUM='12' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY12
+   , MAX(IF(ROWNUM='13' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY13
+   , MAX(IF(ROWNUM='14' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY14
+   , MAX(IF(ROWNUM='15' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY15
+   , MAX(IF(ROWNUM='16' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY16
+   , MAX(IF(ROWNUM='17' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY17
+   , MAX(IF(ROWNUM='18' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY18
+   , MAX(IF(ROWNUM='19' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY19
+   , MAX(IF(ROWNUM='20' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY20
+   , MAX(IF(ROWNUM='21' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY21
+   , MAX(IF(ROWNUM='22' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY22
+   , MAX(IF(ROWNUM='23' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY23
+   , MAX(IF(ROWNUM='24' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY24
+   , MAX(IF(ROWNUM='25' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY25
+   , MAX(IF(ROWNUM='26' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY26
+   , MAX(IF(ROWNUM='27' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY27
+   , MAX(IF(ROWNUM='28' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY28
+   , MAX(IF(ROWNUM='29' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY29
+   , MAX(IF(ROWNUM='30' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY30
+   , MAX(IF(ROWNUM='31' and WRK_TYPE_CD='1', (IF(HLFDAY_OFFDAY_DSTNCT_CD='2', '오후' , LEOFC_TIME)), '-')) AS WORKDAY31
+   , HDAY_DSTNCT_CD
+   FROM(
+      SELECT CHRGR_NM
+      , CONCAT(SUBSTRING(DLALZ_DATE,5,2),'.',SUBSTRING(DLALZ_DATE,7,2))
+      , SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+      , IFNULL(DATE_FORMAT(LEOFC_TIME, '%H:%i'), '') AS LEOFC_TIME
+      , TCDC.COMN_CD_NM AS CHRGR_ROLE_NM
+      , TCDC.SORT_ORDE AS SORT_ORDE
+      , TCD.HDAY_DSTNCT_CD AS HDAY_DSTNCT_CD
+      , DLALZ_DATE
+      , HLFDAY_OFFDAY_DSTNCT_CD
+      , WRK_TYPE_CD
+      FROM ktoa_itsm.TB_DLALZ TD
+      INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+      RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+      left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+      WHERE CHRGR_DSTNCT_CD='2'
+      AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1}  , '%')
+   ) B
+   GROUP BY B.CHRGR_NM
+) C WHERE C.CHRGR_NM =    $P{paramChrgrNm}     ORDER BY C.SORT_ORDE, C.CHRGR_NM, AT_LE_NM]]>
+		</queryString>
+		<field name="CHRGR_ROLE_NM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CHRGR_ROLE_NM"/>
+			<property name="com.jaspersoft.studio.field.label" value="CHRGR_ROLE_NM"/>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+		</field>
+		<field name="SORT_ORDE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="SORT_ORDE"/>
+			<property name="com.jaspersoft.studio.field.label" value="SORT_ORDE"/>
+		</field>
+		<field name="CHRGR_NM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="CHRGR_NM"/>
+			<property name="com.jaspersoft.studio.field.label" value="CHRGR_NM"/>
+		</field>
+		<field name="AT_LE_NM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="AT_LE_NM"/>
+			<property name="com.jaspersoft.studio.field.label" value="AT_LE_NM"/>
+		</field>
+		<field name="WORKDAY01" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY01"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY01"/>
+		</field>
+		<field name="WORKDAY02" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY02"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY02"/>
+		</field>
+		<field name="WORKDAY03" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY03"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY03"/>
+		</field>
+		<field name="WORKDAY04" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY04"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY04"/>
+		</field>
+		<field name="WORKDAY05" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY05"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY05"/>
+		</field>
+		<field name="WORKDAY06" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY06"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY06"/>
+		</field>
+		<field name="WORKDAY07" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY07"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY07"/>
+		</field>
+		<field name="WORKDAY08" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY08"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY08"/>
+		</field>
+		<field name="WORKDAY09" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY09"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY09"/>
+		</field>
+		<field name="WORKDAY10" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY10"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY10"/>
+		</field>
+		<field name="WORKDAY11" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY11"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY11"/>
+		</field>
+		<field name="WORKDAY12" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY12"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY12"/>
+		</field>
+		<field name="WORKDAY13" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY13"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY13"/>
+		</field>
+		<field name="WORKDAY14" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY14"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY14"/>
+		</field>
+		<field name="WORKDAY15" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY15"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY15"/>
+		</field>
+		<field name="WORKDAY16" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY16"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY16"/>
+		</field>
+		<field name="WORKDAY17" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY17"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY17"/>
+		</field>
+		<field name="WORKDAY18" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY18"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY18"/>
+		</field>
+		<field name="WORKDAY19" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY19"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY19"/>
+		</field>
+		<field name="WORKDAY20" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY20"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY20"/>
+		</field>
+		<field name="WORKDAY21" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY21"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY21"/>
+		</field>
+		<field name="WORKDAY22" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY22"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY22"/>
+		</field>
+		<field name="WORKDAY23" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY23"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY23"/>
+		</field>
+		<field name="WORKDAY24" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY24"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY24"/>
+		</field>
+		<field name="WORKDAY25" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY25"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY25"/>
+		</field>
+		<field name="WORKDAY26" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY26"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY26"/>
+		</field>
+		<field name="WORKDAY27" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY27"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY27"/>
+		</field>
+		<field name="WORKDAY28" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY28"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY28"/>
+		</field>
+		<field name="WORKDAY29" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY29"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY29"/>
+		</field>
+		<field name="WORKDAY30" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY30"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY30"/>
+		</field>
+		<field name="WORKDAY31" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="WORKDAY31"/>
+			<property name="com.jaspersoft.studio.field.label" value="WORKDAY31"/>
+		</field>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+		</field>
+	</subDataset>
+	<subDataset name="date" uuid="dcc728a7-9ffe-48a4-a11a-493491f9798c">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1}  , '01')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+		<group name="HDAY_DSTNCT_CD">
+			<groupExpression><![CDATA[$F{HDAY_DSTNCT_CD}]]></groupExpression>
+		</group>
+		<group name="DLALZ_DATE">
+			<groupExpression><![CDATA[$F{DLALZ_DATE}]]></groupExpression>
+		</group>
+		<group name="ROWNUM">
+			<groupExpression><![CDATA[$F{ROWNUM}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="num02" uuid="60cea200-c49c-49ca-916c-61438d6efc24">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1}  , '02')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="num03" uuid="aba500ee-8d3c-4b29-9d10-536eee30ab37">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1}  , '03')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="4" uuid="d06ff41f-bb3f-4d71-b1a3-a84b0e103c68">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="Parameter1" class="java.lang.String"/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1} , '04')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="5" uuid="1024f05e-cd5e-4ad2-a728-1a64f69ea62c">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1} , '05')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="6" uuid="42e6bdc5-afa2-4895-a157-d1833775adc5">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '06')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="7" uuid="4cd5e6df-399b-43d7-a7f3-96fee00bbc0a">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '07')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="8" uuid="543e6bb1-6ea6-46c2-bf2f-996542e459ce">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '08')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="9" uuid="2ee48c79-8bdd-4139-a310-22a8fb9f9070">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="paramChrgrRoleNum" class="java.lang.String"/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '09')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="10" uuid="4c7007bc-61f3-4800-8f29-d8b33a9e3c42">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '10')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="11" uuid="f30b0742-43ba-4307-8efc-ca49610b7a0a">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="paramChrgrRoleNum" class="java.lang.String"/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '11')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="12" uuid="fcad74e9-e687-40d6-81b0-668b2f23cad7">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '12')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="13" uuid="9c7a3b23-9ba2-4c9c-87d8-b58e58311ce1">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '13')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="14" uuid="fb530bc3-4e01-4dd9-bfff-da37d0133577">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '14')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="15" uuid="da9114a8-4053-46b3-87c7-bc1b3a660e31">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '15')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="16" uuid="905f65a6-1b1c-4a70-b638-7e2aefe0cf2c">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '16')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="17" uuid="873ac4d0-db67-4150-a0a8-48369bbbfa86">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '17')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="18" uuid="95309a21-abca-4910-b6c7-e95211965162">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '18')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="19" uuid="5427f8a3-3a47-4df1-9714-bc3897e86a58">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '19')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="20" uuid="174bb83b-6ac8-428b-8c3e-5d37ac13cb69">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '20')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="21" uuid="937ad672-8974-425e-9cd1-5c7fb451036f">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '21')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="22" uuid="7214b1ed-dc32-4933-9d0d-0f9d89c5a53a">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '22')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="23" uuid="9b93aa9e-0d05-47c0-93ac-dec089d8d634">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '23')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="24" uuid="041969d3-6aa5-48e0-86ee-7f130da3764d">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '24')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="25" uuid="8de95a01-4824-489c-b5cf-04a924c95d63">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '25')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="26" uuid="6def9fb9-9edc-48fc-8840-171aaeeaf9ff">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '26')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="27" uuid="2f0848b1-8f7a-4882-b9be-21f24a2c32fb">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(  $P{jrParam1}  , '27')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="28" uuid="23761ede-8383-4bdb-a93d-4c257385cde8">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '28')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="29" uuid="62f359cb-96ea-4a77-a844-61ca0f084a67">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '29')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="30" uuid="230b5fa6-f1bf-4396-bb63-1d1fd7d6296b">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '30')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="31" uuid="99ecc2f2-7cb8-4dac-96ef-eb73c314d637">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<parameter name="jrParam1" class="java.lang.String" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT  TCD.HDAY_DSTNCT_CD
+		, DLALZ_DATE
+		, SUBSTRING(DLALZ_DATE,7,2) AS ROWNUM
+		FROM ktoa_itsm.TB_DLALZ TD
+		INNER JOIN ktoa_itsm.TB_CHARGER TC ON TD.CHRGR_NO = TC.CHRGR_NO
+		RIGHT OUTER JOIN ktoa_itsm.TB_COMN_DETL_CD TCDC ON TC.CHRGR_ROLE_CD = TCDC.COMN_CD AND TCDC.COMN_CD_ID ='ISM008'
+		left outer join TB_COMN_DATE TCD ON TD.DLALZ_DATE = TCD.STDR_DATE
+		WHERE CHRGR_DSTNCT_CD='2'
+		AND DLALZ_DATE LIKE CONCAT(   $P{jrParam1}, '31')]]>
+		</queryString>
+		<field name="HDAY_DSTNCT_CD" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.label" value="HDAY_DSTNCT_CD"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DATE"/>
+			<fieldDescription><![CDATA[공휴일구분코드]]></fieldDescription>
+		</field>
+		<field name="DLALZ_DATE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.label" value="DLALZ_DATE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="TB_DLALZ"/>
+			<fieldDescription><![CDATA[근태일자]]></fieldDescription>
+		</field>
+		<field name="ROWNUM" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+			<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+		</field>
+	</subDataset>
+	<subDataset name="31null" uuid="5bdf5562-bf34-46ad-99a6-63bd043e7f2b">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<parameter name="jrParam1" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT DISTINCT  CHRGR_ROLE_NM, CHRGR_ROLE_CD
+FROM (SELECT CHRGR_ROLE_NM,
+	`SORT_ORDE`,
+	`CHRGR_NM`,
+	CHRGR_ROLE_CD
+FROM (SELECT TC.`CHRGR_NM`,
+	TCDC.`COMN_CD_NM` AS CHRGR_ROLE_NM,
+	TCDC.`SORT_ORDE` AS SORT_ORDE,
+	CHRGR_ROLE_CD
+FROM ktoa_itsm.`TB_DLALZ` TD
+	INNER JOIN ktoa_itsm.`TB_CHARGER` TC ON 
+	 TD.`CHRGR_NO` = TC.`CHRGR_NO` 
+	RIGHT OUTER JOIN ktoa_itsm.`TB_COMN_DETL_CD` TCDC ON 
+	 TC.`CHRGR_ROLE_CD` = TCDC.`COMN_CD` 
+	 AND TCDC.`COMN_CD_ID` = 'ISM008' 
+WHERE 
+	 TC.`CHRGR_DSTNCT_CD` = '2' and TC.`USE_YN` = 'Y' and TC.CHRGR_ROLE_CD != '02') A) C 
+ORDER BY 
+FIELD(CHRGR_ROLE_CD, 10, 01 , 05, 06, 07, 08, 04) ASC, 
+	C.`CHRGR_NM` DESC]]>
+	</queryString>
+	<field name="CHRGR_ROLE_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CHRGR_ROLE_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="CHRGR_ROLE_NM"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="TB_COMN_DETL_CD"/>
+	</field>
+	<field name="CHRGR_ROLE_CD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CHRGR_ROLE_CD"/>
+		<property name="com.jaspersoft.studio.field.label" value="CHRGR_ROLE_CD"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="TB_CHARGER"/>
+		<fieldDescription><![CDATA[담당자역할코드]]></fieldDescription>
+	</field>
+	<title>
+		<band height="95" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="65" y="30" width="744" height="21" backcolor="#C4C4C4" uuid="af725d16-06ea-4e9c-97f9-25a6df5dd095"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<text><![CDATA[출근]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="65" y="51" width="744" height="20" backcolor="#C4C4C4" uuid="85570393-47ad-4bfa-aad3-7c089978aeb4"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<text><![CDATA[퇴근]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="-5" y="30" width="70" height="41" backcolor="#C4C4C4" uuid="6f89a1a5-6c03-4d44-ace8-c0d8755df539"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<text><![CDATA[출퇴근 구분]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="-5" y="71" width="35" height="24" backcolor="#C4C4C4" uuid="5869f7dc-63ac-4377-b467-272ff3773b11"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<text><![CDATA[구분]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="30" y="71" width="35" height="24" backcolor="#C4C4C4" uuid="0ff1cea3-8f93-475b-a2fc-2d7700a13b69">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<text><![CDATA[성명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="" x="322" y="0" width="158" height="30" uuid="02053fcc-c1c2-4a75-a8ac-54596983dbde"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕" size="22"/>
+				</textElement>
+				<text><![CDATA[출퇴근 기록부]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="24" y="7" width="34" height="20" uuid="a02af1a2-869c-4aa3-a394-3a671fe9a503"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[LEFT($P{jrParam1},4)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="7" width="19" height="20" uuid="61da5bc4-34ad-4146-8564-8d417004b127"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[RIGHT($P{jrParam1},2)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="58" y="7" width="20" height="20" uuid="faf5a9e4-4555-486f-abeb-fc317fa8e51a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA["년"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="99" y="7" width="23" height="20" uuid="1802113f-1fcb-4177-be43-3fe871799ee8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA["월"]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="65" y="71" width="24" height="24" uuid="c859f491-8a53-4b86-a21c-b3a63629b5f2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="date" uuid="784e9564-232a-42e4-8dd7-d5cba860da2f">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="9da0e7b2-d516-4827-b589-101db2d41b53">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+							<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[1]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="89" y="71" width="24" height="24" uuid="c76f4beb-63cd-4879-a81d-c6a7941805b2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="num02" uuid="8277da4c-7b56-4577-94b7-d919c72ff3b5">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="3943a972-faa9-48a6-94b7-7cfb37f233a0">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[2]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="113" y="71" width="24" height="24" uuid="ff50a168-e277-4a5a-9f9b-006741280e78">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="num03" uuid="f989732f-98b9-42f5-b752-578d599e2e83">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="49fc1249-ea87-4660-8cd3-66c6d3e333ab">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[3]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="137" y="71" width="24" height="24" uuid="02634173-5699-4e60-8f98-4ff9ca67032e"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="4" uuid="e15a405b-ca35-4187-b971-1957fe04585f">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="d922ef80-63ee-488d-9154-d99d5d5b57e1">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[4]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="161" y="71" width="24" height="24" uuid="c24ce70f-8f1a-49b7-9dad-6dc1f397b7d8"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="5" uuid="a6357da3-93d0-4dad-b3f1-3cb038a9a7a0">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="955c1e87-21b7-4d29-ae61-3023e4423afe">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[5]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="185" y="71" width="24" height="24" uuid="17163d57-bfee-4b1e-9789-dc8a36d59aff"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="6" uuid="670b77c5-b50f-4ca3-afd0-e352490d3d59">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="1cc76328-41cc-4c05-90d3-d1e5a564d7f9">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[6]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="209" y="71" width="24" height="24" uuid="5fd48252-45dc-4145-a30b-d130af9c6626"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="7" uuid="37235b06-36d3-42d9-97c3-5874a5bee808">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="5658a901-deee-4ab7-816e-4b20915641db">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[7]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="233" y="71" width="24" height="24" uuid="f3322735-875c-448d-b735-59676a1a914c"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="8" uuid="26794f4f-eecf-4640-a990-7a79409ee179">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="0d54d09d-268d-4f07-99c8-c61820d3421b">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[8]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="257" y="71" width="24" height="24" uuid="0be591e2-39e6-4281-89c2-60c9fc20759b"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="9" uuid="ca101774-e934-439a-8909-e4daffdaaf06">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="08676f42-4862-4ed0-8c49-139c47f9c0ad">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[9]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="281" y="71" width="24" height="24" uuid="6bbe1acb-ae5f-42f5-bfbb-c9a507e91ff5"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="10" uuid="b7b47ef6-05c6-4aba-b6ed-d0a4b6a2505f">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="8fcac3d6-68a0-4204-a996-511c8c6bdee7">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[10]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="305" y="71" width="24" height="24" uuid="59c6e2f1-92a7-4e5f-b345-0153cb0daa00"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="11" uuid="f0f866f0-ed51-48bc-8cbb-d91828caf0c6">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="63691b7e-f8ef-44ac-b172-95c158eb8edd">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[11]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="329" y="71" width="24" height="24" uuid="6f57ca37-c35f-4252-a5c9-556893df2c9d"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="12" uuid="6ef3b8a3-be46-489a-ad07-4a4c5015c884">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="ba59c6b6-9985-4d9c-b5fa-9c688fd3d9a8">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[12]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="353" y="71" width="24" height="24" uuid="da2602c2-c823-413a-ae96-80eea7beb163"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="13" uuid="24b01c16-bcc8-4db1-ba4b-0ad41a3a67d1">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="43234f88-00c1-4f5d-b134-315b59de28a2">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[13]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="377" y="71" width="24" height="24" uuid="742feead-896c-4131-8a92-1895bfaa01aa"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="14" uuid="dc136288-5b5e-4f97-8556-9a6e12ce7e8a">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="edbe9323-ff50-4099-8d3f-724adfc41c6c">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[14]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="401" y="71" width="24" height="24" uuid="3d6d65ea-ed79-4bc6-a1fd-66a54f557dbe"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="15" uuid="59a7e594-76a3-41c1-8618-d57bbec7f12c">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="322cca5f-861b-4943-b65e-6e3ff648d614">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[15]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="425" y="71" width="24" height="24" uuid="6c2b5027-0958-417e-91f7-feaa48eb1ac1"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="16" uuid="1a798cc5-8494-4e6a-9467-b8d95ebae5d1">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="98897de2-e805-4994-be68-432d44246808">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[16]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="449" y="71" width="24" height="24" uuid="475034eb-d886-4a7e-a4db-25691e4f56cb"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="17" uuid="debef283-65de-4fd6-87da-8eccc12903ba">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="d3a870e2-1e31-41ea-83b4-52afb4e4f86f">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[17]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="473" y="71" width="24" height="24" uuid="a29708aa-2a29-4fd5-b566-68850ab9394f"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="18" uuid="427d0248-fb70-4d4e-bc85-3d741bd9f5c5">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="506afec4-ddc6-4d2b-af31-00ef8c04101c">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[18]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="497" y="71" width="24" height="24" uuid="afe19075-e02a-4f87-a208-aa6bb1c8386b"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="19" uuid="eca14069-d19d-4550-92b0-4322fa55d339">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="231ee93c-8f3c-4383-ba5f-d8a4e6fd6b78">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[19]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="521" y="71" width="24" height="24" uuid="cde4c6ae-6d4e-40c5-a892-ca549306d8ee"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="20" uuid="63021bcc-054f-48a9-8f1c-0dd3e74a708b">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" isRemoveLineWhenBlank="true" uuid="c0e772ed-10da-492c-ad70-6dbb0ef06e85">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[20]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="545" y="71" width="24" height="24" uuid="2ed5e732-7599-40c3-b376-389f6bf724b7"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="21" uuid="fdf1d740-e597-4e43-8350-c749d5d85741">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="f95a162f-db9c-4683-be7f-8816f5ffc97d">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[21]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="569" y="71" width="24" height="24" uuid="8ab39bc9-844c-4fde-90e9-afd07dd976bc"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="22" uuid="64586f90-b259-4e7d-a315-9e99332537d2">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="68df6a7d-3cfa-441e-a3f1-71722d2717e0">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[22]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="593" y="71" width="24" height="24" uuid="da1e837d-9043-42f4-9d3f-34c023cab147">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="23" uuid="df575afd-4fdf-4ffe-8b30-0c19c6937e66">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="29cf3e74-5524-4204-9aca-4fcaf11afeca">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[23]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="617" y="71" width="24" height="24" uuid="3a2a5378-8a83-45ec-b850-41061faf5492"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="24" uuid="c5f85cdd-2ba1-4c0d-96fe-1c2001950179">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="2a28973b-dcc6-47ca-b185-7844fba83725">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[24]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="641" y="71" width="24" height="24" uuid="aabaae7f-d6c8-458d-b9fb-af4a64fed391"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="25" uuid="5da268c4-f511-4226-846a-0e26372a118f">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="115670a1-2afd-4fda-8fb2-8284e75feae3">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[25]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="665" y="71" width="24" height="24" uuid="19ea40e2-253c-415f-ab7d-f96129c5856c"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="26" uuid="b0bc34a8-b9c8-4692-a299-42234bd54658">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="36aa25d6-a95f-4a3a-9021-461ac9bb2fd4">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[26]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="689" y="71" width="24" height="24" uuid="ca1c2ad3-2af5-4b7d-b96c-5c61a81368dd"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="27" uuid="d477ec8b-2546-4943-9f69-6a814f4c1cd6">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="dcfa4eb4-ba4e-401e-833b-3d53fe457911">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[27]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="713" y="71" width="24" height="24" uuid="a025f535-452d-418e-9958-f90f8a8a83f6"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="28" uuid="2b97f35f-6b11-4e25-b126-d03c2c5060b5">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="abf97ced-2cb2-4630-94ac-a09eb5097daa">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[28]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="737" y="71" width="24" height="24" uuid="1fdf6921-ebc4-4cce-9716-3d564aaaffb6"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="29" uuid="87759e66-2976-431b-b7b8-12d0c97b2206">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="a4063d2a-c094-4597-ba72-126b5e552c3b">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[29]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement x="761" y="71" width="24" height="24" uuid="1423dcdc-79af-4f82-b24b-fa09b5aeefda"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="30" uuid="f68d5e0a-e655-4199-8746-31023a454e47">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" x="0" y="0" width="24" height="24" uuid="962b54f9-cff7-49d5-92c6-30b9b8ec1f14">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[30]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<staticText>
+				<reportElement mode="Opaque" x="785" y="71" width="24" height="24" backcolor="#C4C4C4" uuid="1d9a6ef8-2af0-476c-9c46-36c826c9f7ad">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[31]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="785" y="71" width="24" height="24" uuid="df7be071-32a3-4e99-8e00-2264b8ad4806"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="31" uuid="f8193f77-d59f-49e9-83bb-dafde93fb710">
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="24" width="24">
+						<textField>
+							<reportElement style="Style1" isPrintRepeatedValues="false" x="0" y="0" width="24" height="24" uuid="b1b6d62b-fad4-42ff-b5d5-16802d2bf237">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[31]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</title>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<componentElement>
+				<reportElement x="30" y="0" width="779" height="15" uuid="5e5a458f-7ca1-41e5-b834-603e96f05dca"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="ChrgrNm" uuid="771bf9c5-cd98-4cd9-b527-99d798c02a0e">
+						<datasetParameter name="paramChrgrRoleNum">
+							<datasetParameterExpression><![CDATA[$F{CHRGR_ROLE_NM}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="jrParam1">
+							<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="15" width="779">
+						<textField>
+							<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="35" height="15" uuid="e9ca4383-761b-414b-9e1f-3af2ee8c628d">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="맑은고딕"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{CHRGR_NM}]]></textFieldExpression>
+						</textField>
+						<componentElement>
+							<reportElement x="35" y="0" width="744" height="15" uuid="d7e3ec83-f3c6-448d-b0e6-0080152cd5d5">
+								<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+							</reportElement>
+							<jr:list printOrder="Vertical">
+								<datasetRun subDataset="DlalzTime" uuid="97239345-acae-493b-80bb-ac09e577c818">
+									<datasetParameter name="paramChrgrNm">
+										<datasetParameterExpression><![CDATA[$F{CHRGR_NM}]]></datasetParameterExpression>
+									</datasetParameter>
+									<datasetParameter name="jrParam1">
+										<datasetParameterExpression><![CDATA[$P{jrParam1}]]></datasetParameterExpression>
+									</datasetParameter>
+									<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+								</datasetRun>
+								<jr:listContents height="15" width="744">
+									<textField>
+										<reportElement x="0" y="0" width="24" height="15" uuid="42222f90-2945-4e50-b75b-2f11eef6f19c">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY01}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="24" y="0" width="24" height="15" uuid="557f00ed-f6c2-4605-ab2c-3113d7c18e21">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY02}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="48" y="0" width="24" height="15" uuid="d6329cc1-181a-40b4-8696-1bd2991c9689">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY03}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="72" y="0" width="24" height="15" uuid="24026384-27b8-482c-aa56-549bb1145f69">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY04}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="96" y="0" width="24" height="15" uuid="2da85d6a-7b1d-44fa-b10e-44ab547ea720">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY05}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="120" y="0" width="24" height="15" uuid="2f40454a-62cd-4816-882a-a4f92f2a75ca">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY06}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="144" y="0" width="24" height="15" uuid="67285368-024f-4e45-94dd-ccf8376945e7">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY07}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="168" y="0" width="24" height="15" uuid="0905b279-7954-42ce-8070-1d0ee2a0da75">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY08}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="192" y="0" width="24" height="15" uuid="0ff36cc9-b03f-4769-820f-545467d9f344">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY09}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="216" y="0" width="24" height="15" uuid="a1146d52-ba08-49c4-97c7-bf688c2f4a12">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY10}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="240" y="0" width="24" height="15" uuid="92007d70-78b4-4368-bb4e-29fc0208457c">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY11}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="264" y="0" width="24" height="15" uuid="e0bda0dc-e5c9-4328-b5f3-38edc3af8c83">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY12}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="288" y="0" width="24" height="15" uuid="a1f112df-1472-4771-928b-db4de9224b0f">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY13}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="312" y="0" width="24" height="15" uuid="9fff3827-17bf-4056-bffd-7200bd78cb69">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY14}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="336" y="0" width="24" height="15" uuid="a38fc138-7d7f-4949-b172-096e844790df">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY15}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="360" y="0" width="24" height="15" uuid="fe405201-4f0d-452c-a33a-05313b7b8a3b">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY16}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="384" y="0" width="24" height="15" uuid="949e8b65-f64d-4eb6-85b6-81012679c450">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY17}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="408" y="0" width="24" height="15" uuid="08e76eda-d771-4757-901d-f17ed680b55a">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY18}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="432" y="0" width="24" height="15" uuid="8d599d16-438f-4522-aae5-f3fb1368eb37">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY19}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="456" y="0" width="24" height="15" uuid="93cc7f3b-a67c-4616-89ff-911c017aeaad">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY20}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="480" y="0" width="24" height="15" uuid="0e68c4d5-a203-48e8-b36e-188cdaf378d9">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY21}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="504" y="0" width="24" height="15" uuid="f5fab45d-9e43-4b98-b67d-6c5004f55a60">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY22}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="528" y="0" width="24" height="15" uuid="045002aa-6458-4703-83f0-292959c2638b">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY23}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="552" y="0" width="24" height="15" uuid="1a7f904d-e9ce-4a80-8233-b1608d434fc0">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY24}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="576" y="0" width="24" height="15" uuid="9abe1c57-996a-4bf6-97d0-9f57fa55faac">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY25}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="600" y="0" width="24" height="15" uuid="e45def24-4bd6-478b-9d08-c9690be092ef">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY26}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="624" y="0" width="24" height="15" uuid="1926e8b5-0927-4e0c-9f6f-3daec0b33d57">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY27}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="648" y="0" width="24" height="15" uuid="dd07c9fd-9fa7-4429-aabd-221a11e1da3a">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY28}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="672" y="0" width="24" height="15" uuid="861395fc-72ec-4c36-a983-2b24fa10c4f3">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY29}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="696" y="0" width="24" height="15" uuid="262a004d-99a9-446b-afbc-4b7b7d82e617">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY30}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="720" y="0" width="24" height="15" uuid="045c637d-9faf-4605-ab6d-dafbd03716f0">
+											<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											<property name="com.jaspersoft.studio.unit.width" value="px"/>
+										</reportElement>
+										<box>
+											<pen lineWidth="1.0"/>
+											<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+											<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+										</box>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="맑은고딕" size="8"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{WORKDAY31}]]></textFieldExpression>
+									</textField>
+								</jr:listContents>
+							</jr:list>
+						</componentElement>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<textField>
+				<reportElement stretchType="ElementGroupHeight" x="-5" y="0" width="35" height="15" uuid="09d188b6-9eb4-4398-a728-36e61b1b7384">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHRGR_ROLE_NM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

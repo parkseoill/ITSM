@@ -1,0 +1,130 @@
+package truebon.com.dlm.rep.service.impl;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.util.EgovUserDetailsHelper;
+import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
+import truebon.com.dlm.dla.model.DlalzVO;
+import truebon.com.dlm.rep.dao.ReplaceDAO;
+import truebon.com.dlm.rep.model.ReplaceVO;
+
+import truebon.com.dlm.rep.service.ReplaceService;
+
+@Service("ReplaceService")
+public  class ReplaceServiceImpl  extends EgovAbstractServiceImpl implements ReplaceService{
+
+      
+     @Resource(name = "ReplaceDAO")
+     private ReplaceDAO replaceDAO;
+      
+
+      /**
+       * tb_replac_offday를 조회한다.
+       * 
+       * @param searchVO - 조회할 정보가 담긴 VO
+       */
+      
+      public List<ReplaceVO> selectReplaceList(ReplaceVO searchVO) throws Exception {
+      
+      LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+      searchVO.setLoginchrgrNo(user.getChrgrNo());
+          
+      LocalDate currentdate = LocalDate.now();
+      if (searchVO.getSelectedDate() == "") {
+         searchVO.setSelectedDate(currentdate.format(DateTimeFormatter.ofPattern("yyyy")));
+      }
+         return replaceDAO.selectReplaceList(searchVO);
+      }
+     
+      /**
+       * 대휴 발생 현황 상세를 조회한다.
+       * 
+       * @param searchVO - 조회할 정보가 담긴 VO
+       */
+      
+      public List<ReplaceVO> selectDetailReplaceList(ReplaceVO searchVO) throws Exception {
+      
+      LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+      searchVO.setLoginchrgrNo(user.getChrgrNo());
+          
+      LocalDate currentdate = LocalDate.now();
+      if (searchVO.getSelectedDate() == "") {
+         searchVO.setSelectedDate(currentdate.format(DateTimeFormatter.ofPattern("yyyy")));
+      }
+         return replaceDAO.selectDetailReplaceList(searchVO);
+      }
+
+      /**
+       * tb_dlalz를 조회한다.
+       * 
+       * @param searchVO - 조회할 정보가 담긴 VO
+       */
+      
+      public List<ReplaceVO> selectDetailReplaceUseList(ReplaceVO ReplaceVO) throws Exception {
+      
+      LocalDate currentdate = LocalDate.now();
+      if (ReplaceVO.getSelectedDate() == "") {
+         ReplaceVO.setSelectedDate(currentdate.format(DateTimeFormatter.ofPattern("yyyy")));
+      }
+         return replaceDAO.selectDetailReplaceUseList(ReplaceVO);
+      }
+      
+      /**
+       * 담당자 성명을 조회한다.
+       * 
+       * @param searchVO - 조회할 정보가 담긴 VO
+       */
+      
+      public List<ReplaceVO> selectChrgrName(ReplaceVO ReplaceVO) throws Exception {
+      
+         return replaceDAO.selectChrgrName(ReplaceVO);
+      }
+      
+      /**
+       * 휴일 근무 현황을 조회한다.
+       * 
+       * @param searchVO - 조회할 정보가 담긴 VO
+       */
+      
+      public List<ReplaceVO> selectOffdayWrk(ReplaceVO ReplaceVO) throws Exception {
+      
+  		LocalDate currentdate = LocalDate.now();
+    	if(ReplaceVO.getOffdayWrkDate() == "") {
+    		ReplaceVO.setOffdayWrkDate(currentdate.format(DateTimeFormatter.ofPattern("yyyy-MM")));
+       	}
+    	if(ReplaceVO.getSelectedDate2() == "") {
+    		ReplaceVO.setSelectedDate2(currentdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+       	}
+    	
+         return replaceDAO.selectOffdayWrk(ReplaceVO);
+      }
+
+
+      /**
+       * 대휴를  생성한다
+       * 
+       * @param searchVO - 생성할 정보가 담긴 VO
+       */
+	  public void insertReOffday(ReplaceVO searchVO) throws Exception {
+	       replaceDAO.insertReOffday(searchVO);
+	   }   
+
+      /**
+       * 대휴를 삭제한다.
+       * 
+       * @param searchVO - 조회할 정보가 담긴 VO
+       */
+      
+      public void deleteReOffday(ReplaceVO searchVO) throws Exception {
+      
+         replaceDAO.deleteReOffday(searchVO);
+      }
+    
+}

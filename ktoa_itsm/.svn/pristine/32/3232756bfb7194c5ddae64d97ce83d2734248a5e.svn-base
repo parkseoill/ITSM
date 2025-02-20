@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator"%>
+<%
+ /**
+  * @Class Name : GrdUpdt.jsp
+  * @Description : 장애등급관리 팝업 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.10.26   이정하               최초 생성
+  *
+  *  @author 이정하
+  *  @since 2023.10.26
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>장애등급 수정</title>
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/truebon/com/fai/grd/com.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<validator:javascript formName="FailGradeVO" staticJavascript="false" xhtml="true" cdata="false"/>
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<script type="text/javaScript">
+function updateItem() {
+	var objForm = document.getElementById("grdMngForm");
+	if(confirm("<spring:message code="common.update.msg" />")){
+		if(!validateFailGradeVO(objForm)){
+			return;
+		}else{
+			objForm.submit();
+		}
+	}
+}
+
+function closeWindow() {
+	if(confirm("<spring:message code="common.update.msg" />")){
+		parent.$('.ui-dialog-content').dialog('close');
+	}
+}
+</script>
+<c:if test="${!empty resultMsg}"><script>alert("${resultMsg}");</script></c:if>
+</head>
+<body>
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+<div>
+	<h1>장애등급 수정</h1>
+	<div class="horizontal-line"></div>
+	<form id="grdMngForm" name="grdMngForm" action ="<c:url value='/fai/grd/updateGrdUpdt.do' />" method="post">
+ 		<input type="hidden" id="failrInfldgCd" name="failrInfldgCd" value="${resultVO.failrInfldgCd}" />
+		<input type="hidden" id="failrEmgdgrCd" name="failrEmgdgrCd" value="${resultVO.failrEmgdgrCd}"> 	
+    <div class="row"><h3>긴급도  [${resultVO.failrEmgDgrNm}]</h3> <h3>영향도 [${resultVO.failrInfldgNm}]</h3></div>
+    <div class="row">
+    	<h3>등급 </h3>
+    	<select id="failrGrdCd" name="failrGrdCd" title="등급">
+            <option value=""> == 선택 ==</option>
+            <c:forEach var="item" items="${gradeList}" varStatus="status">
+                <option value="${item.newComnCd}" <c:if test="${resultVO.failrGrdCd == item.newComnCd}">selected="selected"</c:if>>${item.comnCdNm}</option>
+            </c:forEach>
+        </select>
+    </div>
+	<div class="horizontal-line2"></div>
+
+    <div class="row">
+        <h3>비고내용</h3>
+    </div>
+    <div class="horizontal-line2"></div>
+    <div class="row">
+        <textarea name="rmarkText" cols="20" rows="10">${resultVO.rmarkText}</textarea>
+    </div>
+	 <!-- 수정 버튼 -->
+<%-- 	<input class="s_submit" type="submit" value='<spring:message code="button.update" />' onclick="updateItem(); return false;" />
+	 --%>				
+    <button style="float: right;" type="submit" onclick="closeWindow(); return false;">수정</button>
+
+    </form>
+</div>
+</body>
+</html>

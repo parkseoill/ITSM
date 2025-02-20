@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+ /**
+  * @Class Name : LcnMngList.jsp
+  * @Description : 라이센스 관리 목록 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.09.26   박서일               최초 생성
+  *   2023.09.26   김승현               라이센스 관리 목록 개발
+  *
+  *  @author 박서일
+  *  @since 2023.09.26
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>라이센스 관리 목록</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+
+<script language="javascript1.2" type="text/javascript">
+
+$(document).ready(function ()	{
+	fn_FocusStart(); //검색창 포커스 함수
+	<c:if test="${sessionScope.loginVO.authorCode ne 'ROLE_ADMIN'}">
+		disabled();
+	</c:if>	
+	
+	fn_checkAll(); //전체선택 함수
+});
+
+//관리자가 아닐 시 목록 체크박스 비활성화
+function disabled() {
+	$('table input[type=checkbox]').attr('disabled','true');
+}
+
+/* ********************************************************
+ * 모두선택 처리 함수
+ ******************************************************** */
+function fn_checkAll(){
+	// 전체 체크박스 선택
+	$("input[name=checkAll]").click(function() {
+		if($("input[name=checkAll]").prop("checked")) {
+			$("input[name=checkField]").prop("checked", true);
+		} else {
+			$("input[name=checkField]").prop("checked", false);
+		}
+	});
+	
+	// 전체 체크박스 선택 중 체크박스 하나를 풀때 '전체' 체크 해제
+	$("input[name=checkField]").click(function() {
+		let total = $("input[name=checkField]").length;
+		let cntChecked = $("input[name=checkField]:checked").length;
+		
+		if(total != cntChecked) {
+			$("input[name=checkAll]").prop("checked", false);
+		} else {
+			$("input[name=checkAll]").prop("checked", true);
+		}
+	});
+}
+
+/* ********************************************************
+ * 멀티삭제 처리 함수
+ ******************************************************** */
+function fn_DeleteList() {
+    let checkChargerNos = "";
+    let checkedCount = 0;
+    
+    $("input[name=checkField]").each(function() {
+    	if($(this).is(":checked") == true) {
+    		checkChargerNos += checkedCount==0? $(this).val() : "," + $(this).val();
+    		checkedCount++;
+    	}
+    });
+
+    if(checkedCount ==0){
+		alert("선택된 라이센스가 없습니다.");
+		return false;
+    }
+
+    if(confirm("<spring:message code="common.delete.msg" />")){	//삭제하시겠습니까?
+    	$("input[name=checkedValueForDel]").val(checkChargerNos);
+    	$("#lcnMngForm").attr("action", "<c:url value='/crm/lcm/deleteLcnMngList.do' />");
+    	$("#lcnMngForm").submit();
+    }
+}
+
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectLcnMng() {
+	document.lcnMngForm.pageIndex.value = 1;
+	document.lcnMngForm.action = "<c:url value='/crm/lcm/LcnMngList.do'/>";
+	document.lcnMngForm.submit();
+}
+
+/* ********************************************************
+ * 입력 화면 호출 함수
+ ******************************************************** */
+function insertLcnMngList() {
+   	document.lcnMngForm.action = "<c:url value='/crm/lcm/LcnMngRegist.do'/>";
+   	document.lcnMngForm.submit();
+}
+
+/* ********************************************************
+ * 상세조회처리 함수
+ ******************************************************** */
+function selectLcnMngListDetail(lcnId) {
+	document.lcnMngForm.lcnId.value = lcnId;
+   	document.lcnMngForm.action = "<c:url value='/crm/lcm/LcnMngUpdt.do'/>";
+   	document.lcnMngForm.submit();
+}
+
+/* ********************************************************
+ * 페이징 처리 함수
+ ******************************************************** */
+function linkPage(pageNo){
+	document.lcnMngForm.pageIndex.value = pageNo;
+	document.lcnMngForm.action = "<c:url value='/crm/lcm/LcnMngList.do'/>";
+   	document.lcnMngForm.submit();
+}
+
+/* ********************************************************
+ * focus 시작점 지정함수
+ ******************************************************** */
+function fn_FocusStart(){
+	$('#F1').focus(); //검색창으로 포커스
+}
+
+/* ********************************************************
+ * 엔터key 목록조회  함수
+ ******************************************************** */
+function press() {
+    if (event.keyCode==13) {
+    	selectLcnMng();
+    }
+}
+
+<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if>
+</script>
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+
+<div class="board">
+	<h1>라이센스 관리 목록</h1>
+	<form name="lcnMngForm" id="lcnMngForm" action="<c:url value = '/crm/lcm/LcnMngList.do'/>" method="POST">
+	<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
+	<input type="hidden" name="checkedValueForDel" />
+	<input type="hidden" name="lcnId">
+	<div class="search_box">
+		<ul>
+			<li style="padding-right: 2%;">
+				<label for="">검색조건 : </label>
+				<input type="radio" checked="checked" style="vertical-align: middle;" name="searchCondition" <c:if test="${searchVO.searchCondition == '1'}">checked="checked"</c:if> value="1">제품명</input>
+				<input type="radio" style="vertical-align: middle;" name="searchCondition" <c:if test="${searchVO.searchCondition == '2'}">checked="checked"</c:if> value="2">라이센스 번호</input>
+			</li>
+			<li>
+				<label for="">검색어 : </label>
+				<input type="text" id="F1" class="s_input2 vat" name="searchKeyword" value="<c:out value='${searchVO.searchKeyword}'/>" size="60" maxlength="60" onkeypress="press();"></input>
+				
+				<input type="submit" class="s_btn" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectLcnMng(); return false;" /><!-- 조회 -->
+				<!-- 관리자만 출력 -->
+				<c:if test="${sessionScope.loginVO.authorCode eq 'ROLE_ADMIN'}">
+					<span class="btn_b"><a href="#LINK" onclick="insertLcnMngList(); return false;" title='<spring:message code="button.create" />'><spring:message code="button.create" /></a></span><!-- 등록 -->
+					<span class="btn_b"><a href="#LINK" onclick="fn_DeleteList(); return false;" title='<spring:message code="button.delete" />'><spring:message code="button.delete" /></a></span><!-- 삭제 -->
+				</c:if>
+			</li>
+		</ul>
+	</div>
+	
+	<table class="board_list">
+		<colgroup>
+			<col style="width: 2%"/>
+			<col style="width: 5%"/>
+			<col style="width: 10%"/>
+			<col style="width: 10%"/>
+			<col style="width: 10%"/>
+		</colgroup>
+		<thead>
+			<tr>
+				<th scope="col"><input type="checkbox" name="checkAll" class="check2" id="checkboxTh" onclick="fn_checkAll();" title="전체선택" /></th>
+				<th scope="col">라이센스 ID</th>
+				<th scope="col">제품명</th>
+				<th scope="col">라이센스 번호</th>
+				<th scope="col">라이센스 내용</th>
+			</tr>
+		</thead>
+		<tbody class="ov">
+			<%-- 데이터가 없을때 화면에 메세지를 출력해준다 --%>
+			<c:if test="${fn:length(lcnList) == 0}">
+			<tr>
+				<td colspan="5">
+					<spring:message code="common.nodata.msg" />
+				</td>
+			</tr>
+			</c:if>
+			
+			<c:forEach var="result" items="${lcnList}">
+				<tr onclick="selectLcnMngListDetail('<c:out value="${result.lcnId}"/>'); return false;">
+					<td onclick="event.cancelBubble=true"><input type="checkbox" name="checkField" class="check2" title="선택" id="checkbox" value="<c:out value='${result.lcnId}'/>"></td>
+					<td><c:out value="${result.lcnId}"/></td>
+					<td><c:out value="${result.prodNm}"/></td>
+					<td><c:out value="${result.lcnNo}"/></td>
+					<td><c:out value="${result.lcnText}"/></td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+	
+	<!-- paging navigation -->
+	<div class="pagination">
+		<ul>
+			<ui:pagination paginationInfo="${paginationInfo}" type="image" jsFunction="linkPage"/>
+		</ul>
+	</div>
+	
+	</form>
+	
+</div>
+</body>
+</html>

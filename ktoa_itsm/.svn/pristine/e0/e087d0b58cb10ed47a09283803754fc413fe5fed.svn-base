@@ -1,0 +1,253 @@
+package truebon.com.dlm.rep.model;
+
+import java.io.Serializable;
+
+@SuppressWarnings("serial")
+public class ReplaceVO implements Serializable{
+   
+    /** 검색 날짜  */
+    private String selectedDate = "";
+   
+    /** 대휴 날짜  */
+    private String repOffdayDate; 
+   
+    /** 대휴 로그인 담당자 번호  */
+    private String loginchrgrNo;
+   
+    /** 담당자 번호  */
+    private String chrgrNo;
+   
+    /** 담당자 이름  */
+    private String chrgrNm;
+   
+    /** 대휴 수  */
+    private String repOffdayCnt;
+   
+    /** 대휴 사유  */
+    private String repOffdayRsnCd;
+    
+    /** 대휴 사유  */
+    private String repOffdayRsn;
+   
+    /** 대휴 날짜  */
+    private String dlalzDate;
+   
+    /** 대휴 입력수 */
+    private String insertCnt;
+   
+    /** 대휴 입력 선택 날짜 */
+    private String selectedDate2 = "";
+    
+    /** 대휴 입력 담당자 선택 */
+    private String chk = "";
+
+	/** 휴일 근무 현황 조회 날짜 */
+    private String offdayWrkDate = "";
+
+	/** 발생 대휴 합계  */
+    private float repSum;
+    
+    /** 사용 대휴 합계  */
+    private float useRepSum;
+    
+    /** 잔여 대휴  */
+    private float remainingRep;
+  
+    /** 대휴 사용 수  */
+    private String useRep;
+
+    /** 휴일 근무 사유 코드  */
+    private String offdayWrkRsnCd;
+ 
+    /** 대휴 사용 비고 */
+    private String remarkText;
+    
+	/** 출근시간  */
+    private String atendTimeT;
+
+	/** 퇴근시간 */
+    private String leofcTimeT;
+    
+	/** 상세 조회 선택 담당자 성명 */
+    private String selectNm;
+
+    
+	public String getSelectedDate() {
+		return selectedDate;
+	}
+
+	public void setSelectedDate(String selectedDate) {
+		this.selectedDate = selectedDate;
+	}
+
+	public String getRepOffdayDate() {
+		return repOffdayDate;
+	}
+
+	public void setRepOffdayDate(String repOffdayDate) {
+		this.repOffdayDate = repOffdayDate;
+	}
+
+	public String getLoginchrgrNo() {
+		return loginchrgrNo;
+	}
+
+	public void setLoginchrgrNo(String loginchrgrNo) {
+		this.loginchrgrNo = loginchrgrNo;
+	}
+
+	public String getChrgrNo() {
+		return chrgrNo;
+	}
+
+	public void setChrgrNo(String chrgrNo) {
+		this.chrgrNo = chrgrNo;
+	}
+
+	public String getChrgrNm() {
+		return chrgrNm;
+	}
+
+	public void setChrgrNm(String chrgrNm) {
+		this.chrgrNm = chrgrNm;
+	}
+
+	public String getRepOffdayCnt() {
+		return repOffdayCnt;
+	}
+
+	public void setRepOffdayCnt(String repOffdayCnt) {
+		this.repOffdayCnt = repOffdayCnt;
+	}
+
+	public String getRepOffdayRsnCd() {
+		return repOffdayRsnCd;
+	}
+
+	public void setRepOffdayRsnCd(String repOffdayRsnCd) {
+		this.repOffdayRsnCd = repOffdayRsnCd;
+	}
+
+	public String getRepOffdayRsn() {
+		return repOffdayRsn;
+	}
+
+	public void setRepOffdayRsn(String repOffdayRsn) {
+		this.repOffdayRsn = repOffdayRsn;
+	}
+
+	public String getDlalzDate() {
+		return dlalzDate;
+	}
+
+	public void setDlalzDate(String dlalzDate) {
+		this.dlalzDate = dlalzDate;
+	}
+
+	public String getInsertCnt() {
+		return insertCnt;
+	}
+
+	public void setInsertCnt(String insertCnt) {
+		this.insertCnt = insertCnt;
+	}
+
+	public String getSelectedDate2() {
+		return selectedDate2;
+	}
+
+	public void setSelectedDate2(String selectedDate2) {
+		this.selectedDate2 = selectedDate2;
+	}
+
+	public String getChk() {
+		return chk;
+	}
+
+	public void setChk(String chk) {
+		this.chk = chk;
+	}
+
+	public String getOffdayWrkDate() {
+		return offdayWrkDate;
+	}
+
+	public void setOffdayWrkDate(String offdayWrkDate) {
+		this.offdayWrkDate = offdayWrkDate;
+	}
+
+	public float getRepSum() {
+		return repSum;
+	}
+
+	public void setRepSum(float repSum) {
+		this.repSum = repSum;
+	}
+
+	public float getUseRepSum() {
+		return useRepSum;
+	}
+
+	public void setUseRepSum(float useRepSum) {
+		this.useRepSum = useRepSum;
+	}
+
+	public float getRemainingRep() {
+		return remainingRep;
+	}
+
+	public void setRemainingRep(float remainingRep) {
+		this.remainingRep = remainingRep;
+	}
+
+	public String getUseRep() {
+		return useRep;
+	}
+
+	public void setUseRep(String useRep) {
+		this.useRep = useRep;
+	}
+
+	public String getOffdayWrkRsnCd() {
+		return offdayWrkRsnCd;
+	}
+
+	public void setOffdayWrkRsnCd(String offdayWrkRsnCd) {
+		this.offdayWrkRsnCd = offdayWrkRsnCd;
+	}
+
+	public String getRemarkText() {
+		return remarkText;
+	}
+
+	public void setRemarkText(String remarkText) {
+		this.remarkText = remarkText;
+	}
+
+	public String getAtendTimeT() {
+		return atendTimeT;
+	}
+
+	public void setAtendTimeT(String atendTimeT) {
+		this.atendTimeT = atendTimeT;
+	}
+
+	public String getLeofcTimeT() {
+		return leofcTimeT;
+	}
+
+	public void setLeofcTimeT(String leofcTimeT) {
+		this.leofcTimeT = leofcTimeT;
+	}
+
+	public String getSelectNm() {
+		return selectNm;
+	}
+
+	public void setSelectNm(String selectNm) {
+		this.selectNm = selectNm;
+	}
+
+    
+}
+   

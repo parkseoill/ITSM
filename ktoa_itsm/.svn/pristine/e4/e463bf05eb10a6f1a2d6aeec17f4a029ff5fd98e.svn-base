@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+ /**
+  * @Class Name : FixedInspMngList.jsp
+  * @Description : 정기점검관리 조회 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.08.07   김승현               최초 생성
+  *
+  *  @author 김승현
+  *  @since 2023.08.07
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>정기점검관리 목록</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+
+<script language="javascript1.2" type="text/javaScript">
+
+$(document).ready(function () {
+	fn_FocusStart();
+	
+	fn_checkAll();
+});
+
+/* ********************************************************
+ * 페이징 처리 함수
+ ******************************************************** */
+function linkPage(pageNo){
+	document.fixedInspMngForm.pageIndex.value = pageNo;
+	document.fixedInspMngForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>";
+	document.fixedInspMngForm.submit();
+}
+
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectFixedInspMng() {
+	document.fixedInspMngForm.pageIndex.value = 1;
+	document.fixedInspMngForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>";
+	document.fixedInspMngForm.submit();
+}
+
+/* ********************************************************
+ * 현황 조회 처리 함수
+ ******************************************************** */
+function selectFixedInspStus()	{
+	document.fixedInspMngForm.action = "<c:url value='/opm/fix/FixedInspStus.do'/>";
+	document.fixedInspMngForm.submit();
+}
+
+/* ********************************************************
+ * focus 시작점 지정함수
+ ******************************************************** */
+function fn_FocusStart(){
+	$('#F1').focus();
+}
+ 
+/* ********************************************************
+ * 엔터key 목록조회  함수
+ ******************************************************** */
+function press() {
+	if (event.keyCode==13) {
+		selectFixedInspMng();
+	}
+}
+
+
+/* ********************************************************
+ * 체크박스 모두선택 및 해제 처리 함수
+ ******************************************************** */
+function fn_checkAll(){
+	// 전체 체크박스 선택
+	$("input[name=checkAll]").click(function() {
+		if($("input[name=checkAll]").prop("checked")) {
+		   $("input[name=checkField]").prop("checked", true);
+		} else {
+		   $("input[name=checkField]").prop("checked", false);
+		}
+	});
+	
+	// 전체 체크박스 선택 중 체크박스 하나를 풀때 '전체' 체크 해제
+	$("input[name=checkField]").click(function() {
+	let total = $("input[name=checkField]").length;
+	let cntChecked = $("input[name=checkField]:checked").length;
+	
+	if(total != cntChecked) {
+	   $("input[name=checkAll]").prop("checked", false);
+	} else {
+	   $("input[name=checkAll]").prop("checked", true);
+	}
+	});
+}
+
+/* ********************************************************
+ * 멀티삭제 처리 함수
+ ******************************************************** */
+function fn_DeleteList() {
+    let checkSrs = "";
+    let checkedCount = 0;
+    
+    $("input[name=checkField]").each(function() {
+		if($(this).is(":checked") == true) {
+		   checkSrs += checkedCount==0? $(this).val() : "," + $(this).val();
+		   checkedCount++;
+		}
+    });
+
+    if(checkedCount ==0){
+		alert("선택된 정기점검이 없습니다.");
+		return false;
+    }
+
+    if(confirm("<spring:message code="common.delete.msg" />")){   //삭제하시겠습니까?
+		$("input[name=checkedValueForDel]").val(checkSrs);
+		$("#fixedInspMngForm").attr("action", "<c:url value='/opm/fix/deleteFixedInspList.do'/>");
+		$("#fixedInspMngForm").submit();
+    }
+}
+
+/* ********************************************************
+ * 상세조회처리 함수
+ ******************************************************** */
+function selectFixedInspMngDetail(assetId, fixedInspPlnMon) {
+	document.fixedInspMngForm.assetId.value = assetId;
+	document.fixedInspMngForm.fixedInspPlnMon.value = fixedInspPlnMon;
+   	document.fixedInspMngForm.action = "<c:url value='/opm/fix/FixedInspMngUpdt.do'/>";
+   	document.fixedInspMngForm.submit();
+}
+
+/* ********************************************************
+ * 일괄 수정 처리 함수
+ ******************************************************** */
+ function fn_mltplUpdt() {
+	
+    let checkSrs = "";
+    let checkedCount = 0;
+    
+    $("input[name=checkField]").each(function() {
+		if($(this).is(":checked") == true) {
+		   checkSrs += checkedCount==0? $(this).val() : "," + $(this).val();
+		   checkedCount++;
+		}
+    });
+
+    if(checkedCount ==0){
+		alert("선택된 정기점검이 없습니다.");
+		return false;
+    }
+    
+    var pagetitle = $("#mltplUpdt").attr("title");
+    var page = "<c:url value='/opm/fix/MltplUpdtPopup.do'/>?checkedCount="+checkedCount+"&checkedValueForDel="+checkSrs;
+    var $dialog = $('<div style="overflow:hidden;padding: 0px 0px 0px 0px;"></div>')
+    .html('<iframe style="border: 0px; " src="' + page + '" width="100%" height="100%"></iframe>')
+    .dialog({
+    	autoOpen: false,
+        modal: true,
+        width: 500,
+        height: 300,
+        title: pagetitle
+	});
+	$dialog.dialog('open');
+}
+
+// 페이지를 갱신시킨다. 
+function reloadPage() {    
+	location.reload(); 
+}
+
+
+
+<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if> //메세지 창
+</script>
+
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+
+<div class="board">
+	<h1>정기점검관리 목록 - 
+		<c:choose> 
+			<c:when test="${searchVO.selectMonth != '' and searchVO.selectMonth != null}"> 
+				${searchVO.selectMonth}월
+			</c:when> 
+			<c:when test="${searchVO.selectQuarter != '' and searchVO.selectQuarter != null}"> 
+				${searchVO.selectQuarter}분기
+			</c:when> 
+			<c:otherwise>
+				<c:if test="${searchVO.selectHalf == '1'}">상반기</c:if>
+				<c:if test="${searchVO.selectHalf == '2'}">하반기</c:if>
+			</c:otherwise>
+		</c:choose> 
+	</h1>
+	<form name="fixedInspMngForm" id="fixedInspMngForm" action="<c:url value = '/opm/reg/FixedInspMngList.do'/>" method="POST">
+	<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
+	<input type="hidden" name="checkedValueForDel" value="<c:out value='${searchVO.checkedValueForDel}'/>"/>
+	<input type="hidden" name="assetId" value="<c:out value='${searchVO.assetId}'/>"/>
+	<input type="hidden" name="fixedInspPlnMon" value="<c:out value='${searchVO.fixedInspPlnMon}'/>"/>
+	<input type="hidden" name="selectedDate"  value="<c:out value='${searchVO.selectedDate}'/>"/>
+	<input type="hidden" name="selectMonth"  value="<c:out value='${searchVO.selectMonth}'/>"/>
+	<input type="hidden" name="selectQuarter"  value="<c:out value='${searchVO.selectQuarter}'/>"/>
+	<input type="hidden" name="selectHalf"  value="<c:out value='${searchVO.selectHalf}'/>"/>
+	<input type="hidden" name="searchCmpny"  value="<c:out value='${searchVO.searchCmpny}'/>"/>
+	<div class="search_box">
+		<ul style="text-align: center; display: flex; justify-content: space-around;">
+			<li>
+				<label for="">장비구분 : </label>
+				<select id="searchKeyword1" name="searchKeyword1">
+					<option value="">==선택==</option>
+					<option value="HW" <c:if test="${searchVO.searchKeyword1 == 'HW'}">selected="selected"</c:if>>HW</option>
+					<option value="SW" <c:if test="${searchVO.searchKeyword1 == 'SW'}">selected="selected"</c:if>>SW</option>
+				</select>
+			</li>
+			<li>
+				<label for="">점검 여부 : </label>
+				<select id="searchKeyword2" name="searchKeyword2">
+					<option value="">==선택==</option>
+					<option value="Y" <c:if test="${searchVO.searchKeyword2 == 'Y'}">selected="selected"</c:if>>Y</option>
+					<option value="N" <c:if test="${searchVO.searchKeyword2 == 'N'}">selected="selected"</c:if>>N</option>
+				</select>
+			</li>
+			<li>
+				<label for="">업무시스템 : </label>
+				<select id="searchKeyword3" name="searchKeyword3" title="검색조건"> 
+					<option value="">== 선택 ==</option>
+					<c:forEach var="bizSytm" items="${bizSysmCdList}" varStatus="status">         
+						<option value='${bizSytm.bizSytmCd}' <c:if test="${searchVO.searchKeyword3 == bizSytm.bizSytmCd}">selected="selected"</c:if>>${bizSytm.bizSytmNm}</option>  
+					</c:forEach>
+				</select> 
+			</li>
+			<li>
+               	<label for="">검색조건 : </label> 
+               	<input style="vertical-align: middle;" checked="checked" type="radio" name="searchCondition" <c:if test="${searchVO.searchCondition == '1'}">checked="checked"</c:if> value="1">제품명</input> 
+               	<input style="vertical-align: middle;" type="radio" name="searchCondition" <c:if test="${searchVO.searchCondition == '2'}">checked="checked"</c:if> value="2">용도</input>
+            </li>
+            <li>
+            	<label for="">검색어 : </label> 
+            	<input id="F1" class="s_input2 vat" name="searchKeyword" type="text" value="<c:out value='${searchVO.searchKeyword}'/>" size="60" maxlength="60" onkeypress="press();" title="<spring:message code="title.searchCondition" />"/>
+            </li>
+            <li>
+				<input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectFixedInspMng(); return false;"/> <!-- 조회 --> 
+				<span class="btn_b"><a href="#LINK" onclick="fn_DeleteList(); return false;" title='<spring:message code="button.delete" />'><spring:message code="button.delete" /></a></span> <!-- 삭제 -->
+            </li>
+            <li>
+				<input class="s_btn" type="submit" value='현황' title='현황' onclick="selectFixedInspStus(); return false;"/> <!-- 현황 --> 
+			</li>
+            <li>					
+				<select id="pageUnit" name="pageUnit">
+					<option value="10"<c:if test="${searchVO.pageUnit == 10}">selected="selected"</c:if>>10개 보기</option>
+					<option value="20"<c:if test="${searchVO.pageUnit == 20}">selected="selected"</c:if>>20개 보기</option>
+					<option value="30"<c:if test="${searchVO.pageUnit == 30}">selected="selected"</c:if>>30개 보기</option>
+					<option value="50"<c:if test="${searchVO.pageUnit == 50}">selected="selected"</c:if>>50개 보기</option>
+					<option value="100"<c:if test="${searchVO.pageUnit == 100}">selected="selected"</c:if>>100개 보기</option>
+				</select>
+			</li>
+		</ul>
+	</div>
+	<table class="board_list">
+		<colgroup>
+			<col style="width: 3px" />
+			<col style="width: 6px" />
+			<col style="width: 4px" />
+			<col style="width: 6px" />
+			<col style="width: 4px" />
+			<col style="width: 4px" />
+			<col style="width: 6px" />
+			<col style="width: 13px" />
+			<col style="width: 10px" />
+			<col style="width: 8px" />
+		</colgroup>
+		<thead>
+            <tr>
+            	<th scope="col"><input type="checkbox" name="checkAll" id="checkboxTh" onclick="fn_checkAll();" title="전체선택" /></th>
+            	<th scope="col">자산ID</th>
+            	<th scope="col">장비구분</th>
+            	<th scope="col" style="color:#FF0000;">점검협력사</th>
+            	<th scope="col" style="color:#FF0000;">점검주기</th>
+            	<th scope="col" style="color:#FF0000;">점검여부</th>
+            	<th scope="col" style="color:#FF0000;">점검일</th>
+            	<th scope="col">제품명</th>
+            	<th scope="col">용도</th>
+            	<th scope="col">업무시스템</th>
+            </tr>
+        </thead>
+        <tbody class="ov">
+        	<%-- 데이터가 없을때 화면에 메세지를 출력해준다 --%>
+            <c:if test="${fn:length(fixedInpscList) == 0}">
+               <tr>
+                  <td colspan="10"><spring:message code="common.nodata.msg" /></td>
+               </tr>
+            </c:if>
+            <c:forEach var="result" items="${fixedInpscList}" varStatus="status">
+            	<tr onclick="selectFixedInspMngDetail('<c:out value="${result.assetId}"/>','<c:out value="${result.fixedInspPlnMon}"/>'); return false;">
+            		<td onclick="event.cancelBubble=true"><input type="checkbox" name="checkField" class="check2" title="선택" id="checkbox" value="<c:out value='${result.assetId}:${result.fixedInspPlnMon}'/>"></td>
+            		<td><c:out value="${result.assetId}" /></td>
+            		<td><c:out value="${result.assetDstnct}" /></td>
+            		<td class="Elli"><c:out value="${result.cmpnyNm}" /></td>
+            		<td><c:out value="${result.maintceInspCycle}" /></td>
+            		<td><c:out value="${result.fixedInspYn}" /></td>
+            		<td><c:out value="${result.fixedInspDate}" /></td>
+            		<td class="Elli"><c:out value="${result.prodNm}" /></td>
+            		<td class="Elli"><c:out value="${result.prodPurp}" /></td>
+            		<td class="Elli"><c:out value="${result.bizSytmNm}" /></td>
+            	</tr>
+            </c:forEach>
+        </tbody>
+	</table>
+	<p style="float:right; padding-top: 10px; padding-right: 10px;">총 ${paginationInfo.totalRecordCount}개</p>
+	<!-- paging navigation -->
+	<div class="pagination" >
+	   <ul>
+	      <ui:pagination paginationInfo="${paginationInfo}" type="image" jsFunction="linkPage" />
+	   </ul>
+	</div>
+	<div style="float: left;">
+		<span class="btn_s2"><a href="#LINK" id="mltplUpdt" onclick="fn_mltplUpdt(); return false;" title='선택 수정'>선택 수정</a></span> 
+		<!-- 선택 수정 -->
+	</div>
+	<div style="float: right;">
+	   <span class="btn_s2"><a href="#LINK" onclick="downloadExcel(); return false;" title='엑셀 다운로드'>엑셀 다운로드</a></span>
+	   <!-- 엑셀 다운로드 -->
+	</div>
+</div>
+</body>
+</html>

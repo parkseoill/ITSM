@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="HwMngMapper">
+	<resultMap id="HwMngList" type="truebon.com.crm.hwm.model.HwMngVO">
+		<result property="hwAssetId" column="HW_ASSET_ID" />
+		<result property="ntwrkDstnct" column="NTWRK_DSTNCT" />
+		<result property="vrtlzDstnct" column="VRTLZ_DSTNCT" />
+		<result property="hwType" column="HW_TYPE" />
+		<result property="hwTypeDtl" column="HW_TYPE_DTL" />
+		<result property="vrtlzType" column="VRTLZ_TYPE" />
+		<result property="upprHwAssetId" column="UPPR_HW_ASSET_ID" />
+		<result property="bizSytm" column="BIZ_SYTM" />
+		<result property="prodPurp" column="PROD_PURP" />
+		<result property="hostNm" column="HOST_NM" />
+		<result property="ipAddr" column="IP_ADDR" />
+		<result property="mnftrNm" column="MNFTR_NM" />
+		<result property="prodNm" column="PROD_NM" />
+		<result property="prodCoQty" column="PROD_CO_QTY" />
+		<result property="excelProdCoQty" column="EXCEL_PROD_CO_QTY" />			 
+		<result property="assetOwn" column="ASSET_OWN" />
+		<result property="serialno" column="SERIALNO" />
+		<result property="prodlocat" column="PRODLOCAT" />
+		<result property="assetStat" column="ASSET_STAT" />
+		<result property="ctrlYn" column="CTRL_YN" />	
+		<result property="maintceCntr" column="MAINTCE_CNTR" />
+		<result property="maintceCntrBeginDate" column="MAINTCE_CNTR_BEGIN_DATE" />
+		<result property="maintceCntrEndDate" column="MAINTCE_CNTR_END_DATE" />
+		<result property="maintceInspCycle" column="MAINTCE_INSP_CYCLE" />
+		<result property="maintceChrgrNo" column="MAINTCE_CHRGR_NO" />
+		<result property="entrngDate" column="ENTRNG_DATE" />
+		<result property="exanDate" column="EXAN_DATE" />
+		<result property="eoslDate" column="EOSL_DATE" />
+		<result property="appliYn" column="APPLI_YN" />
+		<result property="blcktRwrdTime" column="BLCKT_RWRD_TIME" />
+		<result property="rmarkText" column="RMARK_TEXT" />
+		<result property="osText" column="OS_TEXT" />
+		<result property="cpuText" column="CPU_TEXT" />
+		<result property="mmryText" column="MMRY_TEXT" />
+		<result property="diskText" column="DISK_TEXT" />
+		<result property="svcDupCnvrConfgYn" column="SVC_DUP_CNVR_CONFG_YN" />
+		<result property="dplctText" column="DPLCT_TEXT" />
+		<result property="ktoaAssetNo" column="KTOA_ASSET_NO" />	
+		<result property="delYn" column="DEL_YN" />		
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	
+	
+	<select id="selectHwMngList" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultMap="HwMngList">
+		SELECT 
+			  tha.HW_ASSET_ID 
+			, tccn1.COMN_CD_NM   NTWRK_DSTNCT
+			, tccn2.COMN_CD_NM   VRTLZ_DSTNCT
+			, tccn3.COMN_CD_NM   HW_TYPE
+			, tccn4.COMN_CD_NM   HW_TYPE_DTL
+			, tccn5.COMN_CD_NM   VRTLZ_TYPE
+			, tha.UPPR_HW_ASSET_ID 
+			, tbs.BIZ_SYTM_NM   BIZ_SYTM
+			, tha.PROD_PURP 
+			, tha.HOST_NM 
+			, tha.IP_ADDR 
+			, tha.PROD_CO_QTY
+			, tha.MNFTR_NM 
+			, tha.PROD_NM 
+			, tccn7.COMN_CD_NM   ASSET_OWN
+			, tha.SERIALNO 
+			, tha.PRODLOCAT 
+			, tccn8.COMN_CD_NM   ASSET_STAT
+			, tha.CTRL_YN 
+			, tccn9.COMN_CD_NM   MAINTCE_CNTR
+			, tha.MAINTCE_CNTR_BEGIN_DATE 
+			, tha.MAINTCE_CNTR_END_DATE 
+			, tccn10.COMN_CD_NM   MAINTCE_INSP_CYCLE 
+			, tha.MAINTCE_CHRGR_NO 
+			, tha.ENTRNG_DATE 
+			, tha.EXAN_DATE 
+			, tha.EOSL_DATE 
+			, tha.APPLI_YN 
+			, tha.BLCKT_RWRD_TIME 
+			, tha.RMARK_TEXT 
+			, tha.OS_TEXT 
+			, tha.CPU_TEXT 
+			, tha.MMRY_TEXT 
+			, tha.DISK_TEXT 
+			, tha.SVC_DUP_CNVR_CONFG_YN 
+			, tha.DPLCT_TEXT 
+			, tha.KTOA_ASSET_NO 
+			, tha.REGSTR_ID 
+			, tha.DEL_YN
+			, tha.CHNG_TEXT
+			, tha.AVLBL_BEGIN_DATE
+			, MAX(tha.AVLBL_END_DATE)
+			, tha.RDTT 
+			, tha.AMNDR_ID 
+			, tha.MDTT 
+		 FROM TB_HW_ASSET tha 
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn1
+		 	ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn2
+		 	ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn3
+		 	ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn4
+			ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn5
+			ON tha.VRTLZ_TYPE_CD  = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM   AS tbs
+			ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn7
+			ON tha.ASSET_OWN_CD  = tccn7.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn8
+			ON tha.ASSET_STAT_CD  = tccn8.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn9
+			ON tha.MAINTCE_CNTR_CD  = tccn9.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn10
+			ON tha.MAINTCE_INSP_CYCLE_CD  = tccn10.NEW_COMN_CD	
+		 WHERE 1=1	
+			<if test="searchKeyword1 !=null and searchKeyword1 !=''">
+				AND (tha.NTWRK_DSTNCT_CD = ${searchKeyword1})
+			</if>
+			<if test="searchKeyword2 !=null and searchKeyword2 !=''">
+				AND tha.HW_TYPE_CD = #{searchKeyword2}
+			</if>
+			<if test="searchKeyword3 !=null and searchKeyword3 !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword3}
+			</if>
+			<if test="searchKeyword4 !=null and searchKeyword4 !=''">
+				AND (tbs.BIZ_SYTM_CD = ${searchKeyword4})
+			</if>	
+			<if test="searchKeyword5 !=null and searchKeyword5 !=''">
+				AND tha.DEL_YN = #{searchKeyword5}
+			</if>	
+			<if test="searchKeyword6 !=null and searchKeyword6 !=''">
+			    AND tha.PROD_NM LIKE CONCAT('%',#{searchKeyword6},'%')
+			</if>
+			<if test="searchKeyword7 !=null and searchKeyword7 !=''">
+				AND tha.VRTLZ_DSTNCT_CD = #{searchKeyword7}
+			</if>
+			<if test="searchKeyword8 !=null and searchKeyword8 !=''">
+				AND (tha.ASSET_OWN_CD = ${searchKeyword8})
+			</if>			
+			GROUP BY tha.HW_ASSET_ID 
+			ORDER BY tha.HW_ASSET_ID DESC
+			limit #{recordCountPerPage} offset #{firstIndex} 
+			
+	</select>
+	
+	<select id="selectHwMng" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultType="truebon.com.crm.hwm.model.HwMngVO">
+		SELECT 
+			  tha.HW_ASSET_ID 
+			, tccn1.COMN_CD_NM   NTWRK_DSTNCT
+			, tccn2.COMN_CD_NM   VRTLZ_DSTNCT
+			, tccn3.COMN_CD_NM   HW_TYPE
+			, tccn4.COMN_CD_NM   HW_TYPE_DTL
+			, tccn5.COMN_CD_NM   VRTLZ_TYPE
+			, tha.UPPR_HW_ASSET_ID 
+			, tbs.BIZ_SYTM_NM   BIZ_SYTM
+			, tha.PROD_PURP 
+			, tha.HOST_NM 
+			, tha.IP_ADDR 
+			, tha.PROD_CO_QTY
+			, tha.MNFTR_NM 
+			, tha.PROD_NM 
+			, tccn7.COMN_CD_NM   ASSET_OWN
+			, tha.SERIALNO 
+			, tha.PRODLOCAT 
+			, tccn8.COMN_CD_NM   ASSET_STAT
+			, tha.CTRL_YN 
+			, tccn9.COMN_CD_NM   MAINTCE_CNTR
+			, if(tha.MAINTCE_CNTR_BEGIN_DATE !="", CONCAT(SUBSTRING(tha.MAINTCE_CNTR_BEGIN_DATE ,1,4),'-' ,SUBSTRING(tha.MAINTCE_CNTR_BEGIN_DATE ,5,2),'-' ,SUBSTRING(tha.MAINTCE_CNTR_BEGIN_DATE ,7,2)),"") MAINTCE_CNTR_BEGIN_DATE
+			, if(tha.MAINTCE_CNTR_END_DATE !="", CONCAT(SUBSTRING(tha.MAINTCE_CNTR_END_DATE ,1,4),'-' ,SUBSTRING(tha.MAINTCE_CNTR_END_DATE ,5,2),'-' ,SUBSTRING(tha.MAINTCE_CNTR_END_DATE ,7,2)),"") MAINTCE_CNTR_END_DATE
+			, tccn10.COMN_CD_NM   MAINTCE_INSP_CYCLE 
+			, tha.MAINTCE_CHRGR_NO 
+			, if(tha.ENTRNG_DATE !="", CONCAT(SUBSTRING(tha.ENTRNG_DATE ,1,4),'-' ,SUBSTRING(tha.ENTRNG_DATE ,5,2),'-' ,SUBSTRING(tha.ENTRNG_DATE ,7,2)),"") ENTRNG_DATE
+			, if(tha.EXAN_DATE !="", CONCAT(SUBSTRING(tha.EXAN_DATE ,1,4),'-' ,SUBSTRING(tha.EXAN_DATE ,5,2),'-' ,SUBSTRING(tha.EXAN_DATE ,7,2)),"") EXAN_DATE
+			, if(tha.EOSL_DATE !="",CONCAT(SUBSTRING(tha.EOSL_DATE ,1,4),'-' ,SUBSTRING(tha.EOSL_DATE ,5,2),'-' ,SUBSTRING(tha.EOSL_DATE ,7,2)),"") EOSL_DATE
+			, tha.APPLI_YN 
+			, tha.BLCKT_RWRD_TIME 
+			, tha.RMARK_TEXT 
+			, tha.OS_TEXT 
+			, tha.CPU_TEXT 
+			, tha.MMRY_TEXT 
+			, tha.DISK_TEXT 
+			, tha.SVC_DUP_CNVR_CONFG_YN 
+			, tha.DPLCT_TEXT 
+			, tha.KTOA_ASSET_NO 
+			, tha.DEL_YN
+			, tha.CHNG_TEXT
+			, tha.AVLBL_BEGIN_DATE
+			, tha.AVLBL_END_DATE
+			, tha.REGSTR_ID 
+			, tha.RDTT 
+			, tha.AMNDR_ID 
+			, tha.MDTT 
+			, (SELECT tc2.CMPNY_NM AS MAINTCE_CMPNY_NM FROM TB_COMPANY tc2 ,TB_HW_ASSET tha LEFT OUTER JOIN TB_CHARGER tc  on tc.CHRGR_NO = tha.MAINTCE_CHRGR_NO
+			  WHERE  tha.HW_ASSET_ID = #{hwAssetId} AND AVLBL_END_DATE  = (SELECT MAX(AVLBL_END_DATE) FROM TB_HW_ASSET  WHERE HW_ASSET_ID = #{hwAssetId}) 
+			  AND tc2.CMPNY_NO = tc.POSIT_CMPNY_NO ) MAINTCE_CMPNY_NM  	
+			FROM TB_HW_ASSET tha 	   
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn1
+		 	ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn2
+		 	ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn3
+		 	ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn4
+			ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn5
+			ON tha.VRTLZ_TYPE_CD  = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM   AS tbs
+			ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn7
+			ON tha.ASSET_OWN_CD  = tccn7.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn8
+			ON tha.ASSET_STAT_CD  = tccn8.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn9
+			ON tha.MAINTCE_CNTR_CD  = tccn9.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn10
+			ON tha.MAINTCE_INSP_CYCLE_CD  = tccn10.NEW_COMN_CD	
+		 WHERE  tha.HW_ASSET_ID = #{hwAssetId} AND AVLBL_END_DATE  = (SELECT MAX(AVLBL_END_DATE) FROM TB_HW_ASSET  WHERE HW_ASSET_ID = #{hwAssetId})
+	</select>
+	
+	<select id="selectHwMngListTotCnt" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM 
+		(
+			SELECT 
+			  tha.NTWRK_DSTNCT_CD
+			, tha.HW_TYPE_CD
+			, tha.DEL_YN
+			, tha.PROD_NM
+			, tha.ASSET_STAT_CD
+			, tbs.BIZ_SYTM_CD 	
+			, tha.ASSET_OWN_CD
+			, tha.VRTLZ_DSTNCT_CD
+			, MAX(tha.AVLBL_END_DATE)
+			FROM TB_HW_ASSET tha LEFT OUTER JOIN TB_BIZ_SYSTEM tbs 
+			on tha.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD 
+			GROUP BY tha.HW_ASSET_ID 
+		)tha
+		WHERE 1=1
+		<if test="searchKeyword1 !=null and searchKeyword1 !=''">
+			AND (tha.NTWRK_DSTNCT_CD =${searchKeyword1})
+		</if>
+		<if test="searchKeyword2 !=null and searchKeyword2 !=''">
+			AND tha.HW_TYPE_CD = #{searchKeyword2}
+		</if>
+		<if test="searchKeyword3 !=null and searchKeyword3 !=''">
+			AND tha.ASSET_STAT_CD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 !=null and searchKeyword4 !=''">
+			AND (tha.BIZ_SYTM_CD = ${searchKeyword4})
+		</if>
+		<if test="searchKeyword5 !=null and searchKeyword5 !=''">
+			AND tha.DEL_YN = #{searchKeyword5}
+		</if>	
+		<if test="searchKeyword6 !=null and searchKeyword6 !=''">
+		    AND tha.PROD_NM LIKE CONCAT('%',#{searchKeyword6},'%')
+		</if>	
+		<if test="searchKeyword7 !=null and searchKeyword7 !=''">
+			AND tha.VRTLZ_DSTNCT_CD = #{searchKeyword7}
+		</if>
+		<if test="searchKeyword8 !=null and searchKeyword8 !=''">
+			AND (tha.ASSET_OWN_CD = ${searchKeyword8})
+		</if>
+	</select>
+
+	<update id="updateHwMng" parameterType="truebon.com.crm.hwm.model.HwMngVO">
+		<![CDATA[
+			UPDATE TB_HW_ASSET
+				SET 
+					 NTWRK_DSTNCT_CD = #{ntwrkDstnct}
+					, VRTLZ_DSTNCT_CD = #{vrtlzDstnct}
+					, HW_TYPE_CD = #{hwType}
+					, HW_TYPE_DTL_CD = #{hwTypeDtl}
+					, VRTLZ_TYPE_CD = #{vrtlzType}
+					, UPPR_HW_ASSET_ID = #{upprHwAssetId}
+					, BIZ_SYTM_CD = #{bizSytm}
+					, PROD_PURP = #{prodPurp}
+					, HOST_NM = #{hostNm}
+					, IP_ADDR = #{ipAddr}
+					, MNFTR_NM = #{mnftrNm}
+					, PROD_NM = #{prodNm}
+					, PROD_CO_QTY = #{prodCoQty}
+					, ASSET_OWN_CD = #{assetOwn}				
+					, SERIALNO = #{serialno}
+					, PRODLOCAT = #{prodlocat}
+					, ASSET_STAT_CD = #{assetStat}
+					, CTRL_YN = #{ctrlYn}
+					, MAINTCE_CNTR_CD = #{maintceCntr}
+					, MAINTCE_CNTR_BEGIN_DATE = REPLACE(#{maintceCntrBeginDate},'-','')
+					, MAINTCE_CNTR_END_DATE = REPLACE(#{maintceCntrEndDate},'-','')
+					, MAINTCE_INSP_CYCLE_CD = #{maintceInspCycle}
+					, MAINTCE_CHRGR_NO = #{maintceChrgrNo}
+					, ENTRNG_DATE = REPLACE(#{entrngDate},'-','')
+					, EXAN_DATE = REPLACE(#{exanDate},'-','')
+					, EOSL_DATE = REPLACE(#{eoslDate},'-','')				
+					, APPLI_YN = #{appliYn}
+					, BLCKT_RWRD_TIME = #{blcktRwrdTime}
+					, RMARK_TEXT = #{rmarkText}
+					, OS_TEXT = #{osText}
+					, CPU_TEXT= #{cpuText}
+					, MMRY_TEXT= #{mmryText}
+					, DISK_TEXT= #{diskText}
+					, SVC_DUP_CNVR_CONFG_YN= #{svcDupCnvrConfgYn}
+					, DPLCT_TEXT =#{dplctText}
+					, KTOA_ASSET_NO= #{ktoaAssetNo}
+					, DEL_YN= #{delYn}
+					, CHNG_TEXT = #{chngText}
+					, AVLBL_BEGIN_DATE = SUBSTR(REPLACE(SYSDATE(),"-",""),1,8)
+					, AVLBL_END_DATE = '99999999'
+					, AMNDR_ID= #{amndrId}
+					, MDTT=sysdate()
+			WHERE HW_ASSET_ID = #{hwAssetId} AND AVLBL_END_DATE  =(SELECT MAX(AVLBL_END_DATE) FROM TB_HW_ASSET WHERE HW_ASSET_ID = #{hwAssetId})
+		]]>
+	</update> 
+	
+	<insert id="registHwHstry" parameterType="truebon.com.crm.hwm.model.HwMngVO">
+		<![CDATA[
+			INSERT INTO TB_HW_ASSET 
+				 (  
+				  HW_ASSET_ID
+				, NTWRK_DSTNCT_CD 
+				, VRTLZ_DSTNCT_CD
+				, HW_TYPE_CD 
+				, HW_TYPE_DTL_CD
+				, VRTLZ_TYPE_CD 
+				, UPPR_HW_ASSET_ID
+				, BIZ_SYTM_CD
+				, PROD_PURP
+				, HOST_NM
+				, IP_ADDR
+				, MNFTR_NM
+				, PROD_NM
+				, PROD_CO_QTY
+				, ASSET_OWN_CD				
+				, SERIALNO
+				, PRODLOCAT
+				, ASSET_STAT_CD
+				, CTRL_YN
+				, MAINTCE_CNTR_CD
+				, MAINTCE_CNTR_BEGIN_DATE
+				, MAINTCE_CNTR_END_DATE
+				, MAINTCE_INSP_CYCLE_CD
+				, MAINTCE_CHRGR_NO 
+				, ENTRNG_DATE
+				, EXAN_DATE
+				, EOSL_DATE
+				, APPLI_YN
+				, BLCKT_RWRD_TIME
+				, RMARK_TEXT
+				, OS_TEXT
+				, CPU_TEXT
+				, MMRY_TEXT
+				, DISK_TEXT
+				, SVC_DUP_CNVR_CONFG_YN
+				, DPLCT_TEXT 
+				, KTOA_ASSET_NO
+				, DEL_YN
+				, CHNG_TEXT
+				, AVLBL_BEGIN_DATE
+				, AVLBL_END_DATE
+				, REGSTR_ID
+				, RDTT
+				, AMNDR_ID
+				, MDTT 
+				)
+				SELECT 
+				HW_ASSET_ID
+				, NTWRK_DSTNCT_CD 
+				, VRTLZ_DSTNCT_CD
+				, HW_TYPE_CD 
+				, HW_TYPE_DTL_CD
+				, VRTLZ_TYPE_CD 
+				, UPPR_HW_ASSET_ID
+				, BIZ_SYTM_CD
+				, PROD_PURP
+				, HOST_NM
+				, IP_ADDR
+				, MNFTR_NM
+				, PROD_NM
+				, PROD_CO_QTY
+				, ASSET_OWN_CD				
+				, SERIALNO
+				, PRODLOCAT
+				, ASSET_STAT_CD
+				, CTRL_YN
+				, MAINTCE_CNTR_CD
+				, MAINTCE_CNTR_BEGIN_DATE
+				, MAINTCE_CNTR_END_DATE
+				, MAINTCE_INSP_CYCLE_CD
+				, MAINTCE_CHRGR_NO 
+				, ENTRNG_DATE
+				, EXAN_DATE
+				, EOSL_DATE
+				, APPLI_YN
+				, BLCKT_RWRD_TIME
+				, RMARK_TEXT
+				, OS_TEXT
+				, CPU_TEXT
+				, MMRY_TEXT
+				, DISK_TEXT
+				, SVC_DUP_CNVR_CONFG_YN
+				, DPLCT_TEXT 
+				, KTOA_ASSET_NO
+				, DEL_YN
+				, CHNG_TEXT
+				, AVLBL_BEGIN_DATE
+				, SUBSTR(REPLACE(SYSDATE(),"-",""),1,8) AVLBL_END_DATE
+				, REGSTR_ID
+				, RDTT
+				, AMNDR_ID
+				, MDTT 
+				FROM TB_HW_ASSET  
+				WHERE HW_ASSET_ID = #{hwAssetId} AND AVLBL_END_DATE  = (SELECT MAX(AVLBL_END_DATE) FROM TB_HW_ASSET WHERE HW_ASSET_ID = #{hwAssetId} )
+		]]>
+	</insert>
+	
+	<insert id="registHwMng" parameterType="truebon.com.crm.hwm.model.HwMngVO">
+		<![CDATA[
+			INSERT INTO TB_HW_ASSET 
+				(  
+					  HW_ASSET_ID
+					, NTWRK_DSTNCT_CD 
+					, VRTLZ_DSTNCT_CD
+					, HW_TYPE_CD 
+					, HW_TYPE_DTL_CD
+					, VRTLZ_TYPE_CD 
+					, UPPR_HW_ASSET_ID
+					, BIZ_SYTM_CD
+					, PROD_PURP
+					, HOST_NM
+					, IP_ADDR
+					, MNFTR_NM
+					, PROD_NM
+					, PROD_CO_QTY
+					, ASSET_OWN_CD				
+					, SERIALNO
+					, PRODLOCAT
+					, ASSET_STAT_CD
+					, CTRL_YN
+					, MAINTCE_CNTR_CD
+					, MAINTCE_CNTR_BEGIN_DATE
+					, MAINTCE_CNTR_END_DATE
+					, MAINTCE_INSP_CYCLE_CD
+					, MAINTCE_CHRGR_NO 
+					, ENTRNG_DATE
+					, EXAN_DATE
+					, EOSL_DATE
+					, APPLI_YN
+					, BLCKT_RWRD_TIME
+					, RMARK_TEXT
+					, OS_TEXT
+					, CPU_TEXT
+					, MMRY_TEXT
+					, DISK_TEXT
+					, SVC_DUP_CNVR_CONFG_YN
+					, DPLCT_TEXT 
+					, KTOA_ASSET_NO
+					, DEL_YN
+					, AVLBL_BEGIN_DATE
+					, AVLBL_END_DATE
+					, CHNG_TEXT
+					, REGSTR_ID
+					, RDTT
+					, AMNDR_ID
+					, MDTT 
+				)
+			VALUES (  
+					  #{hwAssetId}
+					, #{ntwrkDstnct}
+					, #{vrtlzDstnct}
+					, #{hwType}
+					, #{hwTypeDtl}
+					, #{vrtlzType}
+					, #{upprHwAssetId}
+					, #{bizSytm}
+					, #{prodPurp}
+					, #{hostNm}
+					, #{ipAddr}
+					, #{mnftrNm}
+					, #{prodNm}
+					, #{prodCoQty}
+					, #{assetOwn}				
+					, #{serialno}
+					, #{prodlocat}
+					, #{assetStat}
+					, #{ctrlYn}
+					, #{maintceCntr}				
+					, REPLACE(#{maintceCntrBeginDate},'-','')
+					, REPLACE(#{maintceCntrEndDate},'-','')
+					, #{maintceInspCycle}
+					, #{maintceChrgrNo}
+					, REPLACE(#{entrngDate},'-','')
+					, REPLACE(#{exanDate},'-','')
+					, REPLACE(#{eoslDate},'-','')
+					, #{appliYn}
+					, #{blcktRwrdTime}
+					, #{rmarkText}
+					, #{osText}
+					, #{cpuText}
+					, #{mmryText}
+					, #{diskText}
+					, #{svcDupCnvrConfgYn}
+					, #{dplctText}
+					, #{ktoaAssetNo}
+					, #{delYn}
+					, SUBSTR(REPLACE(SYSDATE(),"-",""),1,8)
+					, '99999999'
+					, '최초등록'
+					, #{regstrId}
+					, sysdate() 
+					, #{amndrId}
+					, sysdate() 
+				)
+		]]>
+	</insert>
+	
+	<select id="selectHwPopUpHstryList" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultMap="HwMngList">
+		SELECT 
+			  HW_ASSET_ID 
+			, AVLBL_BEGIN_DATE 
+			, AVLBL_END_DATE 
+			, CHNG_TEXT 
+		FROM TB_HW_ASSET 
+		WHERE HW_ASSET_ID = #{hwAssetId}
+	</select>
+	
+	<select id="selectHwPopUpHstry" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultType="truebon.com.crm.hwm.model.HwMngVO">
+		SELECT 
+			  tha.HW_ASSET_ID 
+			, tccn1.COMN_CD_NM   NTWRK_DSTNCT
+			, tccn2.COMN_CD_NM   VRTLZ_DSTNCT
+			, tccn3.COMN_CD_NM   HW_TYPE
+			, tccn4.COMN_CD_NM   HW_TYPE_DTL
+			, tccn5.COMN_CD_NM   VRTLZ_TYPE
+			, tha.UPPR_HW_ASSET_ID 
+			, tbs.BIZ_SYTM_NM   BIZ_SYTM
+			, tha.PROD_PURP 
+			, tha.HOST_NM 
+			, tha.IP_ADDR 
+			, tha.PROD_CO_QTY
+			, tha.MNFTR_NM 
+			, tha.PROD_NM 
+			, tccn7.COMN_CD_NM   ASSET_OWN
+			, tha.SERIALNO 
+			, tha.PRODLOCAT 
+			, tccn8.COMN_CD_NM   ASSET_STAT
+			, tha.CTRL_YN 
+			, tccn9.COMN_CD_NM   MAINTCE_CNTR
+			, if(tha.MAINTCE_CNTR_BEGIN_DATE !="", CONCAT(SUBSTRING(tha.MAINTCE_CNTR_BEGIN_DATE ,1,4),'-' ,SUBSTRING(tha.MAINTCE_CNTR_BEGIN_DATE ,5,2),'-' ,SUBSTRING(tha.MAINTCE_CNTR_BEGIN_DATE ,7,2)),"") MAINTCE_CNTR_BEGIN_DATE
+			, if(tha.MAINTCE_CNTR_END_DATE !="", CONCAT(SUBSTRING(tha.MAINTCE_CNTR_END_DATE ,1,4),'-' ,SUBSTRING(tha.MAINTCE_CNTR_END_DATE ,5,2),'-' ,SUBSTRING(tha.MAINTCE_CNTR_END_DATE ,7,2)),"") MAINTCE_CNTR_END_DATE
+			, tccn10.COMN_CD_NM   MAINTCE_INSP_CYCLE 
+			, tha.MAINTCE_CHRGR_NO 
+			, if(tha.ENTRNG_DATE !="", CONCAT(SUBSTRING(tha.ENTRNG_DATE ,1,4),'-' ,SUBSTRING(tha.ENTRNG_DATE ,5,2),'-' ,SUBSTRING(tha.ENTRNG_DATE ,7,2)),"") ENTRNG_DATE
+			, if(tha.EXAN_DATE !="", CONCAT(SUBSTRING(tha.EXAN_DATE ,1,4),'-' ,SUBSTRING(tha.EXAN_DATE ,5,2),'-' ,SUBSTRING(tha.EXAN_DATE ,7,2)),"") EXAN_DATE
+			, if(tha.EOSL_DATE !="",CONCAT(SUBSTRING(tha.EOSL_DATE ,1,4),'-' ,SUBSTRING(tha.EOSL_DATE ,5,2),'-' ,SUBSTRING(tha.EOSL_DATE ,7,2)),"") EOSL_DATE
+			, tha.APPLI_YN 
+			, tha.BLCKT_RWRD_TIME 
+			, tha.RMARK_TEXT 
+			, tha.OS_TEXT 
+			, tha.CPU_TEXT 
+			, tha.MMRY_TEXT 
+			, tha.DISK_TEXT 
+			, tha.SVC_DUP_CNVR_CONFG_YN 
+			, tha.DPLCT_TEXT 
+			, tha.KTOA_ASSET_NO 
+			, tha.DEL_YN
+			, tha.CHNG_TEXT
+			, tha.AVLBL_BEGIN_DATE
+			, tha.AVLBL_END_DATE
+			, tha.REGSTR_ID 
+			, tha.RDTT 
+			, tha.AMNDR_ID 
+			, tha.MDTT 
+			, (SELECT tc2.CMPNY_NM AS MAINTCE_CMPNY_NM FROM TB_COMPANY tc2 ,TB_HW_ASSET tha LEFT OUTER JOIN TB_CHARGER tc  on tc.CHRGR_NO = tha.MAINTCE_CHRGR_NO
+			  WHERE  tha.HW_ASSET_ID = #{hwAssetId} AND tha.AVLBL_BEGIN_DATE = #{avlblBeginDate} AND tha.AVLBL_END_DATE = #{avlblEndDate}
+			  AND tc2.CMPNY_NO = tc.POSIT_CMPNY_NO ) MAINTCE_CMPNY_NM		  
+			FROM TB_HW_ASSET tha 
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn1
+		 	ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn2
+		 	ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn3
+		 	ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn4
+			ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn5
+			ON tha.VRTLZ_TYPE_CD  = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM   AS tbs
+			ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn7
+			ON tha.ASSET_OWN_CD  = tccn7.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn8
+			ON tha.ASSET_STAT_CD  = tccn8.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn9
+			ON tha.MAINTCE_CNTR_CD  = tccn9.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn10
+			ON tha.MAINTCE_INSP_CYCLE_CD  = tccn10.NEW_COMN_CD	
+		 WHERE  tha.HW_ASSET_ID = #{hwAssetId} AND tha.AVLBL_BEGIN_DATE = #{avlblBeginDate} AND tha.AVLBL_END_DATE = #{avlblEndDate}
+	</select>
+	
+	<select id="selectHwPopUpMngList" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultMap="HwMngList">
+      SELECT 
+           tha.HW_ASSET_ID 
+         , tccn1.COMN_CD_NM   NTWRK_DSTNCT 
+         , tccn3.COMN_CD_NM   HW_TYPE
+         , tccn4.COMN_CD_NM   HW_TYPE_DTL
+         , tha.PROD_NM 
+         , tha.PROD_PURP
+       FROM TB_HW_ASSET tha 
+          LEFT JOIN TB_COMN_CD_NEW AS tccn1 ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn2 ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn3 ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn4 ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD         
+          LEFT JOIN TB_BIZ_SYSTEM  AS tbs ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+       WHERE tha.DEL_YN = 'N'
+         <if test="searchKeyword != null and searchKeyword != ''">
+            <if test="searchCondition == 1">AND
+               tha.HW_ASSET_ID LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 2">AND
+               tha.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 3">AND
+               tccn3.COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+         </if>
+         <if test="bizSytm !=null and bizSytm !=''">
+				AND tbs.BIZ_SYTM_CD = #{bizSytm}
+		</if>
+         limit #{recordCountPerPage} offset #{firstIndex}
+   </select>
+   
+   <select id="selectHwPopUpMngListTotCnt" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultType="int">
+         SELECT COUNT(*) totcnt
+         FROM TB_HW_ASSET tha
+         LEFT JOIN TB_COMN_CD_NEW AS tccn3 ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD            
+         LEFT JOIN TB_BIZ_SYSTEM  AS tbs ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+         WHERE tha.DEL_YN = 'N'
+         <if test="searchKeyword != null and searchKeyword != ''">
+            <if test="searchCondition == 1">AND
+               tha.HW_ASSET_ID LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 2">AND
+               tha.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 3">AND
+               tccn3.COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+         </if>
+         <if test="bizSytm !=null and bizSytm !=''">
+				AND tbs.BIZ_SYTM_CD = #{bizSytm}
+		 </if>
+   </select>
+   
+	<select id="selectAppliHwMngList" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultMap="HwMngList">
+      SELECT 
+           tha.HW_ASSET_ID 
+         , tccn1.COMN_CD_NM   NTWRK_DSTNCT
+         , tccn3.COMN_CD_NM   HW_TYPE
+         , tccn4.COMN_CD_NM   HW_TYPE_DTL
+         , tha.PROD_NM 
+       FROM TB_HW_ASSET tha 
+          LEFT JOIN TB_COMN_CD_NEW AS tccn1 ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn2 ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn3 ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn4 ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD
+       WHERE tha.APPLI_YN = 'Y' AND tha.DEL_YN = 'N'
+         <if test="searchKeyword != null and searchKeyword != ''">
+            <if test="searchCondition == 1">AND
+               tha.HW_ASSET_ID LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 2">AND
+               tha.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 3">AND
+               tccn3.COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+         </if>
+         limit #{recordCountPerPage} offset #{firstIndex}
+   </select>
+   
+   <select id="selectAppliHwMngListTotCnt" parameterType="truebon.com.crm.swm.model.SwMngVO" resultType="int">
+         SELECT COUNT(*) totcnt
+         FROM TB_HW_ASSET tha
+         LEFT JOIN TB_COMN_CD_NEW AS tccn3 ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+         WHERE tha.APPLI_YN = 'Y' AND tha.DEL_YN = 'N'
+         <if test="searchKeyword != null and searchKeyword != ''">
+            <if test="searchCondition == 1">AND
+               tha.HW_ASSET_ID LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 2">AND
+               tha.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchCondition == 3">AND
+               tccn3.COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+         </if>
+   </select>
+	
+	<select id="selectHwMngEgovMap" parameterType="truebon.com.crm.hwm.model.HwMngVO" resultType="EgovMap">
+      SELECT 
+           tha.HW_ASSET_ID 
+         , tccn1.COMN_CD_NM   NTWRK_DSTNCT
+         , tccn2.COMN_CD_NM   VRTLZ_DSTNCT
+         , tccn3.COMN_CD_NM   HW_TYPE
+         , tccn4.COMN_CD_NM   HW_TYPE_DTL
+         , tccn5.COMN_CD_NM   VRTLZ_TYPE
+         , tha.UPPR_HW_ASSET_ID 
+         , tbs.BIZ_SYTM_NM   BIZ_SYTM
+         , tha.PROD_PURP  
+         , tha.HOST_NM 
+         , tha.IP_ADDR 
+         , tha.MNFTR_NM 
+         , tha.PROD_NM 
+      	 , CAST(tha.PROD_CO_QTY AS CHAR) EXCEL_PROD_CO_QTY 
+         , tccn7.COMN_CD_NM   ASSET_OWN
+         , tha.SERIALNO 
+         , tha.PRODLOCAT 
+         , tccn8.COMN_CD_NM   ASSET_STAT
+         , tha.CTRL_YN 
+         , tccn9.COMN_CD_NM   MAINTCE_CNTR
+         , tha.MAINTCE_CNTR_BEGIN_DATE 
+         , tha.MAINTCE_CNTR_END_DATE 
+         , tccn10.COMN_CD_NM   MAINTCE_INSP_CYCLE 
+         , tha.MAINTCE_CHRGR_NO 
+         , tha.ENTRNG_DATE 
+         , tha.EXAN_DATE 
+         , tha.EOSL_DATE 
+         , tha.APPLI_YN 
+         , tha.BLCKT_RWRD_TIME 
+         , tha.RMARK_TEXT 
+         , tha.OS_TEXT 
+         , tha.CPU_TEXT 
+         , tha.MMRY_TEXT 
+         , tha.DISK_TEXT 
+         , tha.SVC_DUP_CNVR_CONFG_YN 
+         , tha.DPLCT_TEXT 
+         , tha.KTOA_ASSET_NO 
+         , tha.REGSTR_ID 
+         , tha.DEL_YN
+         , tha.RDTT 
+         , tha.AMNDR_ID 
+         , tha.MDTT 
+       FROM TB_HW_ASSET tha 
+          LEFT JOIN TB_COMN_CD_NEW AS tccn1
+          ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn2
+          ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn3
+          ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn4
+          ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn5
+          ON tha.VRTLZ_TYPE_CD  = tccn5.NEW_COMN_CD
+          LEFT JOIN TB_BIZ_SYSTEM   AS tbs
+          ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn7
+          ON tha.ASSET_OWN_CD  = tccn7.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn8
+          ON tha.ASSET_STAT_CD  = tccn8.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn9
+          ON tha.MAINTCE_CNTR_CD  = tccn9.NEW_COMN_CD
+          LEFT JOIN TB_COMN_CD_NEW AS tccn10
+          ON tha.MAINTCE_INSP_CYCLE_CD  = tccn10.NEW_COMN_CD   
+       WHERE 1=1   
+         <if test="searchKeyword1 !=null and searchKeyword1 !=''">
+            AND tha.NTWRK_DSTNCT_CD = #{searchKeyword1}
+         </if>
+         <if test="searchKeyword2 !=null and searchKeyword2 !=''">
+            AND tha.HW_TYPE_CD = #{searchKeyword2}
+         </if>
+         <if test="searchKeyword3 !=null and searchKeyword3 !=''">
+            AND tha.ASSET_STAT_CD = #{searchKeyword3}
+         </if>
+         <if test="searchKeyword4 !=null and searchKeyword4 !=''">
+            AND tbs.BIZ_SYTM_CD = #{searchKeyword4}
+         </if>   
+         <if test="searchKeyword5 !=null and searchKeyword5 !=''">
+			AND tha.DEL_YN = #{searchKeyword5}
+		</if>	
+         AND tha.DEL_YN != "Y"      
+         ORDER BY tha.HW_ASSET_ID DESC
+         limit #{recordCountPerPage} offset #{firstIndex} 
+         
+   </select>
+</mapper>

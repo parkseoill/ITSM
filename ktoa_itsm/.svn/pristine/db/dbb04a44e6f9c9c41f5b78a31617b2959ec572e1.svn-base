@@ -1,0 +1,97 @@
+package truebon.com.opm.com.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.util.EgovUserDetailsHelper;
+import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
+import truebon.com.opm.com.dao.ComnCdNewDAO;
+import truebon.com.opm.com.model.ComnCdNew;
+import truebon.com.opm.com.model.ComnCdNewVO;
+import truebon.com.opm.com.service.ComnCdNewService;
+
+@Service("ComnCdNewService")
+public class ComnCdNewServiceImpl extends EgovAbstractServiceImpl implements ComnCdNewService {
+
+	@Resource(name = "ComnCdNewDAO")
+	private ComnCdNewDAO comnCdNewDAO;
+
+    /**
+	 * tb_comn_cd_new 목록을 조회한다.
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return tb_comn_cd_new 목록
+	 * @exception Exception
+	 */
+    public List<ComnCdNewVO> selectComnCdNewList(ComnCdNewVO searchVO) throws Exception {
+        return comnCdNewDAO.selectComnCdNewList(searchVO);
+    }
+    /*****************/
+    /**
+	 * tb_comn_cd_new 총 개수를 조회한다.
+	 * 
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_comn_cd_new 목록 개수
+	 * @exception Exception
+	 */  
+    public int selectComnCdNewListTotCnt(ComnCdNewVO vo) throws Exception {
+	    	return comnCdNewDAO.selectComnCdNewListTotCnt(vo);
+	}
+    /**
+	 * 공통코드NEW 목록을 조회한다.
+	 */
+  
+    public List<ComnCdNewVO> selectComnCdList(ComnCdNewVO vo) throws Exception {
+        return comnCdNewDAO.selectComnCdList(vo);
+    }
+	/**
+	 * 공통코드NEW 을 등록한다.
+	 * @param vo - 등록할 정보가 담긴 ComnCdNewVO
+	 * @return 등록 결과
+	 * @exception Exception
+	 */
+    public void insertComnCdNew(ComnCdNewVO vo) throws Exception {
+    	// 로그인 객체 선언
+    	LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+    	vo.setRegstrId(user.getId());
+    	comnCdNewDAO.insertComnCdNew(vo);
+    }
+    /**
+	 * 공통코드NEW을 수정한다.
+	 * @param vo - 수정할 정보가 담긴 ComnCdNewVO
+	 * @return void형
+	 * @exception Exception
+	 */
+    public void updateComnCdNew(ComnCdNew vo) throws Exception {
+    	// 로그인 객체 선언
+    	LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+    	vo.setAmndrId(user.getId());
+    	
+    	comnCdNewDAO.updateComnCdNew(vo);
+    }
+    /**
+	  *  공통코드NEW 상세항목을 조회한다.
+	  * @param comnCdNew
+	  * @return ComnCdNew
+	  *  @throws Exception
+	  */
+	public ComnCdNewVO selectComnCdNew(ComnCdNewVO vo) throws Exception {
+		ComnCdNewVO resultVO = comnCdNewDAO.selectComnCdNew(vo);
+        
+        return resultVO;
+	}
+	/**
+	 * 공통코드NEW 목록을 조회한다.
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return tb_comn_cd_new 목록
+	 * @exception Exception
+	 */
+    public List<ComnCdNewVO> selectComnCdNewNmList(ComnCdNewVO searchVO) throws Exception {
+        return comnCdNewDAO.selectComnCdNewNmList(searchVO);
+    }
+
+
+}

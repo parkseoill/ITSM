@@ -1,0 +1,115 @@
+package truebon.com.fai.mng.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Repository;
+
+import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import egovframework.rte.psl.dataaccess.util.EgovMap;
+import truebon.com.fai.mng.model.FailureMngVO;
+
+/**
+ * 장애관리 DAO 클래스 정의
+ * 
+ * @author 박서일
+ * @since 2023.10.04
+ * @version 1.0
+ * @see
+ * 
+ *      <pre>
+ * << 개정이력(Modification Information) >>
+ *   
+ *  수정일               수정자            수정내용
+ *  ----------   --------   ---------------------------
+ *  2023.10.19   박서일           최초 생성
+ *
+ *      </pre>
+ */
+
+@Repository("FailureMngDAO")
+public class FailureMngDAO extends EgovComAbstractDAO {
+
+	/**
+	 * 장애 목록을 조회한다.
+	 * 
+	 * @param vo - 조회할 정보가 담긴 FailureMngVO
+	 * @return 조회한 라이센스 목록
+	 * @exception Exception
+	 */
+	public List<FailureMngVO> selectFailureMngList(FailureMngVO searchVO) throws Exception {
+		return selectList("FailureMngMapper.selectFailureMngList", searchVO);
+	}
+
+	/**
+	 * 장애 총 갯수를 조회한다. @param searchVO - 조회할 정보가 담긴 VO @return 장애 총 갯수 @exception
+	 */
+	public int selectFailureListTotCnt(FailureMngVO searchVO) {
+		return (Integer) selectOne("FailureMngMapper.selectFailureListTotCnt", searchVO);
+	}
+
+	/**
+	 * TB_FAIL을 조회한다.
+	 * 
+	 * @param vo - 조회할 정보가 담긴 FailureMngVO
+	 * @return 조회한 TB_FAIL
+	 * @exception Exception
+	 */
+	public FailureMngVO selectFailureMng(FailureMngVO vo) {
+		return (FailureMngVO) selectOne("FailureMngMapper.selectFailureMng", vo);
+	}
+
+	/**
+	* 장애 조치기한 가이드를 조회한다.
+	* 
+	* @return 조회한 장애 조치기한 가이드
+	* @exception Exception
+	*/
+	public List<Map<String, Object>> selectMngmntPeriodGuide() {
+		return selectList("FailureMngMapper.selectMngmntPeriodGuide");
+	}
+
+    /**
+     * 장애 등급을 조회한다.
+     * 
+     * @param vo - 조회할 정보가 담긴 FailureMngVO
+     * @exception Exception
+     */
+	public FailureMngVO selectFailureGrd(FailureMngVO failureMngVO) throws Exception{
+		return (FailureMngVO) selectOne("FailureMngMapper.selectFailureGrd", failureMngVO);
+    }
+
+	/**
+	 * TB_FAIL을 수정한다.
+	 * 
+	 * @param vo - 수정할 정보가 담긴 FailureMngVO
+	 * @return void형
+	 * @exception Exception
+	 */
+	public void updateFailureMng(FailureMngVO vo) throws Exception {
+		update("FailureMngMapper.updateFailureMng", vo);
+	}
+
+	/**
+	 * TB_FAIL을 등록한다.
+	 * 
+	 * @param vo - 등록할 정보가 담긴 FailureMngVO
+	 * @return void형
+	 * @exception Exception
+	 */
+	public void registFailureMng(FailureMngVO vo) throws Exception {
+		insert("FailureMngMapper.registFailureMng", vo);
+	}
+
+	/**
+	 * 장애 목록을 조회한다. (엑셀 다운로드)
+	 * 
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return EgovMap 목록
+	 * @exception Exception
+	 */
+	public List<EgovMap> selectFailureEgovMap(FailureMngVO searchVO) throws Exception {
+		return selectList("FailureMngMapper.selectFailureEgovMap", searchVO);
+	}
+
+}

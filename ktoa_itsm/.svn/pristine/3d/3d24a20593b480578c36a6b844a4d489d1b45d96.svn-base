@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<%
+ /**
+  * @Class Name : HwMngRegist.jsp
+  * @Description : HW자산 등록 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.09.26   박서일               최초 생성
+  *
+  *  @author 박서일
+  *  @since 2023.09.26
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator" %>
+<c:set var="ImgUrl" value="${pageContext.request.contextPath}/images/egovframework/com/sym/mnu/mpm/"/>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>HW 등록</title>
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+<!-- validator 클라이언트 -->
+<script type="text/javascript" src="<c:url value="/validator.do" />"></script>
+<validator:javascript formName="hwMngVO" staticJavascript="false" xhtml="true" cdata="false"/>
+<script language="javascript1.2" type="text/javaScript">
+
+/* ********************************************************
+ * 등록처리 함수
+ ******************************************************** */
+function registHwMng() {
+	if($("#vrtlzDstnct").val() == "ITA0101" ) {
+		if($("#hwType").val() == null || $("#hwType").val() == "" || $("#hwType").val() == "==선택하세요==") {
+			alert("HW유형를 선택해 주세요");
+			$("#hwType").focus();
+			return;
+		}
+		else if($("#hwTypeDtl").val() == null || $("#hwTypeDtl").val() == "" || $("#hwTypeDtl").val() == "==선택하세요==") {
+			alert("HW유형상세를 선택해 주세요");
+			$("#hwTypeDtl").focus();
+			return;
+		}	 
+	}else if($("#vrtlzDstnct").val() == "ITA0102") {
+		if($("#vrtlzType").val() == null || $("#vrtlzType").val() == "" || $("#vrtlzType").val() == "==선택하세요==") {
+			alert("가상화유형를 선택해 주세요");
+			$("#vrtlzType").focus();
+			return;
+		}
+		else if($("#upprHwAssetId").val() == null || $("#upprHwAssetId").val() == "" || $("#upprHwAssetId").val() == "==선택하세요==") {
+			alert("상위HW자산ID를 선택해 주세요");
+			$("#upprHwAssetId").focus();
+			return;
+		}
+	}
+
+	if($("#maintceCntr").val() == "ITA0501" ) {
+		if($("#maintceCntrBeginDate").val() == null || $("#maintceCntrBeginDate").val() == "" || $("#maintceCntrBeginDate").val() == "==선택하세요==") {
+			alert("유지보수 시작일자를 선택해 주세요");
+			$("#maintceCntrBeginDate").focus();
+			return;
+		} 
+		if($("#maintceInspCycle").val() == null || $("#maintceInspCycle").val() == "" || $("#maintceInspCycle").val() == "==선택하세요==") {
+			alert("유지보수 점검주기를 선택해 주세요");
+			$("#maintceInspCycle").focus();
+			return;
+		} 
+		if($("#maintceCntrEndDate").val() == null || $("#maintceCntrEndDate").val() == "" || $("#maintceCntrEndDate").val() == "==선택하세요==") {
+			alert("유지보수 종료일자를 선택해 주세요");
+			$("#maintceCntrEndDate").focus();
+			return;
+		} 
+
+	}
+	
+	var objForm = document.getElementById("hwMngForm");
+	 
+	if(!validateHwMngVO(objForm)){
+		return;
+	}
+	objForm.submit();
+	
+} 
+
+/* ********************************************************
+ * 목록 조회  함수
+ ******************************************************** */
+function selectList(){
+	document.hwMngForm.action = "<c:url value='/crm/hwm/HwMngList.do'/>?searchKeyword1="+$("#searchList1").val()+"&searchKeyword8="+$("#searchList2").val()+"&searchKeyword4="+$("#searchList3").val();
+   	document.hwMngForm.submit();
+}
+
+$(document).ready(function(){
+	
+	
+	$('#popupMaintceChrList').click(function (e) {
+    	e.preventDefault();
+        var pagetitle = $(this).attr("title");
+        var page = "<c:url value='/crm/hwm/HwMngPopupUser.do'/>";
+        var $dialog = $('<div style="overflow:hidden;padding: 0px 0px 0px 0px;"></div>')
+        .html('<iframe style="border: 0px; " src="' + page + '" width="100%" height="100%"></iframe>')
+        .dialog({
+        	autoOpen: false,
+            modal: true,
+            width: 500,
+            height: 550,
+            title: pagetitle
+    	});
+    	$dialog.dialog('open');
+	});
+
+	$('#popupUpprHwAssetIdList').click(function (e) {
+    	e.preventDefault();
+        var pagetitle = $(this).attr("title");
+        var page = "<c:url value='/crm/hwm/HwMngHwPopup.do'/>";
+        var $dialog = $('<div style="overflow:hidden;padding: 0px 0px 0px 0px;"></div>')
+        .html('<iframe style="border: 0px; " src="' + page + '" width="100%" height="100%"></iframe>')
+        .dialog({
+        	autoOpen: false,
+            modal: true,
+            width: 500,
+            height: 550,
+            title: pagetitle
+    	});
+    	$dialog.dialog('open');
+	});
+	
+	// 가상화 구분 선택시
+	$("#vrtlzDstnct").change(function(){  
+	    if($(this).val() == "ITA0101"){
+	    	 $('#hw').show();    
+	     	 $('#vrtlz').hide();     
+	    	 $('#vrtlzType').val("");   
+	    	 $('#upprHwAssetId').val("");  	     	
+	    }   
+	    if($(this).val() == "ITA0102"){
+	    	$('#vrtlz').show();    
+	     	$('#hw').hide();     
+	    	$('#hwType').val("");   
+	    	$('#hwTypeDtl').val("");      	 
+	    }  
+	});
+	
+	// 유지보수 계약 N시
+	$("#maintceCntr").change(function(){  
+	   if($(this).val() != "ITA0501"){  
+	    	$("#maintceCntrBeginDate").attr("readonly",true);
+	    	$("#maintceInspCycle").attr("readonly",true); 	 
+	    	$("#maintceCntrEndDate").attr("readonly",true); 	 
+	    	$("#maintceChrgrNo").attr("readonly",true); 	 
+	    	$('#maintceCntrBeginDate').val('');
+	    	$('#maintceInspCycle').val('');
+	    	$('#maintceCntrEndDate').val('');
+	    	$('#maintceChrgrNo').val('');
+	      }  
+	    else{
+	    	$("#maintceCntrBeginDate").attr("readonly",false);
+	    	$("#maintceInspCycle").attr("readonly",false); 	 
+	    	$("#maintceCntrEndDate").attr("readonly",false); 	 
+	    	$("#maintceChrgrNo").attr("readonly",false); 	
+	    }	
+	});
+	
+ 	$.datepicker.setDefaults($.datepicker.regional['ko']); 
+ 	$( "#maintceCntrBeginDate, #maintceCntrEndDate, #entrngDate, #exanDate, #eoslDate").datepicker({
+ 		changeMonth: true, 
+ 		changeYear: true,
+        gotoCurrent: true,
+        showButtonPanel:true, // 캘린더 하단에 버튼 패널을 표시한다(오늘날짜로이동버튼, 닫기버튼). 
+        currentText: '오늘', // 오늘날짜로이동되는 버튼의 텍스트 변경 
+        closeText: '닫기'  // 닫기버튼의 텍스트 변경 
+ 	});
+ 	$('#Date').datepicker('setDate', 'today'); 
+ 	
+ 	// 달력 설정 조건 추가
+	$( "#maintceCntrBeginDate" ).datepicker({
+		changeMonth: true, 
+		changeYear: true,
+		onClose: function( selectedDate ) {    
+		     //시작일(beginDate) datepicker가 닫힐때
+		     //종료일(endDate)의 선택할수있는 최소 날짜(minDate)를 선택한 시작일로 지정
+		    $("#maintceCntrEndDate").datepicker( "option", "minDate", selectedDate );
+		}
+	});
+	$( "#maintceCntrEndDate" ).datepicker({
+		changeMonth: true, 
+		changeYear: true,
+		onClose: function( selectedDate ) {    
+		    // 종료일(endDate) datepicker가 닫힐때
+		    // 시작일(beginDate)의 선택할수있는 최대 날짜(maxDate)를 선택한 시작일로 지정
+		    $("#maintceCntrBeginDate").datepicker( "option", "maxDate", selectedDate );
+		}
+	});
+	
+	
+	/* ********************************************************
+	 * HW 유형, HW 유형 상세 선택 함수
+	 ******************************************************** */
+   $('#hwType').change(function(){
+        var temp = $('#hwType option:selected').val();
+        $("#hwTypeDtl option").not("[value='none']").remove(); 
+        $.ajax({
+           url : "<c:url value='/crm/swm/HwType.do'/>",
+           type : 'POST',
+             data: {
+              "newComnCd":temp 
+           },  
+           dataType: 'json' ,      
+           success: function (data) {                                    
+              $(data.hwTypeDtlList).each(function(i){                                          
+                 $("#hwTypeDtl").append("<option value='"+ data.hwTypeDtlList[i].newComnCd +"'>"+ data.hwTypeDtlList[i].comnCdNm +"</option>");                  
+              });
+           },
+           error: function(){
+              alert("<spring:message code="comCopBlog.articleBlogList.validate.occurError" />");//에러가 발생했습니다.
+               
+           }
+      });
+   });
+}); 
+
+//오늘 버튼 클릭 시 오늘 날짜로 이동
+$.datepicker._gotoToday = function(id) {
+   $(id).datepicker('setDate', 'today');
+};
+
+</script>
+</head>
+<body>
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript><!-- 자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다. -->
+
+<form  id="hwMngForm" name="hwMngForm" action ="${pageContext.request.contextPath}/crm/hwm/HwMngRegist.do" method="post">
+<input type="hidden"name="pageIndex" value="${searchVO.pageIndex}">
+<input type="hidden"name="pageUnit" value="${searchVO.pageUnit}">  
+<input type="hidden"name="searchKeyword1" value="${searchVO.searchKeyword1}"> 
+<input type="hidden"name="searchKeyword2" value="${searchVO.searchKeyword2}"> 
+<input type="hidden"name="searchKeyword3" value="${searchVO.searchKeyword3}"> 
+<input type="hidden"name="searchKeyword4" value="${searchVO.searchKeyword4}"> 
+<input type="hidden"name="searchKeyword5" value="${searchVO.searchKeyword5}"> 
+<input type="hidden"name="searchKeyword6" value="${searchVO.searchKeyword6}"> 
+<input type="hidden"name="searchKeyword7" value="${searchVO.searchKeyword7}"> 
+<input type="hidden"name="searchKeyword8" value="${searchVO.searchKeyword8}">
+<input type="hidden"name="searchList1" id="searchList1" value="${searchVO.searchList1}">
+<input type="hidden"name="searchList2" id="searchList2" value="${searchVO.searchList2}">
+<input type="hidden"name="searchList3" id="searchList3" value="${searchVO.searchList3}">
+<input type="hidden"name="searchList" id="searchList" value="${searchVO.searchList}">
+<div class="wTableFrm">
+	<!-- 타이틀 -->
+	<h2>HW 자산 등록</h2>
+
+	<!-- 등록폼 -->
+	<table class="wTable">
+		<colgroup>
+			<col style="width:15%" />
+			<col style="width:35%" />
+			<col style="width:15%" />
+			<col style="" />
+		</colgroup>
+		<tr>
+			<th>HW자산ID<span class="pilsu">*</span></th>
+			<td class="left">
+				<input id="hwAssetId" type="text" name="hwAssetId" title="ID" value="" readonly="readonly" class="readOnlyClass" style="width:140px; padding-left:5px;"/>	
+			</td>	
+			<th>가상화 구분<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="vrtlzDstnct" name="vrtlzDstnct" title="가상화 구분" style="width:140px; padding-left:5px;">
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="vrtlzDstnct" items="${vrtlzDstnctCdList}" varStatus="status" >         
+						<option value="${vrtlzDstnct.comnCdId}">${vrtlzDstnct.comnCdNm}</option>
+					</c:forEach>
+				</select>	
+			</td>
+		</tr>	
+
+		<tr id="hw">
+			<th>HW 유형<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="hwType" name="hwType" title="HW 유형" style="width:140px; padding-left:5px;">
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="hwType" items="${hwTypeCdList}" varStatus="status" >         
+						<option value="${hwType.comnCdId}">${hwType.comnCdNm}</option>
+					</c:forEach>
+				</select>	
+			</td>			
+			<th>HW 유형상세<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="hwTypeDtl" name="hwTypeDtl" title="HW 유형상세" style="width:140px; padding-left:5px;">
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="hwTypeDetail" items="${hwTypeDetailCdList}" varStatus="status" >         
+						<option value="${hwTypeDetail.comnCdId}">${hwTypeDetail.comnCdNm}</option>
+					</c:forEach>
+				</select>	
+			</td>
+		</tr>
+			
+		<tr id="vrtlz">		
+			<th>가상화 유형<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="vrtlzType" name="vrtlzType" title="가상화 유형" style="width:140px; padding-left:5px;">
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="vrtlzType" items="${vrtlzTypeCdList}" varStatus="status" >         
+						<option value="${vrtlzType.comnCdId}">${vrtlzType.comnCdNm}</option>
+					</c:forEach>
+				</select>	
+			</td>			
+			<th>상위 HW자산 ID<span class="pilsu">*</span></th>
+			<td class="left">
+				<input type="text" id="upprHwAssetId" name="upprHwAssetId" title="상위 HW자산 ID" value="" style="width:140px; padding-left:5px;"/>	
+				<a id="popupUpprHwAssetIdList" href="#LINK" target="_blank" title="상위  HW ID">
+				<img src="<c:url value='/images/egovframework/com/cmm/icon/search2.gif' />" alt='' /> (상위 HW자산 ID 선택)</a>				
+			</td>
+		</tr>	
+		
+		<tr>
+			<th>네트워크 구분<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id=ntwrkDstnct name="ntwrkDstnct" title="네트워크 구분" style="width:140px; padding-left:5px;" >
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="ntwrk" items="${ntwrkCdList}" varStatus="status" >         
+						<option value="${ntwrk.comnCdId}">${ntwrk.comnCdNm}</option>
+					</c:forEach>
+				</select>	
+			</td>
+			<th>업무 시스템<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="bizSytm" name="bizSytm" title="업무 시스템" >
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="bizSysm" items="${bizSysmCdList}" varStatus="status" >         
+						<option value="${bizSysm.bizSytmCd}">${bizSysm.bizSytmNm}</option>
+					</c:forEach>
+				</select>
+			</td>
+		</tr>				
+		
+		<tr>
+			<th>자산소유<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id=assetOwn name="assetOwn" title="자산소유" >
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="assetOwn" items="${assetOwnCd}" varStatus="status" >         
+						<option value="${assetOwn.comnCdId}">${assetOwn.comnCdNm}</option>
+					</c:forEach>
+				</select>	
+			</td>
+			<th>자산상태<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="assetStat" name="assetStat" title="자산상태" >
+					<option value="" label="">== 선택 ==</option>
+					<c:forEach var="assetStat" items="${assetStatCdList}" varStatus="status" >         
+						<option value="${assetStat.comnCdId}">${assetStat.comnCdNm}</option>
+					</c:forEach>
+				</select>
+			</td>
+		</tr>		
+		
+		<tr>
+			<th>어플라이언스 여부<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="appliYn" name="appliYn" style="width:140px; padding-left:5px;" >
+					<option value="" label="">== 선택 ==</option>	
+					<option value="Y">Y</option>			
+					<option value="N">N</option>							
+				</select> 			
+			</td>
+			<th>관제 여부<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="ctrlYn" name="ctrlYn" style="width:140px; padding-left:5px;" >
+					<option value="" label="">== 선택 ==</option>	
+					<option value="Y">Y</option>			
+					<option value="N">N</option>							
+				</select> 					
+			</td>
+		</tr>	
+		
+		<tr>
+			<th>제품 용도<span class="pilsu">*</span></th>
+			<td class="left">
+				<input type="text" id="prodPurp" name="prodPurp" title="제품 용도" value="" style="width:200px; padding-left:5px;"  />	
+			</td>
+			<th>서비스 이중화 구성 여부<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="svcDupCnvrConfgYn" name="svcDupCnvrConfgYn" style="width:140px; padding-left:5px;" >
+					<option value="" label="">== 선택 ==</option>	
+					<option value="Y">Y</option>			
+					<option value="N">N</option>							
+				</select> 					
+			</td> 
+		</tr>	
+			
+		<tr>
+			<th>제품 수량<span class="pilsu">*</span></th>
+			<td class="left">
+				<input type="number" id="prodCoQty" name="prodCoQty" title="제품 수량" value="" style="width:200px; padding-left:5px;"  />	
+			</td>
+			<th>제품 위치<span class="pilsu">*</span></th>
+			<td class="left">
+				<input type="text" id="prodlocat" name="prodlocat" title="제품 위치" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>	
+		
+		<tr>
+			<th>유지보수 계약<span class="pilsu">*</span></th>
+			<td class="left">
+				<select id="maintceCntr" name="maintceCntr" title="검색조건" >
+					<option value=""  label="">== 선택 ==</option>
+					<c:forEach var="maintceCntr" items="${maintceCntrCd}" varStatus="status" >         
+						<option value="${maintceCntr.comnCdId}">${maintceCntr.comnCdNm}</option>
+					</c:forEach>
+				</select>
+			</td>
+			<th>유지보수 계약 시작일자</th>
+			<td class="left">
+				<input type="text" id="maintceCntrBeginDate" name="maintceCntrBeginDate" title="유지보수 계약 시작일자" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>		
+		
+		<tr>
+			<th>유지보수 점검 주기</th>
+			<td class="left">
+				<select id="maintceInspCycle" name="maintceInspCycle" title="검색조건" >
+					<option value=""  label="">== 선택 ==</option>
+					<c:forEach var="maintceInspCycle" items="${maintceInspCycleCd}" varStatus="status" >         
+						<option value="${maintceInspCycle.comnCdId}">${maintceInspCycle.comnCdNm}</option>
+					</c:forEach>
+				</select>
+			</td>
+			<th>유지보수 종료 시작일자</th>
+			<td class="left">
+				<input type="text" id="maintceCntrEndDate" name="maintceCntrEndDate" title="유지보수 종료 시작일자" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>	
+		 
+		<tr>
+			<th>유지보수 담당자 번호</th>
+			<td class="left">
+				<input type="hidden" id="maintceChrgrNo" name="maintceChrgrNo" title="관제 여부" style="width:140px; padding-left:5px;"/>	
+				<input type="text" id="maintceCmpnyNm" name="maintceCmpnyNm" title="유지보수 담당자 번호" style="width:140px; padding-left:5px;"/>
+				<a id="popupMaintceChrList" href="#LINK" target="_blank" title="담당자 선택">
+				<img src="<c:url value='/images/egovframework/com/cmm/icon/search2.gif' />" alt='' />(담당자 선택)</a>
+			</td>
+			<th>KTOA 자산 번호</th>
+			<td class="left">
+				<input type="text" id="ktoaAssetNo" name="ktoaAssetNo" title="KTOA 자산 번호" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>
+		
+		<tr>
+			<th>제조사명</th>
+			<td class="left">
+				<input type="text" id="mnftrNm" name="mnftrNm" title="제조사명" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+			<th>제품명</th>
+			<td class="left">
+				<input type="text" id="prodNm" name="prodNm" title="제품명" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>
+		
+		<tr>
+			<th>호스트명</th>
+			<td class="left">
+				<input type="text" id="hostNm" name="hostNm" title="호스트명" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+			<th>입고 날짜</th>
+			<td class="left">
+				<input type="text" id="entrngDate" name="entrngDate" title="입고 날짜" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>
+		
+		<tr>
+			<th>EOSL 일자</th>
+			<td class="left">
+				<input type="text" id="eoslDate" name="eoslDate" title="EOSL 일자" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+			<th>검수 날짜</th>
+			<td class="left">
+				<input type="text" id="exanDate" name="exanDate" title="검수 날짜" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>
+		
+		<tr>
+			<th>시리얼 넘버</th>
+			<td class="left">
+				<input type="text" id="serialno" name="serialno" title="시리얼 넘버" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+			<th>정전 보상 시간</th>
+			<td class="left">
+				<input type="text" id="blcktRwrdTime" name="blcktRwrdTime" title="정전 보상 시간" value="" style="width:140px; padding-left:5px;"/>	
+			</td>
+		</tr>
+		
+		<tr>
+			<th>IP 주소</th>
+			<td class="left">
+				<input type="text" id="ipAddr" name="ipAddr" title="IP 주소" value="" style="width:140px; padding-left:5px;"/>
+			</td>
+			<th>삭제 여부</th>
+			<td class="left">		
+				<select id="delYn" name="delYn" style="width:140px; padding-left:5px;" >
+					<option value="" label="">== 선택 ==</option>	
+					<option value="Y">Y</option>			
+					<option selected="selected" value="N">N</option>							
+				</select> 				
+			</td>
+		</tr>
+					
+		<tr>
+			<th>이중화 내용</th>
+			<td class="left" colspan="3">
+				<textarea id="dplctText" name="dplctText" title="이중화 내용"  style="width:100%; height:30px; padding:5px;"></textarea>			
+			</td>
+		</tr>	
+		
+		<tr>
+			<th>OS 내용</th>
+			<td class="left" colspan="3">
+				<textarea id="osText" name="osText" title="OS 내용"  style="width:100%; height:30px; padding:5px;"></textarea>			
+			</td>
+		</tr>	
+		
+		<tr>
+			<th>메모리 내용</th>
+			<td class="left" colspan="3">
+				<textarea id="mmryText" name="mmryText" title="메모리 내용"  style="width:100%; height:30px; padding:5px;"></textarea>			
+			</td>
+		</tr>
+		
+		<tr>
+			<th>디스크 내용</th>
+			<td class="left" colspan="3">
+				<textarea id="diskText" name="diskText" title="디스크 내용"  style="width:100%; height:30px; padding:5px;"></textarea>			
+			</td>
+		</tr>
+		
+		<tr>
+			<th>CPU 내용</th>
+			<td class="left" colspan="3">
+				<textarea id="cpuText" name="cpuText" title="CPU 내용"  style="width:100%; height:30px; padding:5px;"></textarea>			
+			</td>
+		</tr>
+		
+		<tr>
+			<th>비고 내용</th>
+			<td class="left" colspan="3">
+				<textarea id="rmarkText" name="rmarkText" title="비고 내용"  style="width:100%; height:25px; padding:5px;"></textarea>			
+			</td>
+		</tr>
+								
+	</table>
+
+	<!-- 하단 버튼 -->
+	<div class="btn">		
+		<input class="s_submit" type="submit" value='<spring:message code="button.create" />' onclick="registHwMng(); return false;" /><!-- 등록 -->	
+		<span class="btn_s"><a href="#LINK'/>" onclick="selectList(); return false;"><spring:message code="button.list"/></a></span><!-- 목록 -->
+	</div>
+	
+	<div style="clear:both;"></div>
+</div>
+</form>
+
+</body>
+</html>

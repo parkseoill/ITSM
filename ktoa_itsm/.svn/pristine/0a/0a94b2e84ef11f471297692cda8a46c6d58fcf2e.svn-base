@@ -1,0 +1,169 @@
+package egovframework.com.cmm.dsb.controller;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+
+import org.codehaus.jettison.json.JSONArray;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
+import egovframework.com.cmm.dsb.model.DashBoard;
+import egovframework.com.cmm.dsb.model.DashBoardOffdayVO;
+import egovframework.com.cmm.dsb.model.DashBoardVO;
+import egovframework.com.cmm.dsb.service.DashBoardService;
+
+
+@Controller
+@SessionAttributes(types = DashBoard.class)
+public class DashBoardController {
+
+	/** 대시보드 Service */
+	@Resource(name = "DashBoardService")
+	private DashBoardService boardService;
+
+	/**
+	 * 서비스 요청 처리 통계
+	 * @param DashBoardVO - 조회된 정보가 담긴 DashBoardVO
+	 * @exception Exception
+	 */	
+	@RequestMapping(value = "/cmm/dsb/serviceRequestProcessingStatistics.do", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public String serviceRequestProcessingStatisticsList(@ModelAttribute("dashBoardVO") DashBoardVO dashBoardVO,
+			Model model, DashBoardOffdayVO dashBoardOffdayVO) throws Exception {
+		ArrayList<String> srpsArrayList = new ArrayList<String>();
+		
+		// 서비스 관련 데이터
+		DashBoardVO srps = boardService.serviceRequestProcessingStatistics(dashBoardVO);		
+		// 근무 현황 - 금일 휴가자 데이터
+		List<DashBoardOffdayVO> dbodl = offdayToday(dashBoardOffdayVO);		
+		// 근태 알림
+		List<DashBoardVO> dlalz =  boardService.dlalzList(dashBoardVO);
+		
+		LocalDate currentdate = LocalDate.now();
+        LocalDate minusDate = currentdate.minusDays(3);
+
+        int nowdate = Integer.parseInt(currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+        int preDate = Integer.parseInt(minusDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+        String alertDate = "";
+        
+        for (int i = 0; i < dlalz.size(); i++) {
+        	int chkDate = Integer.parseInt(dlalz.get(i).getDlalzDate());
+        	if(preDate <=chkDate && nowdate > chkDate) {               
+        		alertDate += (chkDate+"").substring(6,8)+"일 ";
+        	}
+        }
+		
+		// 서비스요청관리통계(0~9)
+		srpsArrayList.add(srps.getPrevious_month());
+		srpsArrayList.add(srps.getCurrent_month());
+		srpsArrayList.add(srps.getPrevious_month_register_carry());
+		srpsArrayList.add(srps.getCurrent_month_register_carry());		
+		srpsArrayList.add(srps.getPrevious_month_register());
+		srpsArrayList.add(srps.getCurrent_month_register());
+		srpsArrayList.add(srps.getPrevious_month_register_all());
+		srpsArrayList.add(srps.getCurrent_month_register_all());
+		srpsArrayList.add(srps.getPrevious_success());
+		srpsArrayList.add(srps.getCurrent_success());
+		
+		// 나의서비스현황(10~19)
+		srpsArrayList.add(srps.getPrevious_month());
+		srpsArrayList.add(srps.getCurrent_month());
+		srpsArrayList.add(srps.getMy_previous_month_register_carry());
+		srpsArrayList.add(srps.getMy_current_month_register_carry());
+		srpsArrayList.add(srps.getMy_previous_month_register());
+		srpsArrayList.add(srps.getMy_current_month_register());
+		srpsArrayList.add(srps.getMy_previous_month_register_all());
+		srpsArrayList.add(srps.getMy_current_month_register_all());
+		srpsArrayList.add(srps.getMy_previous_success());
+		srpsArrayList.add(srps.getMy_current_success());		
+		
+		//출퇴근기록부 체크(20)
+	    srpsArrayList.add(alertDate);
+
+		// 금일 휴가자
+		for (int i = 0; i < dbodl.size(); i++) {
+			if(dbodl.get(i).getOffday_cd_today().equals("2")) {
+				srpsArrayList.add(dbodl.get(i).getChrgr_nm_today().toString() + " 전일휴무");								
+			}				
+			else if(dbodl.get(i).getOffday_cd_today().equals("3")) {
+				if(dbodl.get(i).getHlfday_cd_today().equals("1")) {
+					srpsArrayList.add(dbodl.get(i).getChrgr_nm_today() + " 오전반차");
+				}
+				else if(dbodl.get(i).getHlfday_cd_today().equals("2")) {
+					srpsArrayList.add(dbodl.get(i).getChrgr_nm_today() + " 오후반차");
+				}
+			}			
+		}		
+		
+		JSONArray json = new JSONArray(srpsArrayList);
+		return json.toString();
+	}
+	
+	/**
+	 * 대시보드 휴가자 팝업
+	 * @param 금주or차주 데이터를 담을 DashBoardOffdayVO 
+	 * @exception Exception 
+	 */	
+	@RequestMapping(value="/cmm/dsb/Popup.do")
+	public String AttendancePopup(@ModelAttribute("dashBoardOffdayVO") DashBoardOffdayVO dashBoardOffdayVO,
+			@RequestParam(value = "popupType", required = false) String popupType,
+			Model model) throws Exception {
+		List<String> dataList = new ArrayList<String>();
+		dataList = offdaySetList();		
+		
+		if ("1".equals(popupType)) {
+			dashBoardOffdayVO.setSun_date(dataList.get(0));
+	        dashBoardOffdayVO.setSatur_date(dataList.get(1));
+	        }
+	    else if ("2".equals(popupType)) {	 
+	    	dashBoardOffdayVO.setSun_date(dataList.get(2));
+	        dashBoardOffdayVO.setSatur_date(dataList.get(3));
+	    }
+		
+		List<DashBoardOffdayVO> resultList = new ArrayList<DashBoardOffdayVO>();
+		
+		resultList = boardService.serviceOffday(dashBoardOffdayVO);
+		
+	    model.addAttribute("resultList", resultList);
+		
+		return "/egovframework/com/cmm/OffdayPopup";
+	}
+
+	// 금주 상세, 차주 상세에서 필요한 요일 세팅
+	public List<String> offdaySetList() {
+		LocalDate currentDate = LocalDate.now(); //현재 날짜
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd"); //날짜 포맷
+		List<String> dataList = new ArrayList<String>();
+		
+		dataList.add(currentDate.with(DayOfWeek.SUNDAY).minusWeeks(1).format(formatter));
+        dataList.add(currentDate.with(DayOfWeek.SATURDAY).format(formatter));
+        dataList.add(currentDate.with(DayOfWeek.SUNDAY).format(formatter));
+        dataList.add(currentDate.with(DayOfWeek.SATURDAY).plusWeeks(1).format(formatter));        
+		return dataList;
+	}
+	
+	/** 
+	 * 금일 휴가자 
+	 * @param 데이터를 담을 DashBoardOffdayVO 
+	 * @exception Exception 
+	 */	 
+	public List<DashBoardOffdayVO> offdayToday(DashBoardOffdayVO dashBoardOffdayVO) throws Exception {		
+		List<DashBoardOffdayVO> dashBoardOffdayVOList = boardService.offdayToday(dashBoardOffdayVO);		
+		return dashBoardOffdayVOList;
+	}
+	
+	
+}

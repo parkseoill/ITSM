@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="comnCdNewVO">
+			<field property="newComnCd" depends="required">
+        		<arg0 key="새공동코드"/>
+			</field>
+			<field property="comnCdNm" depends="required">
+        		<arg0 key="공통코드명"/>
+			</field>
+			<field property="comnCdLvl" depends="required">
+        		<arg0 key="공통코드레벨"/>
+			</field>
+			<field property="sortOrde" depends="required">
+        		<arg0 key="정렬순서"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

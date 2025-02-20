@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FailPeriodMapper">
+
+	<resultMap id="FailPeriodList"
+		type="truebon.com.fai.prd.model.FailPeriodVO">
+		<result property="bizSytmCd" column="BIZ_SYTM_CD" />
+		<result property="bizSytmNm" column="BIZ_SYTM_NM" />
+		<result property="failrGrdCd" column="FAILR_GRD_CD" />
+		<result property="failrMngmntPeriod" column="FAILR_MNGMNT_PERIOD" />
+		<result property="rmarkText" column="RMARK_TEXT" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+
+
+	<select id="selectFailPeriodList"
+		parameterType="truebon.com.fai.prd.model.FailPeriodVO"
+		resultType="truebon.com.fai.prd.model.FailPeriodVO">
+
+		SELECT 
+		tbs.BIZ_SYTM_NM AS BIZ_SYTM_NM,
+		tfp.BIZ_SYTM_CD AS BIZ_SYTM_CD,
+		MAX(CASE WHEN tfp.FAILR_GRD_CD = 'FLR0501' THEN CAST(tfp.FAILR_MNGMNT_PERIOD AS INT) END) AS P1,
+		MAX(CASE WHEN tfp.FAILR_GRD_CD = 'FLR0502' THEN	CAST(tfp.FAILR_MNGMNT_PERIOD AS INT) END) AS P2,
+		MAX(CASE WHEN tfp.FAILR_GRD_CD = 'FLR0503' THEN CAST(tfp.FAILR_MNGMNT_PERIOD AS INT) END) AS P3,
+		MAX(CASE WHEN tfp.FAILR_GRD_CD = 'FLR0504' THEN CAST(tfp.FAILR_MNGMNT_PERIOD AS INT) END) AS P4,
+		MAX(CASE WHEN tfp.FAILR_GRD_CD = 'FLR0505' THEN CAST(tfp.FAILR_MNGMNT_PERIOD AS INT) END) AS P5
+		FROM TB_FAIL_PERIOD tfp
+		LEFT OUTER JOIN TB_BIZ_SYSTEM tbs
+		ON tbs.BIZ_SYTM_CD = tfp.BIZ_SYTM_CD
+		WHERE 1=1
+		<if test="searchUseYn != null and searchUseYn !=''">
+				AND tbs.USE_YN = #{searchUseYn}
+		</if>
+		GROUP BY tbs.BIZ_SYTM_NM
+		ORDER BY tbs.BIZ_SYTM_CD
+	</select>
+
+
+	<select id="selectFailPeriodListTotCnt"
+		parameterType="truebon.com.fai.prd.model.FailPeriodVO" resultType="int">
+		SELECT
+		COUNT(*) totCnt
+		FROM ktoa_itsm.TB_FAIL_PERIOD tfp
+		LEFT OUTER JOIN
+		ktoa_itsm.TB_BIZ_SYSTEM tbs
+		ON tbs.BIZ_SYTM_CD = tfp.BIZ_SYTM_CD
+		WHERE 1=1
+		<if test="searchUseYn != null and searchUseYn !=''">
+				AND tbs.USE_YN = #{searchUseYn}
+		</if>
+		GROUP BY tbs.BIZ_SYTM_NM
+		ORDER BY tbs.BIZ_SYTM_CD
+	</select>
+
+	<select id="selectFailPeriod"
+		parameterType="truebon.com.fai.prd.model.FailPeriodVO"
+		resultType="truebon.com.fai.prd.model.FailPeriodVO">
+		SELECT
+		tb.BIZ_SYTM_NM AS BIZ_SYTM_NM,
+		tc.COMN_CD_NM AS FAILR_GRD_NM,
+		tfp.BIZ_SYTM_CD AS BIZ_SYTM_CD,
+		tfp.FAILR_GRD_CD AS FAILR_GRD_CD,
+		tfp.FAILR_MNGMNT_PERIOD AS FAILR_MNGMNT_PERIOD,
+		tfp.RMARK_TEXT
+		FROM TB_FAIL_PERIOD tfp
+		LEFT OUTER JOIN TB_BIZ_SYSTEM tb 
+		ON tb.BIZ_SYTM_CD = tfp.BIZ_SYTM_CD
+		LEFT OUTER JOIN TB_COMN_CD_NEW tc 
+		ON tc.NEW_COMN_CD = tfp.FAILR_GRD_CD
+		WHERE tfp.BIZ_SYTM_CD = #{bizSytmCd} AND tfp.FAILR_GRD_CD = #{failrGrdCd}
+	</select>
+
+	<insert id="insertFailPeriod" parameterType="truebon.com.fai.prd.model.FailPeriodVO">
+		INSERT INTO TB_FAIL_PERIOD (
+			BIZ_SYTM_CD,
+			FAILR_GRD_CD,
+			FAILR_MNGMNT_PERIOD,
+			REGSTR_ID,
+			RDTT,
+			AMNDR_ID,
+			MDTT
+		) VALUES (
+		<foreach collection="totalMinutes" item="minutes" index="i" separator=",">
+			#{bizSytmCd},
+			'FLR050${i + 1}',
+			#{minutes},
+			#{regstrId},
+			SYSDATE(),
+			#{amndrId},
+			SYSDATE()
+		</foreach>
+		)
+	
+	</insert>
+
+	<update id="updateFailPeriod"
+		parameterType="truebon.com.fai.prd.model.FailPeriod">
+		UPDATE TB_FAIL_PERIOD
+		SET
+		FAILR_MNGMNT_PERIOD = #{failrMngmntPeriod},
+		RMARK_TEXT = #{rmarkText},
+		AMNDR_ID = #{amndrId},
+		MDTT = SYSDATE()
+		WHERE BIZ_SYTM_CD = #{bizSytmCd} AND FAILR_GRD_CD = #{failrGrdCd}
+	</update>
+
+</mapper>

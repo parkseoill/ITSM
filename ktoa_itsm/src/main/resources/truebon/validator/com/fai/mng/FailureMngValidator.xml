@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+	<formset>
+		<form name="failureMngVO">
+			<field property="failrDstnct" depends="required">
+				<arg0 key="장애구분" />
+			</field>
+			<field property="failrKind" depends="required">
+				<arg0 key="장애종류 " />
+			</field>
+			<field property="bizSytm" depends="required">
+				<arg0 key="업무시스템 " />
+			</field>
+			<field property="failrEmgdgr" depends="required">
+				<arg0 key="장애긴급도 " />
+			</field>
+			<field property="failrGrd" depends="required">
+				<arg0 key="장애등급 " />
+			</field>
+			<field property="failrMngmntPeriod" depends="required">
+				<arg0 key="장애조치기한 " />
+			</field>
+			<field property="svcAbnoYn" depends="required">
+				<arg0 key="서비스이상여부 " />
+			</field>
+			<field property="failrInfldgEvltn" depends="required">
+				<arg0 key="장애영향도평가 " />
+			</field>
+			<field property="mnpBizmanFailrYn" depends="required">
+				<arg0 key="MNP사업자장애여부 " />
+			</field>
+			<field property="failrTitle" depends="required">
+				<arg0 key="장애제목 " />
+			</field>
+			<field property="failrOccurDt" depends="required">
+				<arg0 key="장애발생일시 " />
+			</field>
+			<field property="failrHpng" depends="required">
+				<arg0 key="장애인지일시 " />
+			</field>
+			<field property="failrHpng" depends="required">
+				<arg0 key="장애현상 " />
+			</field>
+			<field property="failrCause" depends="required">
+				<arg0 key="장애원인 " />
+			</field>
+			<field property="failrMngmntMater" depends="required">
+				<arg0 key="장애조치사항 " />
+			</field>
+			<field property="mangrNm" depends="required">
+				<arg0 key="조치자명 " />
+			</field>				
+			
+		</form>
+	</formset>
+</form-validation>

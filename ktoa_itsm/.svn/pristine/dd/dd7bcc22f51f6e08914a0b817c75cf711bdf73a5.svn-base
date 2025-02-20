@@ -1,0 +1,88 @@
+package truebon.com.opm.com.dao;
+
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import truebon.com.opm.com.model.ComnCdNew;
+import truebon.com.opm.com.model.ComnCdNewVO;
+
+
+
+@Repository("ComnCdNewDAO")
+public class ComnCdNewDAO extends EgovComAbstractDAO {
+
+	
+	/**
+	 * tb_comn_cd_new 목록을 조회한다.
+	 * 
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_comn_cd_new 목록
+	 * @exception Exception
+	 */
+	public List<ComnCdNewVO> selectComnCdNewList(ComnCdNewVO searchVO) throws Exception {
+		return selectList("ComnCdNewMapper.selectComnCdNew", searchVO);
+	}
+	
+	/**********************************/
+	/**
+	 * tb_comn_cd_new 총 개수를 조회한다.
+	 * 
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_comn_cd_new 목록 개수
+	 * @exception Exception
+	 */
+	public int selectComnCdNewListTotCnt(ComnCdNewVO searchVO) {
+    	return (Integer)selectOne("ComnCdNewMapper.selectComnCdNewListTotCnt", searchVO);
+    }
+	/**
+	 * 공통코드NEW 목록을 조회한다.
+	 */
+	//selectComnCdNewList
+	public List<ComnCdNewVO> selectComnCdList(ComnCdNewVO searchVO) throws Exception {
+        return selectList("ComnCdNewMapper.selectComnCdNewList", searchVO);
+	}
+	
+	/**
+	 * 공통코드NEW 을 등록한다.
+	 * @param vo - 등록할 정보가 담긴 ComnCdNewVO
+	 * @return 등록 결과
+	 * @exception Exception
+	 */
+    public void insertComnCdNew(ComnCdNewVO vo) throws Exception {
+        insert("ComnCdNewMapper.insertComnCdNew", vo);
+    }
+    /**
+   	 * 공통코드NEW을 수정한다.
+   	 * @param vo - 수정할 정보가 담긴 ComnCdNewVO
+   	 * @return void형
+   	 * @exception Exception
+   	 */
+	 public void updateComnCdNew(ComnCdNew vo) throws Exception {
+	     update("ComnCdNewMapper.updateComnCdNew", vo);
+	 }
+	/**
+	  *  공통코드NEW 상세항목을 조회한다.
+	  * @param comnCdNew
+	  * @return ComnCdNew(공통코드 lv1)
+	  *  @throws Exception
+	  */
+	public ComnCdNewVO selectComnCdNew(ComnCdNewVO searchVO) {
+		//selectComnCdNewDetail
+		return (ComnCdNewVO)selectOne("ComnCdNewMapper.selectComnCdNewOne", searchVO);
+	}
+	/**
+	 * 공통코드NEW 목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_biz_sytm 목록
+	 * @exception Exception
+	 */
+    public List<ComnCdNewVO> selectComnCdNewNmList(ComnCdNewVO searchVO) throws Exception {
+        return selectList("ComnCdNewMapper.selectComnCdNewNmList", searchVO);
+    }
+	
+
+
+}

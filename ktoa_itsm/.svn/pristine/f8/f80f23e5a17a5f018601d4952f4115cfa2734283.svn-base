@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ChargerMapper">
+	
+	<resultMap id="ChargerList" type="truebon.com.sys.chr.model.ChargerVO">
+		<result property="chrgrNo" column="CHRGR_NO" />
+		<result property="chrgrNm" column="CHRGR_NM" />
+		<result property="chrgrWirelnTelNo" column="CHRGR_WIRELN_TEL_NO" />
+		<result property="chrgrWirelsTelNo" column="CHRGR_WIRELS_TEL_NO" />
+		<result property="chrgrZipcd" column="CHRGR_ZIPCD" />
+		<result property="chrgrAddr" column="CHRGR_ADDR" />
+		<result property="chrgrEaddr" column="CHRGR_EADDR" />
+		<result property="clspos" column="CLSPOS" />
+		<result property="positCmpnyNo" column="POSIT_CMPNY_NO" />
+		<result property="positDeptNo" column="POSIT_DEPT_NO" />
+		<result property="emgcyContTelNo" column="EMGCY_CONT_TEL_NO" />
+		<result property="emgcyContReltnCd" column="EMGCY_CONT_RELTN_CD" />
+		<result property="chrgrDstnctCd" column="CHRGR_DSTNCT_CD" />
+		<result property="cosnCmpnyNo" column="COSN_CMPNY_NO" />
+		<result property="cosnDeptNo" column="COSN_DEPT_NO" />
+		<result property="chrgrRoleCd" column="CHRGR_ROLE_CD" />
+		<result property="useYn" column="USE_YN" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+	
+	<insert id="insertCharger" parameterType="truebon.com.sys.chr.model.Charger">
+		<![CDATA[
+			INSERT INTO TB_CHARGER 
+				( CHRGR_NO
+				  , CHRGR_NM
+				  , CHRGR_WIRELN_TEL_NO
+				  , CHRGR_WIRELS_TEL_NO
+				  , CHRGR_ZIPCD
+				  , CHRGR_ADDR
+				  , CHRGR_EADDR
+				  , CLSPOS
+				  , POSIT_CMPNY_NO
+				  , POSIT_DEPT_NO
+				  , EMGCY_CONT_TEL_NO
+				  , EMGCY_CONT_RELTN_CD
+				  , CHRGR_DSTNCT_CD
+				  , COSN_CMPNY_NO
+				  , COSN_DEPT_NO
+				  , CHRGR_ROLE_CD
+				  , USE_YN
+				  , REGSTR_ID
+				  , RDTT
+				  , AMNDR_ID
+				  , MDTT )
+			VALUES ( #{chrgrNo}
+				  , #{chrgrNm}
+				  , #{chrgrWirelnTelNo}
+				  , #{chrgrWirelsTelNo}
+				  , #{chrgrZipcd}
+				  , #{chrgrAddr}
+				  , #{chrgrEaddr}
+				  , #{clspos}
+				  , #{positCmpnyNo}
+				  , #{positDeptNo}
+				  , #{emgcyContTelNo}
+				  , #{emgcyContReltnCd}
+				  , #{chrgrDstnctCd}
+				  , #{cosnCmpnyNo}
+				  , #{cosnDeptNo}
+				  , #{chrgrRoleCd}
+				  , 'Y'
+				  , #{regstrId}
+				  , SYSDATE()
+				  , #{amndrId}
+				  , SYSDATE() )
+		]]>
+	</insert>
+	
+	<update id="updateCharger" parameterType="truebon.com.sys.chr.model.Charger">
+		<![CDATA[
+			UPDATE TB_CHARGER
+			SET CHRGR_WIRELN_TEL_NO=#{chrgrWirelnTelNo}
+				, CHRGR_WIRELS_TEL_NO=#{chrgrWirelsTelNo}
+				, CHRGR_ZIPCD=#{chrgrZipcd}
+				, CHRGR_ADDR=#{chrgrAddr}
+				, CHRGR_EADDR=#{chrgrEaddr}
+				, CLSPOS=#{clspos}
+				, POSIT_CMPNY_NO=#{positCmpnyNo}
+				, POSIT_DEPT_NO=#{positDeptNo}
+				, EMGCY_CONT_TEL_NO=#{emgcyContTelNo}
+				, EMGCY_CONT_RELTN_CD=#{emgcyContReltnCd}
+				, CHRGR_DSTNCT_CD=#{chrgrDstnctCd}
+				, COSN_CMPNY_NO=#{cosnCmpnyNo}
+				, COSN_DEPT_NO=#{cosnDeptNo}
+				, CHRGR_ROLE_CD=#{chrgrRoleCd}
+				, AMNDR_ID=#{amndrId}
+				, MDTT=sysdate()
+			WHERE CHRGR_NO = #{chrgrNo};
+			]]>
+	</update>
+	
+	<update id="deleteCharger" parameterType="truebon.com.sys.chr.model.Charger">
+		<![CDATA[
+			UPDATE TB_CHARGER 
+			SET USE_YN = 'N'
+				, AMNDR_ID = #{amndrId}
+				, MDTT = sysdate() 
+			WHERE CHRGR_NO = #{chrgrNo};
+			]]>
+	</update>
+	
+	<select id="selectCharger" parameterType="truebon.com.sys.chr.model.ChargerVO" resultType="truebon.com.sys.chr.model.ChargerVO">
+		<![CDATA[
+			SELECT
+				tc.CHRGR_NO					AS CHRGR_NO
+				, tc.CHRGR_NM				AS CHRGR_NM
+				, tc.CHRGR_WIRELN_TEL_NO	AS CHRGR_WIRELN_TEL_NO
+				, tc.CHRGR_WIRELS_TEL_NO	AS CHRGR_WIRELS_TEL_NO
+				, tc.CHRGR_ZIPCD			AS CHRGR_ZIPCD
+				, tc.CHRGR_ADDR				AS CHRGR_ADDR
+				, tc.CHRGR_EADDR			AS CHRGR_EADDR
+				, tc.CLSPOS					AS CLSPOS
+				, tc.POSIT_CMPNY_NO			AS POSIT_CMPNY_NO
+				, tc.POSIT_DEPT_NO			AS POSIT_DEPT_NO
+				, tc.EMGCY_CONT_TEL_NO		AS EMGCY_CONT_TEL_NO
+				, tc.EMGCY_CONT_RELTN_CD	AS EMGCY_CONT_RELTN_CD
+				, tc.CHRGR_DSTNCT_CD		AS CHRGR_DSTNCT_CD
+				, tc.COSN_CMPNY_NO			AS COSN_CMPNY_NO
+				, tc.COSN_DEPT_NO			AS COSN_DEPT_NO
+				, tc.CHRGR_ROLE_CD			AS CHRGR_ROLE_CD
+				, tc.USE_YN					AS USE_YN
+				, tc.REGSTR_ID				AS REGSTR_ID
+				, tc.RDTT					AS RDTT
+				, tc.AMNDR_ID				AS AMNDR_ID
+				, tc.MDTT					AS MDTT
+				, tc2.CMPNY_NM				AS POSIT_CMPNY_NM
+				, td.DEPT_NM				AS POSIT_DEPT_NM
+				, tc3.CMPNY_NM 				AS COSN_CMPNY_NM
+				, (SELECT td2.DEPT_NM 
+					FROM TB_DEPT td2
+					WHERE td2.CMPNY_NO = tc.COSN_CMPNY_NO
+					AND td2.DEPT_NO = tc.COSN_DEPT_NO)		AS COSN_DEPT_NM
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE CHRGR_NO = #{chrgrNo}
+			]]>
+	</select>
+	
+	<select id="selectChargerList" parameterType="truebon.com.sys.chr.model.ChargerVO" resultMap="ChargerList">
+			SELECT
+				tc.CHRGR_NO					AS CHRGR_NO
+				, tc.CHRGR_NM				AS CHRGR_NM
+				, tc.CHRGR_WIRELN_TEL_NO	AS CHRGR_WIRELN_TEL_NO
+				, tc.CHRGR_WIRELS_TEL_NO	AS CHRGR_WIRELS_TEL_NO
+				, tc.CHRGR_ZIPCD			AS CHRGR_ZIPCD
+				, tc.CHRGR_ADDR				AS CHRGR_ADDR
+				, tc.CHRGR_EADDR			AS CHRGR_EADDR
+				, tc.CLSPOS					AS CLSPOS
+				, tc.POSIT_CMPNY_NO			AS POSIT_CMPNY_NO
+				, tc.POSIT_DEPT_NO			AS POSIT_DEPT_NO
+				, tc.EMGCY_CONT_TEL_NO		AS EMGCY_CONT_TEL_NO
+				, tc.EMGCY_CONT_RELTN_CD	AS EMGCY_CONT_RELTN_CD
+				, tc.CHRGR_DSTNCT_CD		AS CHRGR_DSTNCT_CD
+				, tc.COSN_CMPNY_NO			AS COSN_CMPNY_NO
+				, tc.COSN_DEPT_NO			AS COSN_DEPT_NO
+				, tc.USE_YN					AS USE_YN
+				, tc.CHRGR_ROLE_CD 			AS CHRGR_ROLE_CD
+				, tcdc.COMN_CD_NM 			AS CHRGR_ROLE_NM
+				, tc.REGSTR_ID				AS REGSTR_ID
+				, tc.RDTT					AS RDTT
+				, tc.AMNDR_ID				AS AMNDR_ID
+				, tc.MDTT					AS MDTT
+				, tc2.CMPNY_NM				AS POSIT_CMPNY_NM
+				, td.DEPT_NM				AS POSIT_DEPT_NM
+				, tc3.CMPNY_NM 				AS COSN_CMPNY_NM
+				, (SELECT td2.DEPT_NM 
+					FROM TB_DEPT td2
+					WHERE td2.CMPNY_NO = tc.COSN_CMPNY_NO
+					AND td2.DEPT_NO = tc.COSN_DEPT_NO)		AS COSN_DEPT_NM
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMN_DETL_CD tcdc ON tc.CHRGR_ROLE_CD = tcdc.COMN_CD AND tcdc.COMN_CD_ID = 'ISM008'
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc.CHRGR_WIRELS_TEL_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 4">AND
+					tc.CHRGR_EADDR LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 5">AND
+					tcdc.COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			<if test="searchCondition == 6">AND
+				tc.CHRGR_NO = #{chrgrNo}
+			</if>
+			<choose>
+				<when test="arrChrgrDstnctCd.size != 0">
+					AND CHRGR_DSTNCT_CD IN
+					<foreach collection="arrChrgrDstnctCd" item="item" separator="," open="(" close=")">
+						#{item}
+					</foreach>
+				</when>
+			</choose>
+			 	AND tc.USE_YN = 'Y'
+				ORDER BY tc.CHRGR_NM
+			<!-- 전체조회 시 사용 -->
+			<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+				limit #{recordCountPerPage} offset #{firstIndex}
+			</if>
+	</select>	
+	
+	<select id="selectChargerListTotCnt" parameterType="truebon.com.sys.chr.model.ChargerVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMN_DETL_CD tcdc ON tc.CHRGR_ROLE_CD = tcdc.COMN_CD AND tcdc.COMN_CD_ID = 'ISM008'
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc.CHRGR_WIRELS_TEL_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 4">AND
+					tc.CHRGR_EADDR LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 5">AND
+					tcdc.COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			<if test="searchCondition == 6">AND
+				tc.CHRGR_NO = #{chrgrNo}
+			</if>
+			<choose>
+				<when test="arrChrgrDstnctCd.size != 0">
+					AND CHRGR_DSTNCT_CD IN
+					<foreach collection="arrChrgrDstnctCd" item="item" separator="," open="(" close=")">
+						#{item}
+					</foreach>
+				</when>
+			</choose>
+			 AND tc.USE_YN = 'Y'		
+	</select>
+	
+	<select id="selectNameList" parameterType="truebon.com.sys.chr.model.ChargerVO" resultType="truebon.com.sys.chr.model.ChargerVO">
+			SELECT 
+				CHRGR_NO
+				,CHRGR_NM
+			FROM TB_CHARGER
+			WHERE CHRGR_DSTNCT_CD = '2' 
+			AND USE_YN = 'Y'
+			AND CHRGR_NM != '관리자'
+			AND CHRGR_NM != '익명사용자'
+	</select>
+	
+	<select id="selectCmpnyList" parameterType="truebon.com.sys.chr.model.ChargerVO" resultMap="ChargerList">
+			SELECT
+				tc.CHRGR_NO					AS CHRGR_NO
+				, tc.CHRGR_NM				AS CHRGR_NM
+				, tc.CHRGR_WIRELS_TEL_NO	AS CHRGR_WIRELS_TEL_NO
+				, tc.POSIT_CMPNY_NO			AS POSIT_CMPNY_NO
+				, tc.POSIT_DEPT_NO			AS POSIT_DEPT_NO
+				, tc.CHRGR_DSTNCT_CD		AS CHRGR_DSTNCT_CD
+				, tc.REGSTR_ID				AS REGSTR_ID
+				, tc.RDTT					AS RDTT
+				, tc.AMNDR_ID				AS AMNDR_ID
+				, tc.MDTT					AS MDTT
+				, tc2.CMPNY_NM				AS POSIT_CMPNY_NM
+				, td.DEPT_NM				AS POSIT_DEPT_NM
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc.CHRGR_WIRELS_TEL_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			 	AND tc.USE_YN = 'Y' AND (tc.CHRGR_DSTNCT_CD ='3' OR tc.CHRGR_DSTNCT_CD ='4')
+				ORDER BY tc.CHRGR_NM
+				limit #{recordCountPerPage} offset #{firstIndex}	
+	</select>	
+	
+	<select id="ChargerListPopTotCnt" parameterType="truebon.com.sys.chr.model.ChargerVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc.CHRGR_WIRELS_TEL_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			 AND tc.USE_YN = 'Y' AND (tc.CHRGR_DSTNCT_CD ='3' OR tc.CHRGR_DSTNCT_CD ='4')		
+	</select>
+	
+	<select id="selectChargerSrList" parameterType="truebon.com.sys.chr.model.ChargerVO" resultMap="ChargerList">
+			SELECT
+				tc.CHRGR_NO					AS CHRGR_NO
+				, tc.CHRGR_NM				AS CHRGR_NM
+				, tc.CHRGR_WIRELN_TEL_NO	AS CHRGR_WIRELN_TEL_NO
+				, tc.POSIT_CMPNY_NO			AS POSIT_CMPNY_NO
+				, tc.POSIT_DEPT_NO			AS POSIT_DEPT_NO
+				, tc.CHRGR_DSTNCT_CD		AS CHRGR_DSTNCT_CD
+				, tc2.CMPNY_NM				AS POSIT_CMPNY_NM
+				, td.DEPT_NM				AS POSIT_DEPT_NM
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					td.DEPT_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc.CHRGR_WIRELN_TEL_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+				AND tc.USE_YN = 'Y' AND (tc.CHRGR_DSTNCT_CD ='1' OR tc.CHRGR_DSTNCT_CD ='2')
+				ORDER BY tc.CHRGR_NM
+				limit #{recordCountPerPage} offset #{firstIndex}	
+	</select>	
+	
+	<select id="ChargerSrListPopTotCnt" parameterType="truebon.com.sys.chr.model.ChargerVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					td.DEPT_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc.CHRGR_WIRELN_TEL_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+			 AND tc.USE_YN = 'Y' AND (tc.CHRGR_DSTNCT_CD ='1' OR tc.CHRGR_DSTNCT_CD ='2')		
+	</select>
+	
+	<select id="CheckVisitorsNmCmpny" parameterType="truebon.com.sys.chr.model.ChargerVO" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			WHERE tc.CHRGR_Nm = #{chrgrNm}
+			AND POSIT_CMPNY_NO = #{positCmpnyNo}
+	</select>
+	
+	<select id="selectSrDeptList" parameterType="truebon.com.sys.chr.model.ChargerVO" resultMap="ChargerList">    
+			SELECT DISTINCT 
+				 tc.POSIT_CMPNY_NO			AS POSIT_CMPNY_NO
+				, tc2.CMPNY_NM				AS POSIT_CMPNY_NM
+				, td.DEPT_NM				AS POSIT_DEPT_NM
+				, td.DEPT_NO				AS POSIT_DEPT_NO	
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			INNER JOIN TB_SR_MASTER tsm ON tc.CHRGR_NO = tsm.REQ_CHRGR_NO
+			WHERE tc.USE_YN = 'Y'
+    </select>
+    
+    <select id="selectChargerSwList" parameterType="truebon.com.sys.chr.model.ChargerVO" resultMap="ChargerList">    
+			SELECT
+				tc.CHRGR_NO					AS CHRGR_NO
+				, tc.CHRGR_NM				AS CHRGR_NM
+				, tc.CHRGR_WIRELS_TEL_NO	AS CHRGR_WIRELS_TEL_NO
+				, tc.POSIT_CMPNY_NO			AS POSIT_CMPNY_NO
+				, tc.POSIT_DEPT_NO			AS POSIT_DEPT_NO
+				, tc.CHRGR_DSTNCT_CD		AS CHRGR_DSTNCT_CD
+				, tc2.CMPNY_NM				AS POSIT_CMPNY_NM
+				, td.DEPT_NM				AS POSIT_DEPT_NM
+			FROM TB_CHARGER tc
+			INNER JOIN TB_COMPANY tc2 ON tc.POSIT_CMPNY_NO = tc2.CMPNY_NO
+			INNER JOIN TB_DEPT td ON tc2.CMPNY_NO = td.CMPNY_NO AND tc.POSIT_DEPT_NO = td.DEPT_NO
+			LEFT OUTER JOIN TB_COMPANY tc3 ON tc.COSN_CMPNY_NO = tc3.CMPNY_NO
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				<if test="searchCondition == 1">AND
+					tc2.CMPNY_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 2">AND
+					tc.CHRGR_NM LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+				<if test="searchCondition == 3">AND
+					tc.CHRGR_WIRELS_TEL_NO LIKE CONCAT('%',#{searchKeyword},'%')
+				</if>
+			</if>
+				AND tc.USE_YN = 'Y' AND (tc.CHRGR_DSTNCT_CD ='3')
+				ORDER BY tc.CHRGR_NM
+				limit #{recordCountPerPage} offset #{firstIndex}
+    </select>
+    
+    
+	
+</mapper>

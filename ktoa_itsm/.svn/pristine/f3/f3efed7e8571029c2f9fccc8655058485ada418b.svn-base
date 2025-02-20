@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="WorkMapper">
+
+	<resultMap id="WorkList" type="truebon.com.dlm.wrk.model.WorkVO">
+		<result property="dlalzDate" column="DLALZ_DATE" />
+		<result property="chrgrNo" column="CHRGR_NO" />
+		<result property="dlalzDstnctCd" column="DLALZ_DSTNCT_CD" />
+		<result property="wrkTypeCd" column="WRK_TYPE_CD" />
+		<result property="wrkTimeCd" column="WRK_TIME_CD" />
+		<result property="offdayTypeCd" column="OFFDAY_TYPE_CD" />
+		<result property="hlfdayOffdayDstnctCd" column="HLFDAY_OFFDAY_DSTNCT_CD" />
+		<result property="securBonduYn" column="SECUR_BONDU_YN" />
+		<result property="rmarkText" column="RMARK_TEXT" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="amndrNm" column="AMNDR_NM" />
+		<result property="chrgrNm" column="CHRGR_NM" />
+		<result property="chrgrRoleCd" column="CHRGR_ROLE_CD" />
+		<result property="cmpnyNm" column="CMPNY_NM" />
+		<result property="comnCdNm" column="COMN_CD_NM" />
+		<result property="dyweekDstnctCd" column="DYWEEK_DSTNCT_CD" />   
+		<result property="plnOffdayRmark" column="PLN_OFFDAY_RMARK" />  
+		<result property="sumPlnOffdayRmark" column="SUM_PLN_OFFDAY_RMARK" />
+		<result property="sumOffdayRmark" column="SUM_OFFDAY_RMARK" />
+		<result property="plnOffdayWrkRsnCd" column="PLN_OFFDAY_WRK_RSN_CD" />
+		<result property="offdayWrkRsnCd" column="OFFDAY_WRK_RSN_CD" />
+		<result property="plnOpWrkTimeCd" column="PLN_OP_WRK_TIME_CD" />
+		<result property="opWrkTimeCd" column="OP_WRK_TIME_CD" />  
+		<result property="stdrDate" column="STDR_DATE" />  
+		<result property="hdayDstinctCd" column="HDAY_DSTNCT_CD" /> 
+		<result property="offdayCnt" column="OFFDAY_CNT" />  
+		<result property="offdaySumCnt" column="OFFDAY_SUM_CNT" /> 
+	</resultMap>
+   
+
+	<select id="selectWorkList" parameterType="truebon.com.dlm.wrk.model.WorkVO" resultMap="WorkList">
+    	SELECT 
+                C.DLALZ_DATE
+              , C.CHRGR_NO
+              , C.DLALZ_DSTNCT_CD
+              , NVL(C.WRK_TYPE_CD,'') WRK_TYPE_CD
+              , C.WRK_TIME_CD
+              , NVL(C.OFFDAY_TYPE_CD,'') OFFDAY_TYPE_CD
+              , NVL(C.OFFDAY_WRK_RSN_CD,'') OFFDAY_WRK_RSN_CD
+              , NVL(C.HLFDAY_OFFDAY_DSTNCT_CD,'') HLFDAY_OFFDAY_DSTNCT_CD
+              , NVL(C.PLN_OFFDAY_TYPE_CD,'') PLN_OFFDAY_TYPE_CD
+              , NVL(C.PLN_HLFDAY_OFFDAY_DSTNCT_CD,'') PLN_HLFDAY_OFFDAY_DSTNCT_CD
+              , NVL(C.PLN_OP_WRK_TIME_CD,'') PLN_OP_WRK_TIME_CD
+              , NVL(C.OP_WRK_TIME_CD,'') OP_WRK_TIME_CD
+              , C.SECUR_BONDU_YN
+              , C.RMARK_TEXT
+              , C.REGSTR_ID
+              , C.AMNDR_ID
+              , C.CHRGR_NM 
+              , C.CHRGR_ROLE_CD 
+              , C.PLN_OFFDAY_RMARK
+              , NVL(C.PLN_OFFDAY_WRK_RSN_CD,'') PLN_OFFDAY_WRK_RSN_CD
+              , D.CMPNY_NM 
+              , tc.CHRGR_NM AS AMNDR_NM
+              , E.COMN_CD_NM
+              , tcd.DYWEEK_DSTNCT_CD 
+              , tcd.STDR_DATE
+              , tcd.HDAY_DSTNCT_CD
+         FROM (SELECT 
+                a.DLALZ_DATE
+              , a.CHRGR_NO
+              , a.DLALZ_DSTNCT_CD
+              , a.WRK_TYPE_CD
+              , a.WRK_TIME_CD
+              , a.OFFDAY_TYPE_CD
+              , a.OFFDAY_WRK_RSN_CD
+              , a.HLFDAY_OFFDAY_DSTNCT_CD
+              , a.PLN_OFFDAY_TYPE_CD
+              , a.PLN_HLFDAY_OFFDAY_DSTNCT_CD
+              , a.SECUR_BONDU_YN
+              , a.PLN_OP_WRK_TIME_CD
+              , a.OP_WRK_TIME_CD
+              , a.RMARK_TEXT
+              , a.REGSTR_ID
+              , a.AMNDR_ID
+              , a.PLN_OFFDAY_RMARK
+              , a.PLN_OFFDAY_WRK_RSN_CD
+              , b.CHRGR_NM 
+              , b.CHRGR_ROLE_CD 
+              , b.POSIT_CMPNY_NO
+             FROM TB_DLALZ a 
+                INNER JOIN TB_CHARGER b ON a.CHRGR_NO = b.CHRGR_NO
+             ) C 
+             INNER JOIN TB_COMPANY D ON C.POSIT_CMPNY_NO = D.CMPNY_NO
+             LEFT OUTER JOIN TB_USER tu ON tu.USER_ID = C.AMNDR_ID
+             LEFT OUTER JOIN TB_CHARGER tc ON tu.CHRGR_NO = tc.CHRGR_NO
+             LEFT OUTER JOIN
+             (
+                SELECT F.COMN_CD_NM ,E.CHRGR_NO 
+                FROM TB_CHARGER E
+                INNER JOIN TB_COMN_DETL_CD F ON E.CHRGR_ROLE_CD = F.COMN_CD
+                WHERE F.COMN_CD_ID ='ISM008' AND E.COSN_CMPNY_NO = '0001'
+                AND E.CHRGR_ROLE_CD != '02'
+             ) E
+             ON C.CHRGR_NO = E.CHRGR_NO 
+             LEFT OUTER JOIN TB_COMN_DATE tcd on C.DLALZ_DATE = tcd.STDR_DATE 
+             WHERE 1=1
+             
+             <if test="selectedDate !=null and selectedDate !=''">
+                AND C.DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%')
+             </if>
+             ORDER BY C.DLALZ_DATE, FIELD(C.CHRGR_ROLE_CD, 10,01,05,06,07,08,04) , FIELD(C.CHRGR_NO, 0002, 0003 )DESC ,FIELD(C.CHRGR_NM,'최호용','박서일','김승현'), C.CHRGR_NO
+      
+	</select>   
+   
+   
+	<select id="selectRmark" parameterType="truebon.com.dlm.wrk.model.WorkVO" resultMap="WorkList">   
+        SELECT  
+	        tc.CHRGR_NM 
+	      , GROUP_CONCAT(concat(" ",SUBSTRING(td.DLALZ_DATE,5,2),"/" ,SUBSTRING(td.DLALZ_DATE,7,2)) , concat(" (",td.PLN_OFFDAY_RMARK,")") order by  td.DLALZ_DATE ASC SEPARATOR ' / ' ) SUM_PLN_OFFDAY_RMARK
+	      , GROUP_CONCAT(concat(" ",SUBSTRING(td.DLALZ_DATE,5,2),"/" ,SUBSTRING(td.DLALZ_DATE,7,2)) , concat(" (",td.RMARK_TEXT,")") order by  td.DLALZ_DATE ASC SEPARATOR ' / ' ) SUM_OFFDAY_RMARK
+	        FROM TB_DLALZ td , TB_CHARGER tc 
+	        WHERE td.CHRGR_NO = tc.CHRGR_NO 
+	        AND td.DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%')
+	        AND (PLN_OFFDAY_RMARK != '' OR  RMARK_TEXT != '')
+	        GROUP BY tc.CHRGR_NM 
+	        ORDER BY FIELD(tc.CHRGR_ROLE_CD, 10,01,05,06,07,08,04) , tc.CHRGR_NO; 
+    </select> 
+   
+      
+    <select id="selectOffday" parameterType="truebon.com.dlm.wrk.model.WorkVO" resultMap="WorkList"> 
+   		<![CDATA[
+			SELECT td.DLALZ_DATE , td.CHRGR_NO , tc.CHRGR_NM, if( DLALZ_DSTNCT_CD = '2', 1, 0.5)OFFDAY_CNT, C.SUM_CNT OFFDAY_SUM_CNT
+				FROM  TB_CHARGER tc, TB_DLALZ td
+				LEFT OUTER JOIN
+				(
+					SELECT  a.CHRGR_NO ,(COUNT(a.OFFDAY_TYPE_CD) - (COUNT(case when a.DLALZ_DSTNCT_CD ='3' then 1 end))/2)SUM_CNT
+					FROM TB_DLALZ a , TB_CHARGER b 
+					WHERE (a.DLALZ_DATE > CONCAT(DATE_FORMAT(NOW(),'%Y'), '0101') AND a.DLALZ_DATE <= (DATE_FORMAT(NOW(),'%Y%m%d')))
+					AND a.CHRGR_NO  = b.CHRGR_NO 
+					AND a.OFFDAY_TYPE_CD = '1'
+					AND b.CHRGR_NM = #{chrgrNm} 
+				) C	
+				on td.CHRGR_NO = C.CHRGR_NO
+				WHERE (td.DLALZ_DATE > CONCAT(DATE_FORMAT(NOW(),'%Y'), '0101') AND td.DLALZ_DATE <= (DATE_FORMAT(NOW(),'%Y%m%d')))
+				AND td.CHRGR_NO  = tc.CHRGR_NO 
+				AND td.OFFDAY_TYPE_CD = '1'
+				AND tc.CHRGR_NM = #{chrgrNm} 
+		]]>
+    </select>
+      
+      
+	<update id="updateWork" parameterType="truebon.com.dlm.wrk.model.Work">
+      
+        UPDATE TB_DLALZ
+        SET  	
+        <if test="plnOffdayRmark!=null and !plnOffdayRmark.equals('')">
+            PLN_OFFDAY_RMARK = #{plnOffdayRmark} ,
+     	</if>
+       	<if test='plnOpWrkTimeCd == "" and comnCdNm == "OP"'>
+            PLN_OP_WRK_TIME_CD = NULL 
+          , PLN_DLALZ_DSTNCT_CD ='2'
+        </if>
+        <if test='plnOpWrkTimeCd == "1" and comnCdNm == "OP"'>
+            PLN_OP_WRK_TIME_CD = '1' 
+          , PLN_DLALZ_DSTNCT_CD ='1'
+        </if>
+        <if test='plnOpWrkTimeCd == "2" and comnCdNm == "OP"'>
+            PLN_OP_WRK_TIME_CD = '2' 
+          , PLN_DLALZ_DSTNCT_CD ='1'
+        </if>
+        <choose>
+            <when test = 'plnOffdayTypeCd == "" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = NULL ,PLN_HLFDAY_OFFDAY_DSTNCT_CD = NULL, PLN_OFFDAY_RMARK = NULL , PLN_DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'plnOffdayTypeCd == "1" and  plnHlfdayOffdayDstnctCd == "" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '1' , PLN_DLALZ_DSTNCT_CD = '2', PLN_HLFDAY_OFFDAY_DSTNCT_CD = NULL</when>
+            <when test = 'plnOffdayTypeCd == "2" and  plnHlfdayOffdayDstnctCd == "" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '2' , PLN_DLALZ_DSTNCT_CD = '2', PLN_HLFDAY_OFFDAY_DSTNCT_CD = NULL </when>
+            <when test = 'plnOffdayTypeCd == "3" and  plnHlfdayOffdayDstnctCd == "" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '3' , PLN_DLALZ_DSTNCT_CD = '2', PLN_HLFDAY_OFFDAY_DSTNCT_CD = NULL</when>
+            <when test = 'plnOffdayTypeCd == "1" and  plnHlfdayOffdayDstnctCd == "1" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '1' , PLN_HLFDAY_OFFDAY_DSTNCT_CD = '1' , PLN_DLALZ_DSTNCT_CD = '3'</when>
+            <when test = 'plnOffdayTypeCd == "1" and  plnHlfdayOffdayDstnctCd == "2" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '1' , PLN_HLFDAY_OFFDAY_DSTNCT_CD = '2' , PLN_DLALZ_DSTNCT_CD = '3'</when>
+            <when test = 'plnOffdayTypeCd == "2" and  plnHlfdayOffdayDstnctCd == "1" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '2' , PLN_HLFDAY_OFFDAY_DSTNCT_CD = '1' , PLN_DLALZ_DSTNCT_CD = '3'</when>
+            <when test = 'plnOffdayTypeCd == "2" and  plnHlfdayOffdayDstnctCd == "2" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '2' , PLN_HLFDAY_OFFDAY_DSTNCT_CD = '2' , PLN_DLALZ_DSTNCT_CD = '3'</when>
+            <when test = 'plnOffdayTypeCd == "3" and  plnHlfdayOffdayDstnctCd == "1" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '3' , PLN_HLFDAY_OFFDAY_DSTNCT_CD = '1' , PLN_DLALZ_DSTNCT_CD = '3'</when>
+            <when test = 'plnOffdayTypeCd == "3" and  plnHlfdayOffdayDstnctCd == "2" and comnCdNm != "OP"'>PLN_OFFDAY_TYPE_CD = '3' , PLN_HLFDAY_OFFDAY_DSTNCT_CD = '2' , PLN_DLALZ_DSTNCT_CD = '3'</when>
+            <when test = 'plnOffdayWrkRsnCd == "" and comnCdNm != "OP"'>PLN_OFFDAY_WRK_RSN_CD = NULL , PLN_DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'plnOffdayWrkRsnCd == "1" and comnCdNm != "OP"'>PLN_OFFDAY_WRK_RSN_CD = '1' , PLN_DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'plnOffdayWrkRsnCd == "2" and comnCdNm != "OP"'>PLN_OFFDAY_WRK_RSN_CD = '2' , PLN_DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'plnOffdayWrkRsnCd == "3" and comnCdNm != "OP"'>PLN_OFFDAY_WRK_RSN_CD = '3' , PLN_DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'plnOffdayWrkRsnCd == "4" and comnCdNm != "OP"'>PLN_OFFDAY_WRK_RSN_CD = '4' , PLN_DLALZ_DSTNCT_CD = '1'</when>
+            <otherwise></otherwise>
+        </choose>  
+        WHERE CHRGR_NO = #{chrgrNo} 
+        AND DLALZ_DATE = REPLACE(#{dlalzDate},'-','') 
+	</update>
+   
+   
+	<update id="updateResWork" parameterType="truebon.com.dlm.wrk.model.Work">
+      
+	    UPDATE TB_DLALZ
+	    SET  	
+        <if test="rmarkText!=null and !rmarkText.equals('')">
+            RMARK_TEXT = #{rmarkText} ,
+     	</if>
+       	<if test='opWrkTimeCd == "" and comnCdNm == "OP"'>
+            OP_WRK_TIME_CD = NULL 
+          , DLALZ_DSTNCT_CD ='2'
+        </if>
+        <if test='opWrkTimeCd == "1" and comnCdNm == "OP"'>
+             OP_WRK_TIME_CD = '1' 
+           , DLALZ_DSTNCT_CD ='1'
+        </if>
+        <if test='opWrkTimeCd == "2" and comnCdNm == "OP"'>
+             OP_WRK_TIME_CD = '2' 
+           , DLALZ_DSTNCT_CD ='1'
+        </if>
+        <choose>
+            <when test = 'offdayTypeCd == "" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = NULL, HLFDAY_OFFDAY_DSTNCT_CD = NULL, RMARK_TEXT = NULL , DLALZ_DSTNCT_CD = '1', WRK_TYPE_CD = '1'</when>
+            <when test = 'offdayTypeCd == "1" and  hlfdayOffdayDstnctCd == "" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '1' , DLALZ_DSTNCT_CD = '2', HLFDAY_OFFDAY_DSTNCT_CD = NULL, WRK_TYPE_CD = NULL</when>
+            <when test = 'offdayTypeCd == "2" and  hlfdayOffdayDstnctCd == "" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '2' , DLALZ_DSTNCT_CD = '2', HLFDAY_OFFDAY_DSTNCT_CD = NULL, WRK_TYPE_CD = NULL</when>
+            <when test = 'offdayTypeCd == "3" and  hlfdayOffdayDstnctCd == "" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '3' , DLALZ_DSTNCT_CD = '2', HLFDAY_OFFDAY_DSTNCT_CD = NULL, WRK_TYPE_CD = NULL</when>
+            <when test = 'offdayTypeCd == "1" and  hlfdayOffdayDstnctCd == "1" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '1' , HLFDAY_OFFDAY_DSTNCT_CD = '1' , DLALZ_DSTNCT_CD = '3', WRK_TYPE_CD = '1'</when>
+            <when test = 'offdayTypeCd == "1" and  hlfdayOffdayDstnctCd == "2" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '1' , HLFDAY_OFFDAY_DSTNCT_CD = '2' , DLALZ_DSTNCT_CD = '3', WRK_TYPE_CD = '1'</when>
+            <when test = 'offdayTypeCd == "2" and  hlfdayOffdayDstnctCd == "1" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '2' , HLFDAY_OFFDAY_DSTNCT_CD = '1' , DLALZ_DSTNCT_CD = '3', WRK_TYPE_CD = '1'</when>
+            <when test = 'offdayTypeCd == "2" and  hlfdayOffdayDstnctCd == "2" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '2' , HLFDAY_OFFDAY_DSTNCT_CD = '2' , DLALZ_DSTNCT_CD = '3', WRK_TYPE_CD = '1'</when>
+            <when test = 'offdayTypeCd == "3" and  hlfdayOffdayDstnctCd == "1" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '3' , HLFDAY_OFFDAY_DSTNCT_CD = '1' , DLALZ_DSTNCT_CD = '3', WRK_TYPE_CD = '1'</when>
+            <when test = 'offdayTypeCd == "3" and  hlfdayOffdayDstnctCd == "2" and comnCdNm != "OP"'>OFFDAY_TYPE_CD = '3' , HLFDAY_OFFDAY_DSTNCT_CD = '2' , DLALZ_DSTNCT_CD = '3', WRK_TYPE_CD = '1'</when>
+            <when test = 'offdayWrkRsnCd == "" and comnCdNm != "OP"'>OFFDAY_WRK_RSN_CD = NULL , DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'offdayWrkRsnCd == "1" and comnCdNm != "OP"'>OFFDAY_WRK_RSN_CD = '1' , DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'offdayWrkRsnCd == "2" and comnCdNm != "OP"'>OFFDAY_WRK_RSN_CD = '2' , DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'offdayWrkRsnCd == "3" and comnCdNm != "OP"'>OFFDAY_WRK_RSN_CD = '3' , DLALZ_DSTNCT_CD = '1'</when>
+            <when test = 'offdayWrkRsnCd == "4" and comnCdNm != "OP"'>OFFDAY_WRK_RSN_CD = '4' , DLALZ_DSTNCT_CD = '1'</when>
+            <otherwise></otherwise>
+        </choose>
+         
+        WHERE CHRGR_NO = #{chrgrNo} 
+        AND DLALZ_DATE = REPLACE(#{dlalzDate},'-','') 
+	</update>
+       
+        
+      
+	<update id="closing" parameterType="truebon.com.dlm.wrk.model.Work">      
+		UPDATE TB_DLALZ 
+	     	SET   
+	     	  OFFDAY_TYPE_CD = if(PLN_OFFDAY_TYPE_CD IS NOT NULL, PLN_OFFDAY_TYPE_CD, OFFDAY_TYPE_CD)
+	     	, WRK_TYPE_CD = if(PLN_DLALZ_DSTNCT_CD = '2', NULL, WRK_TYPE_CD)  
+	     	, HLFDAY_OFFDAY_DSTNCT_CD = PLN_HLFDAY_OFFDAY_DSTNCT_CD
+	     	, RMARK_TEXT=PLN_OFFDAY_RMARK 
+	     	, OFFDAY_WRK_RSN_CD = PLN_OFFDAY_WRK_RSN_CD
+	        , OP_WRK_TIME_CD = PLN_OP_WRK_TIME_CD 
+	        , DLALZ_DSTNCT_CD = if(PLN_DLALZ_DSTNCT_CD IS NOT NULL, PLN_DLALZ_DSTNCT_CD, DLALZ_DSTNCT_CD) 
+			WHERE
+		    DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%');
+	</update> 
+   
+   
+    <insert id="insertClosing" parameterType="truebon.com.dlm.wrk.model.Work">  
+        INSERT INTO TB_DLALZ 
+            ( 
+                DLALZ_DATE
+              , CHRGR_NO
+              , DLALZ_DSTNCT_CD
+              , WRK_TYPE_CD
+              , WRK_TIME_CD
+              , OFFDAY_TYPE_CD
+              , SECUR_BONDU_YN
+              , REGSTR_ID
+              , RDTT
+              , AMNDR_ID
+              , MDTT 
+              , RMARK_TEXT 
+            )
+        VALUES 
+            ( 
+              REPLACE(#{selectedDate},'-','')
+              , (SELECT CHRGR_NO FROM TB_CHARGER WHERE CHRGR_ROLE_CD ='02' LIMIT 1)
+              , ''
+              , ''
+              , ''
+              , ''
+              , ''
+              , ''
+              , SYSDATE()
+              , ''
+              , SYSDATE() 
+              , '마감'
+            )
+	</insert> 
+   
+   
+	<update id="updateOp1" parameterType="truebon.com.dlm.wrk.model.Work">    	         
+		UPDATE TB_DLALZ td, TB_CHARGER tc
+			SET td.PLN_OP_WRK_TIME_CD = #{plnOpWrkTimeCd}
+			   ,td.PLN_DLALZ_DSTNCT_CD ='1'
+			WHERE
+		    td.DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%')
+		    AND
+		    td.CHRGR_NO =tc.CHRGR_NO 		
+			    AND 
+			    (
+		            td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%1')
+				 or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%3')
+				 or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%5')
+			     or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%7')
+				 or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%9')
+				)		     		
+		    AND tc.CHRGR_NM  = #{chrgrNm}   
+	</update>
+   
+
+	<update id="updateOp2" parameterType="truebon.com.dlm.wrk.model.Work">    		         
+		UPDATE TB_DLALZ td, TB_CHARGER tc
+			SET td.PLN_OP_WRK_TIME_CD = #{plnOpWrkTimeCd}
+			  , td.PLN_DLALZ_DSTNCT_CD ='1'
+			WHERE
+		    td.DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%')
+		    AND
+		        td.CHRGR_NO =tc.CHRGR_NO 			
+			        AND 
+			        (
+			            td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%2')
+					 or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%4')
+					 or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%6')
+				     or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%8')
+					 or td.DLALZ_DATE LIKE CONCAT(#{selectedDate}, '%0')
+				    )		     		
+		    AND tc.CHRGR_NM  = #{chrgrNm} 
+	</update>
+
+
+	<update id="updateOp3" parameterType="truebon.com.dlm.wrk.model.Work">    		         
+		UPDATE TB_DLALZ td, TB_CHARGER tc
+			SET td.PLN_OP_WRK_TIME_CD = NULL
+			  , td.PLN_DLALZ_DSTNCT_CD ='2'
+			WHERE
+		    td.DLALZ_DATE LIKE CONCAT(REPLACE(#{selectedDate},'-',''), '%')
+		    AND td.CHRGR_NO =tc.CHRGR_NO 			     		
+		    AND tc.CHRGR_NM  = #{chrgrNm} 
+	</update>
+   
+   
+</mapper>
+   
+   
+   

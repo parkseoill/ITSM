@@ -1,0 +1,470 @@
+package truebon.com.dlm.wrk.controller;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.com.cmm.EgovMessageSource;
+import truebon.com.dlm.wrk.model.WorkVO;
+import truebon.com.dlm.wrk.service.WorkService;
+
+@Controller
+
+public class WorkScheduleController {
+
+	/* Validator */
+	@Autowired 
+	private DefaultBeanValidator beanValidator;
+	
+
+	/** EgovMessageSource */
+	@Resource(name = "egovMessageSource")
+	EgovMessageSource egovMessageSource;
+
+	/** 근무 Service */
+	@Resource(name = "WorkService")
+	private WorkService workService;
+
+	/**
+	 * 근무편성표 조회
+	 */
+
+	@RequestMapping(value = "/dlm/wrk/WorkScheduleMng.do")
+	public String WorkScheduleMng(@ModelAttribute("searchVO") WorkVO searchVO, ModelMap model, HttpServletRequest request) throws Exception {
+		
+		// 목록
+		List<WorkVO> workList = workService.selectWorkList(searchVO);
+		List<WorkVO> rmarkList = workService.selectRmark(searchVO);
+		List<WorkVO> offdayList = workService.selectOffday(searchVO);
+		List<String> date = new ArrayList<>();		
+		if(!offdayList.isEmpty()) {
+			model.addAttribute("offdaySum", offdayList.get(0).getOffdaySumCnt().substring(0, offdayList.get(0).getOffdaySumCnt().length()-3));
+			model.addAttribute("offdayList", offdayList);
+		}
+		String emptyData = "";
+		// 데이터가 없는 경우 
+		if (workList.size() == 0) {
+			emptyData = "N";
+		} else {
+			for (int i = 0; i < workList.size(); i++) {
+				if (workList.get(i).getChrgrNm().equals(workList.get(31).getChrgrNm())) {
+					date.add(workList.get(i).getDlalzDate());
+				}
+			}
+
+			String closing = "N";
+
+			for (int i = 0; i < workList.size(); i++) {
+				// 근무 유형
+				if (workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("3")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("연전");
+				}
+				if (workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("2")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("3")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("연후");
+				}
+				if (!workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("2")
+						&& workList.get(i).getPlnOffdayTypeCd().equals("1")) {
+					workList.get(i).setSchedule("연차");
+				}
+				if (workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("1")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("3")) {
+					workList.get(i).setSchedule("대전");
+				}
+				if (workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("2")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("1")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("3")) {
+					workList.get(i).setSchedule("대후");
+				}
+				if (!workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("2")
+						&& workList.get(i).getPlnOffdayTypeCd().equals("2")
+						&& !workList.get(i).getComnCdNm().equals("OP")) {
+					workList.get(i).setSchedule("대휴");
+				}
+				if (workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("1")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("공전");
+				}
+				if (workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("2")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("1")
+						&& !workList.get(i).getPlnOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("공후");
+				}
+				if (!workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getPlnHlfdayOffdayDstnctCd().equals("2")
+						&& workList.get(i).getPlnOffdayTypeCd().equals("3")) {
+					workList.get(i).setSchedule("공가");
+				}
+				if (workList.get(i).getPlnOffdayWrkRsnCd().equals("1")) {
+					workList.get(i).setSchedule("당직");
+				}
+				if (workList.get(i).getPlnOffdayWrkRsnCd().equals("2")
+						|| workList.get(i).getPlnOffdayWrkRsnCd().equals("3")) {
+					workList.get(i).setSchedule("PM");
+				}
+				if (workList.get(i).getPlnOffdayWrkRsnCd().equals("4")) {
+					workList.get(i).setSchedule("기타");
+				}
+				if (workList.get(i).getPlnOpWrkTimeCd().equals("1")) {
+					workList.get(i).setSchedule("주간");
+				}
+				if (workList.get(i).getPlnOpWrkTimeCd().equals("2")) {
+					workList.get(i).setSchedule("야간");
+				}				
+
+				// 요일코드 한글로 변환
+				if (workList.get(i).getDyweekDstnctCd().equals("1")) {
+					workList.get(i).setDyweekDstnctCd("일");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("2")) {
+					workList.get(i).setDyweekDstnctCd("월");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("3")) {
+					workList.get(i).setDyweekDstnctCd("화");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("4")) {
+					workList.get(i).setDyweekDstnctCd("수");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("5")) {
+					workList.get(i).setDyweekDstnctCd("목");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("6")) {
+					workList.get(i).setDyweekDstnctCd("금");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("7")) {
+					workList.get(i).setDyweekDstnctCd("토");
+				}
+
+				//관리자 코드가 있을시 
+				if (workList.get(i).getChrgrRoleCd().equals("02")) {
+
+					closing = "Y";
+					model.addAttribute("closing", closing);
+				}
+			}
+
+			String month = workList.get(0).getDlalzDate();
+			month = month.substring(4, 6);
+			
+			model.addAttribute("closing", closing);
+			model.addAttribute("date", date);
+			model.addAttribute("month", month);
+			model.addAttribute("resultList", workList);
+			model.addAttribute("name", workList.get(31).getChrgrNm());
+			model.addAttribute("searchVO", searchVO);
+			model.addAttribute("rmarkList", rmarkList);
+		}
+		LocalDate currentdate = LocalDate.now();
+		String nowDate = (currentdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+		model.addAttribute("nowDate", nowDate);
+		model.addAttribute("emptyData", emptyData);
+		return "/truebon/com/dlm/wrk/WorkScheduleMng";
+	}
+
+	
+	/**
+	 * 근무편성표 실적 조회
+	 */
+
+	@RequestMapping(value = "/dlm/wrk/ResWorkScheduleMng.do")
+	public String ResWorkScheduleMng(@ModelAttribute("searchVO") WorkVO searchVO, ModelMap model) throws Exception {
+		// 목록
+		List<WorkVO> workList = workService.selectWorkList(searchVO);
+		List<WorkVO> rmarkList = workService.selectRmark(searchVO);
+		List<String> date = new ArrayList<>();
+		List<WorkVO> offdayList = workService.selectOffday(searchVO);	
+		if(!offdayList.isEmpty()) {
+			model.addAttribute("offdaySum", offdayList.get(0).getOffdaySumCnt().substring(0, offdayList.get(0).getOffdaySumCnt().length()-3));
+			model.addAttribute("offdayList", offdayList);
+		}
+		String emptyData = "";
+		// 데이터가 없는 경우
+		if (workList.size() == 0) {
+			emptyData = "N";
+		} else {
+			for (int i = 0; i < workList.size(); i++) {
+				if (workList.get(i).getChrgrNm().equals(workList.get(31).getChrgrNm())) {
+					date.add(workList.get(i).getDlalzDate());
+				}
+			}
+
+			for (int i = 0; i < workList.size(); i++) {
+				// 근무 유형
+				if (workList.get(i).getHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getOffdayTypeCd().equals("3")
+						&& !workList.get(i).getOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("연전");
+				}
+				if (workList.get(i).getHlfdayOffdayDstnctCd().equals("2")
+						&& !workList.get(i).getOffdayTypeCd().equals("3")
+						&& !workList.get(i).getOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("연후");
+				}
+				if (!workList.get(i).getHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getHlfdayOffdayDstnctCd().equals("2")
+						&& workList.get(i).getOffdayTypeCd().equals("1")) {
+					workList.get(i).setSchedule("연차");
+				}
+				if (workList.get(i).getHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getOffdayTypeCd().equals("1")
+						&& !workList.get(i).getOffdayTypeCd().equals("3")) {
+					workList.get(i).setSchedule("대전");
+				}
+				if (workList.get(i).getHlfdayOffdayDstnctCd().equals("2")
+						&& !workList.get(i).getOffdayTypeCd().equals("1")
+						&& !workList.get(i).getOffdayTypeCd().equals("3")) {
+					workList.get(i).setSchedule("대후");
+				}
+				if (!workList.get(i).getHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getHlfdayOffdayDstnctCd().equals("2")
+						&& workList.get(i).getOffdayTypeCd().equals("2")
+						&& !workList.get(i).getComnCdNm().equals("OP")) {
+					workList.get(i).setSchedule("대휴");
+				}
+				if (workList.get(i).getHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getOffdayTypeCd().equals("1")
+						&& !workList.get(i).getOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("공전");
+				}
+				if (workList.get(i).getHlfdayOffdayDstnctCd().equals("2")
+						&& !workList.get(i).getOffdayTypeCd().equals("1")
+						&& !workList.get(i).getOffdayTypeCd().equals("2")) {
+					workList.get(i).setSchedule("공후");
+				}
+				if (!workList.get(i).getHlfdayOffdayDstnctCd().equals("1")
+						&& !workList.get(i).getHlfdayOffdayDstnctCd().equals("2")
+						&& workList.get(i).getOffdayTypeCd().equals("3")) {
+					workList.get(i).setSchedule("공가");
+				}
+				if (workList.get(i).getOffdayWrkRsnCd().equals("1")) {
+					workList.get(i).setSchedule("당직");
+				}
+				if (workList.get(i).getOffdayWrkRsnCd().equals("2")
+						|| workList.get(i).getOffdayWrkRsnCd().equals("3")) {
+					workList.get(i).setSchedule("PM");
+				}
+				if (workList.get(i).getOffdayWrkRsnCd().equals("4")) {
+					workList.get(i).setSchedule("기타");
+				}
+				if (workList.get(i).getOpWrkTimeCd().equals("1")) {
+					workList.get(i).setSchedule("주간");
+				}
+				if (workList.get(i).getOpWrkTimeCd().equals("2")) {
+					workList.get(i).setSchedule("야간");
+				}
+				if (workList.get(i).getWrkTypeCd().equals("2")) {
+					workList.get(i).setSchedule("재택");
+				}
+				if (workList.get(i).getWrkTypeCd().equals("3")) {
+					workList.get(i).setSchedule("외근");
+				}
+				
+				// 요일코드 한글로 변환
+				if (workList.get(i).getDyweekDstnctCd().equals("1")) {
+					workList.get(i).setDyweekDstnctCd("일");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("2")) {
+					workList.get(i).setDyweekDstnctCd("월");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("3")) {
+					workList.get(i).setDyweekDstnctCd("화");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("4")) {
+					workList.get(i).setDyweekDstnctCd("수");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("5")) {
+					workList.get(i).setDyweekDstnctCd("목");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("6")) {
+					workList.get(i).setDyweekDstnctCd("금");
+				}
+				if (workList.get(i).getDyweekDstnctCd().equals("7")) {
+					workList.get(i).setDyweekDstnctCd("토");
+				}
+				if (workList.get(i).getChrgrNo().equals("0072")) {
+					String pm = workList.get(i).getPlnOffdayRmark();
+					model.addAttribute("pm", pm);
+				}
+			}
+			String month = workList.get(0).getDlalzDate();
+			month = month.substring(4, 6);
+
+			model.addAttribute("date", date);
+			model.addAttribute("month", month);
+			model.addAttribute("resultList", workList);
+			model.addAttribute("name", workList.get(31).getChrgrNm());
+			model.addAttribute("searchVO", searchVO);
+			model.addAttribute("rmarkList", rmarkList);
+		}
+		
+		model.addAttribute("emptyData", emptyData);
+
+		return "/truebon/com/dlm/wrk/ResWorkScheduleMng";
+
+	}
+
+	
+	/**
+	 * 근무편성 수정
+	 * 
+	 * @param WorkVO
+	 */
+	@RequestMapping("/dlm/wrk/updateWorkScheUpdt.do")
+	public String updateWorkScheUpdt(@ModelAttribute("workVO") WorkVO workVO, BindingResult bindingResult,
+			ModelMap model) throws Exception {
+		String sLocationUrl = "";
+		String resultMsg = "";
+
+		// 유효성 검사
+		beanValidator.validate(workVO, bindingResult);
+		if (bindingResult.hasErrors()) {
+			sLocationUrl = "/truebon/com/dlm/wrk/WorkScheUpdt";
+			return sLocationUrl;
+		} else {
+			workService.updateWork(workVO);
+			resultMsg = egovMessageSource.getMessage("success.common.update");
+			sLocationUrl = "forward:/dlm/wrk/WorkScheduleMng.do";
+		}
+
+		model.addAttribute("resultMsg", resultMsg);
+		return "forward:/dlm/wrk/WorkScheduleMng.do";
+
+	}
+
+	/**
+	 * 실적 근무편성 수정
+	 * 
+	 * @param WorkVO
+	 */
+	@RequestMapping("/dlm/wrk/ResUpdateWorkScheUpdt.do")
+	public String ResUpdateWorkScheUpdt(@ModelAttribute("workVO") WorkVO workVO, BindingResult bindingResult,
+			ModelMap model) throws Exception {
+		String sLocationUrl = "";
+		String resultMsg = "";
+
+		beanValidator.validate(workVO, bindingResult);
+		if (bindingResult.hasErrors()) {
+			sLocationUrl = "/truebon/com/dlm/wrk/ResWorkScheUpdt";
+			return sLocationUrl;
+		} else {
+			workService.updateResWork(workVO);
+			resultMsg = egovMessageSource.getMessage("success.common.update");
+			sLocationUrl = "forward:/dlm/wrk/ResWorkScheduleMng.do";
+		}
+
+		model.addAttribute("resultMsg", resultMsg);
+		return "forward:/dlm/wrk/ResWorkScheduleMng.do";
+
+	}
+
+	
+	/**
+	 * 마감 버튼
+	 * 
+	 * @param searchVO
+	 */
+	@RequestMapping("/dlm/wrk/closing.do")
+	public String closing(@ModelAttribute("searchVO") WorkVO searchVO, BindingResult bindingResult, ModelMap model)
+			throws Exception {
+		List<WorkVO> workList = workService.selectWorkList(searchVO);
+		for(int i=0; i< workList.size(); i++) {
+			if (workList.get(i).getChrgrRoleCd().equals("02")) {
+				model.addAttribute("resultMsg", "이미 마감 되었습니다.");
+				String sLocationUrl = "forward:/dlm/wrk/WorkScheduleMng.do";
+				return sLocationUrl;
+			}
+		}
+		
+		workService.closing(searchVO);
+		String selectedDate = searchVO.getSelectedDate() + "-01";
+		searchVO.setSelectedDate(selectedDate);
+		workService.insertClosing(searchVO);
+		
+		model.addAttribute("resultMsg", "마감 되었습니다.");
+		String sLocationUrl = "forward:/dlm/wrk/WorkScheduleMng.do";
+		return sLocationUrl;
+
+	}
+
+	/**
+	 * PM날짜 등록
+	 * 
+	 * @param searchVO
+	 */
+	@RequestMapping("/dlm/wrk/insertPm.do")
+	public String insertPm(@ModelAttribute("searchVO") WorkVO searchVO, BindingResult bindingResult, ModelMap model)
+			throws Exception {
+		
+		String selectedDate = searchVO.getSelectedDate() + "-02";
+		searchVO.setSelectedDate(selectedDate);
+		workService.insertPM(searchVO);
+		
+		model.addAttribute("resultMsg", "PM 날짜가 등록 되었습니다.");
+		String sLocationUrl = "forward:/dlm/wrk/WorkScheduleMng.do";
+		return sLocationUrl;
+
+	}
+		
+	/**
+	 * OP 일괄 입력
+	 * 
+	 * @param WorkVO
+	 */
+	@RequestMapping("/dlm/wrk/opWorkScheUpdt.do")
+	public String opWorkScheUpdt(@ModelAttribute("workVO") WorkVO workVO, BindingResult bindingResult, ModelMap model)
+			throws Exception {
+		String sLocationUrl = "";
+		String resultMsg = "";
+
+		if (bindingResult.hasErrors()) {
+			sLocationUrl = "/truebon/com/dlm/wrk/WorkScheduleMng";
+			return sLocationUrl;
+		} else {
+
+			String chk = workVO.getSelectedOpDate().substring(8, 10); // 선택날짜 1일 or 2일 or (삭제) 체크
+			if (chk.equals("01")) {
+				workVO.setSelectedDate((workVO.getSelectedOpDate().substring(0, 7).replace("-", "")));
+				workVO.setOpDatechk("1");
+				workService.updateOp(workVO);
+			} else if (chk.equals("02")) {
+				workVO.setSelectedDate((workVO.getSelectedOpDate().substring(0, 7).replace("-", "")));
+				workVO.setOpDatechk("2");
+				workService.updateOp(workVO);
+			} else {
+				workVO.setSelectedDate((workVO.getSelectedOpDate().substring(0, 7).replace("-", "")));
+				workVO.setOpDatechk("3");
+				workService.updateOp(workVO);
+			}
+
+			resultMsg = egovMessageSource.getMessage("success.common.update");
+			sLocationUrl = "forward:/dlm/wrk/WorkScheduleMng.do";
+		}
+		String returnDate = workVO.getSelectedOpDate().substring(0, 7);
+		returnDate = "forward:/dlm/wrk/WorkScheduleMng.do?selectedDate=" + returnDate;
+		model.addAttribute("resultMsg", resultMsg);
+
+		return returnDate;
+
+	}
+
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="replaceVO">
+			<field property="selectedDate2" depends="required">
+        		<arg0 key="날짜"/>
+			</field>
+			<field property="insertCnt" depends="required">
+        		<arg0 key="대휴 수"/>
+			</field>
+			<field property="repOffdayRsnCd" depends="required">
+        		<arg0 key="사유"/>
+			</field>
+		</form>
+    </formset>
+</form-validation>

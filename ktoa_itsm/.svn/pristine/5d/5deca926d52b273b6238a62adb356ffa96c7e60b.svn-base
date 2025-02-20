@@ -1,0 +1,28 @@
+package truebon.com.opm.fix.service;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import truebon.com.opm.fix.model.FixedInspMngVO;
+
+public interface FixedInspMngService {
+
+    /**
+	 * tb_sw_asset 목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_sw_asset 목록
+	 * @exception Exception
+	 */
+    List<FixedInspMngVO> selectFixedInspList(FixedInspMngVO searchVO) throws Exception;
+
+    /**
+	 * 정기점검 목록의 총 갯수를 조회한다.
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return 정기점검 목록의 총 갯수
+	 * @exception Exception
+	 */
+	int selectFixedInspListTotCnt(FixedInspMngVO searchVO) throws Exception;
+	
+
+}

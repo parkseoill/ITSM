@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+ /**
+  * @Class Name : FixedInspStus.jsp
+  * @Description : 정기점검현황 조회 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.08.07   김승현               최초 생성
+  *
+  *  @author 김승현
+  *  @since 2023.08.07
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>정기점검현황</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+<!-- 달력 기본 설정 -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/truebon/com/cmm/jquery-monthPicker/MonthPicker.css' />">
+<script src="<c:url value='/js/truebon/com/cmm/jquery-monthPicker/MonthPicker.js' />"></script>
+
+<script language="javascript1.2" type="text/javaScript">
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectFixedInspMng() {
+	document.fixedInspStusForm.pageIndex.value = 1;
+	document.fixedInspStusForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>";
+	document.fixedInspStusForm.submit();
+}
+
+function insertFixedInspStus(){
+	document.fixedInspStusForm.action = "<c:url value='/opm/fix/InsertFixedInspStus.do'/>";
+	document.fixedInspStusForm.submit();
+
+}
+
+function selectFixedInspMngList(i, period){
+	if(period == 'month'){
+		if(parseInt(i) <10){
+			document.fixedInspStusForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>?selectMonth="+"0" +parseInt(i)+"";
+			document.fixedInspStusForm.submit();
+		}
+		else{
+			document.fixedInspStusForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>?selectMonth="+parseInt(i)+"";
+			document.fixedInspStusForm.submit();
+		}
+				
+	}
+	if(period == 'quarter'){
+		document.fixedInspStusForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>?selectQuarter="+ parseInt(i)+"";
+		document.fixedInspStusForm.submit();
+	}
+	if(period == 'half'){
+		document.fixedInspStusForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>?selectHalf="+ parseInt(i)+"";
+		document.fixedInspStusForm.submit();
+	}
+			
+
+}
+/* ********************************************************
+ * 날짜체크처리 함수
+ ******************************************************** */
+function checkDate(){
+   var getDate = document.getElementById('selectedDate').value;
+   if(getDate != ""){
+      document.WorkScheduleMngForm.checkDate.value = getDate.concat('01');
+   }else{
+      alert("년도를 입력해주세요.");
+   } 
+}
+
+$(function() {
+	//연도-월(MonthPicker options)
+	var monthPickerOptions = {
+		MonthFormat: 'yy-mm',
+		ShowIcon: true,
+		i18n: {
+			year: '년도',
+			prevYear: '이전년도',
+			nextYear: '다음년도',
+			next12Years: '다음 12년',
+			prev12Years: '이전 12년',
+			nextLabel: '다음',
+			prevLabel: '이전',
+			buttonText: '달력보기',
+			jumpYears: '년도로 이동',
+			backTo: '뒤로',
+			months: ['1 월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+		},
+		OnAfterChooseMonth: function(dateText){
+			console.log("Selected date:"+dateText+",current value:"+this.value);
+			// jr정보 전송
+			fn_jrView();
+		}
+	};
+	// 현재 날짜 입력(연도-월)
+	$('#insertMonth').val(getToday('yyyy-mm'));
+	$('#insertMonth').MonthPicker(monthPickerOptions);
+	
+	//기간 조회 달력
+   $('.sdate').datepicker( {
+        changeYear: true,
+        showButtonPanel: true,
+        gotoCurrent: true,
+        currentText:"현재연도",
+        dateFormat: 'yy',
+        stepMonths: 12,
+        beforeShow: function(input) {
+            $(input).datepicker("widget").addClass('hide-month-calendar');
+        },
+        onClose: function(dateText, inst) { 
+            $(this).datepicker('setDate', new Date(inst.selectedYear, 1));
+            $(this).datepicker("widget").removeClass('hide-month-calendar');
+        } 
+    });    
+
+	
+});
+
+<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if>
+</script>
+<style>
+.viewTable {
+	border-top: 2px solid #0c4ca4;
+}
+
+.viewTable thead th{
+	color: #222;
+	font-size: 13px;
+	font-weight: 400;
+	background: #f4f4f4;
+	padding: 8px 0;
+	border: 1px solid #d9d9d9;
+}
+
+.viewTable tbody td {
+	/* text-align: center; */
+	padding: 8px 5px;
+	border: 1px solid #d9d9d9;
+	
+}
+
+.hide-calendar .ui-datepicker-calendar {
+	display: none;
+}
+
+.hide-month-calendar .ui-datepicker-calendar {
+	display: none;
+}
+
+.hide-month-calendar .ui-datepicker-month {
+	display: none;
+}
+
+.click:hover{
+	background:#DAE7F6;
+	cursor : pointer;
+}
+</style>
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+
+<div class="board">
+	<h1>정기점검현황</h1>
+	<form name="fixedInspStusForm" id="fixedInspStusForm" action="<c:url value = '/opm/fix/FixedInspStus.do'/>" method="POST">
+		<div class="search_box">
+			<ul>
+				<li style = "float: left;">
+					<label for="">날짜(년) :</label>
+					<input id="selectedDate" name="selectedDate" type="text" class="sdate" value="<c:out value='${searchVO.selectedDate}'/>" /> 
+				</li>
+				<li style = "float: left; padding-left:1%;">
+					<label for="">점검 회사 :</label>
+					<select id="searchCmpny" name="searchCmpny" title="검색조건" style="">
+					<option value="">== 전체 ==</option>
+						<c:forEach var="CmpnyList" items="${CmpnyList}" varStatus="status" >         
+							<option value="${CmpnyList.cmpnyNo}" <c:if test="${searchVO.searchCmpny == CmpnyList.cmpnyNo}">selected="selected"</c:if>>${CmpnyList.cmpnyNm}</option>
+						</c:forEach>
+					</select>						
+				</li>
+				<li style = "float: left; padding-left:1%;">		
+					<input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectFixedInspMng(); return false;"/> <!-- 조회 --> 
+				</li>
+				<li>
+					<label for="">생성(월) :</label>
+					<input type="text" id="insertMonth" name="insertMonth" style="width:60px;height:18px;">
+					<span class="btn_b"><a href="#LINK" onclick="insertFixedInspStus(); return false;" title='<spring:message code="button.create" />'><spring:message code="button.create" /></a></span><!-- 등록 -->	
+				</li>	
+			</ul>		
+		</div>
+		<p style="font-size: 12px; display:inline;">※연간 실적현황※</p>	
+		<p style="float:right; font-size: 12px;">※반기:1월, 7월 / 분기:1월 4월 7월 10월 / 월: 모든달 데이터가 들어갑니다.※</p>	
+		<table class="viewTable" style="width:40%; margin-top:1%;">
+			<colgroup>
+				<col style="width: 100px">
+			</colgroup>
+			
+			<thead>
+				<tr>
+					<th>점검구분</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>점검율</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>월 점검</td>
+					<td>${monPlnSum}</td>
+					<td>${monResSum}</td>
+					<c:choose>
+						<c:when test="${monResSum == 0 && monPlnSum == 0 }">
+							<td>0%</td>
+						</c:when>	
+						<c:otherwise>
+							<td>${fn:substring(monResSum/monPlnSum*100,0,4)}%</td>
+						</c:otherwise>
+					</c:choose>				
+				</tr>
+				<tr>
+					<td>분기 점검</td>
+					<td>${quarterPlnSum}</td>
+					<td>${quarterResSum}</td>
+					<c:choose>
+						<c:when test="${quarterResSum == 0 && quarterResSum == 0 }">
+							<td>0%</td>
+						</c:when>
+						<c:otherwise>
+							<td>${fn:substring(quarterResSum/quarterPlnSum*100,0,4)}</td>
+						</c:otherwise>
+					</c:choose>				
+					</tr>
+					<tr>
+						<td>반기 점검</td>
+						<td>${halfPlnSum}</td>
+						<td>${halfResSum}</td>
+						<c:choose>
+							<c:when test="${halfResSum == 0 && halfPlnSum == 0 }">
+								<td>0%</td>
+							</c:when>
+							<c:otherwise>
+								<td>${fn:substring(halfResSum/halfPlnSum*100,0,4)}</td>
+							</c:otherwise>
+						</c:choose>
+					</tr>
+					<tr>
+						<td>총 합계</td>
+						<td>${plnSum}</td>
+						<td>${resSum}</td>
+						<c:choose>
+							<c:when test="${plnSum == 0 && resSum == 0 }">
+								<td>0%</td>
+							</c:when>
+							<c:otherwise>
+								<td>${fn:substring(resSum/plnSum*100,0,4)}</td>
+							</c:otherwise>
+						</c:choose>
+					</tr>
+				</tbody>
+			</table>
+			<table class="viewTable">
+				<colgroup>
+					<col style="width: 100px">
+				</colgroup>
+				<thead>
+					<tr>
+						<th rowspan="2" align="center">점검주기</th>
+						<th colspan="2" align="center">1월</th>
+						<th colspan="2" align="center">2월</th>
+						<th colspan="2" align="center">3월</th>
+						<th colspan="2" align="center">4월</th>
+						<th colspan="2" align="center">5월</th>
+						<th colspan="2" align="center">6월</th>
+						<th colspan="2" align="center">7월</th>
+						<th colspan="2" align="center">8월</th>
+						<th colspan="2" align="center">9월</th>
+						<th colspan="2" align="center">10월</th>
+						<th colspan="2" align="center">11월</th>
+						<th colspan="2" align="center">12월</th>
+					</tr>
+					<tr>
+						<c:forEach var="month" items="${month}" varStatus="status" step="2">
+	     					 <th>계획</th>
+							 <th>실적</th>
+	            		</c:forEach>		
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>월 점검</td>
+						<c:forEach var="month" items="${month}" varStatus="status">
+						   	<c:if test="${status.count % 2 == 1}">
+	     						<td class="click" onclick="selectFixedInspMngList('${(status.count/2) +(1-((status.count/2)%1))%1}','month'); return false;"><c:out value="${month}" /></td>
+	     					</c:if>
+	     					<c:if test="${status.count % 2 == 0}">
+	     						<td class="click" onclick="selectFixedInspMngList('${status.count/2}','month'); return false;"><c:out value="${month}" /></td>
+	     					</c:if>
+            		</c:forEach>
+				</tr>
+			</tbody>
+		</table>
+		<table class="viewTable" style="width:39%">
+			<colgroup>
+				<col style="width: 100px">
+			</colgroup>
+			<thead>
+				<tr>
+					<th rowspan="2" align="center">점검주기</th>
+					<th colspan="2" align="center">1분기</th>
+					<th colspan="2" align="center">2분기</th>
+					<th colspan="2" align="center">3분기</th>
+					<th colspan="2" align="center">4분기</th>
+				</tr>
+				<tr>
+					<c:forEach var="quarter" items="${quarter}" varStatus="status" step="2">
+     					 <th>계획</th>
+						 <th>실적</th>
+            		</c:forEach>	
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>분기 점검</td>
+					<c:forEach var="quarter" items="${quarter}" varStatus="status">
+						<c:if test="${status.count % 2 == 1}">
+     						<td class="click" onclick="selectFixedInspMngList('${(status.count/2) +(1-((status.count/2)%1))%1}','quarter'); return false;"><c:out value="${quarter}" /></td>
+     					</c:if>
+     					<c:if test="${status.count % 2 == 0}">
+     						<td class="click" onclick="selectFixedInspMngList('${status.count/2}','quarter'); return false;"><c:out value="${quarter}" /></td>
+     					</c:if>
+            		</c:forEach>
+				</tr>
+			</tbody>
+		</table>
+		<table class="viewTable" style="width: 30%; margin-top: 1%;">
+			<colgroup>
+				<col style="width: 100px">
+			</colgroup>
+			<thead>
+				<tr>
+					<th rowspan="2" align="center">점검주기</th>
+					<th colspan="2" align="center">상반기</th>
+					<th colspan="2" align="center">하반기</th>
+				</tr>
+				<tr>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>분기 점검</td>
+					<c:forEach var="half" items="${half}" varStatus="status">
+						<c:if test="${status.count % 2 == 1}">
+     						<td class="click" onclick="selectFixedInspMngList('${(status.count/2) +(1-((status.count/2)%1))%1}','half'); return false;"><c:out value="${half}" /></td>
+     					</c:if>
+     					<c:if test="${status.count % 2 == 0}">
+     						<td class="click" onclick="selectFixedInspMngList('${status.count/2}','half'); return false;"><c:out value="${half}" /></td>
+     					</c:if>
+            		</c:forEach>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+</body>
+</html>

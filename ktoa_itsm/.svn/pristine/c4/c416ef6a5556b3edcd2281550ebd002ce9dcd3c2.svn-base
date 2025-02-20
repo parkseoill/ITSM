@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="FixedInspMapper">
+	<resultMap id="FixedInspMng" type="truebon.com.opm.fix.model.FixedInspMngVO">
+		<result property="assetId" column="ASSET_ID"/>
+		<result property="assetDstnct" column="ASSET_DSTNCT"/>
+		<result property="fixedInspCmpny" column="FIXED_INSP_CMPNY"/>
+		<result property="maintceInspCycle" column="MAINTCE_INSP_CYCLE"/>
+		<result property="fixedInspYn" column="FIXED_INSP_YN"/>
+		<result property="fixedInspDate" column="FIXED_INSP_DATE"/>
+		<result property="prodNm" column="PROD_NM"/>
+		<result property="prodPurp" column="PROD_PURP"/>
+		<result property="bizSytmNm" column="BIZ_SYTM_NM"/>
+		<result property="fixedInspPlnMon" column="FIXED_INSP_PLN_MON"/>
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="amndrNm" column="AMNDR_NM" />
+		<result property="mdtt" column="MDTT" />
+		<result property="cmpnyNm" column="CMPNY_NM"/>		
+		<result property="cmpnyNo" column="CMPNY_No"/>
+	</resultMap>
+
+	<select id="selectFixedInspList" parameterType="truebon.com.opm.fix.model.FixedInspMngVO" resultMap="FixedInspMng">
+		SELECT 
+        	DISTINCT (A.ASSET_ID)
+        	, A.ASSET_DSTNCT
+        	, tc2.CMPNY_NM
+        	, A.FIXED_INSP_CMPNY_NO
+        	, tccn1.COMN_CD_NM AS MAINTCE_INSP_CYCLE
+        	, A.FIXED_INSP_YN
+        	, IFNULL(CONCAT(SUBSTR(A.FIXED_INSP_DATE,1,4),'-',SUBSTR(A.FIXED_INSP_DATE,5,2),'-',SUBSTR(A.FIXED_INSP_DATE,7,2)), '') AS FIXED_INSP_DATE
+        	, A.PROD_NM
+        	, A.PROD_PURP
+        	, tbs1.BIZ_SYTM_NM 
+        	, A.FIXED_INSP_PLN_MON 
+		FROM 
+		(	SELECT 
+	 			tha.HW_ASSET_ID AS ASSET_ID
+	 			, 'HW' AS ASSET_DSTNCT
+	 			, tha.MAINTCE_CHRGR_NO
+	 			, tha.MAINTCE_INSP_CYCLE_CD
+	 			, IF(tfi.FIXED_INSP_DATE IS NOT NULL OR tfi.FIXED_INSP_DATE = '', 'Y', 'N') FIXED_INSP_YN
+	 			, tfi.FIXED_INSP_DATE  
+	 			, tfi.FIXED_INSP_CMPNY_NO 
+	 			, tha.PROD_NM
+	 			, tha.PROD_PURP
+	 			, tha.BIZ_SYTM_CD
+	 			, tfi.FIXED_INSP_PLN_MON 
+	        FROM TB_FIXED_INSP tfi 
+			INNER JOIN TB_HW_ASSET tha 
+			ON tfi.ASSET_ID = tha.HW_ASSET_ID
+			UNION ALL
+			SELECT 
+	 			tsa.SW_ASSET_ID AS ASSET_ID
+	 			, 'SW' AS ASSET_DSTNCT
+	 			, tsa.MAINTCE_CHRGR_NO
+	 			, tsa.MAINTCE_INSP_CYCLE_CD
+	 			, IF(tfi.FIXED_INSP_DATE IS NOT NULL OR tfi.FIXED_INSP_DATE = '', 'Y', 'N') FIXED_INSP_YN
+	 			, tfi.FIXED_INSP_DATE  
+	 			, tfi.FIXED_INSP_CMPNY_NO 
+	 			, tsa.PROD_NM
+	 			, tsa.PROD_PURP
+	 			, tsa.BIZ_SYTM_CD
+	 			, tfi.FIXED_INSP_PLN_MON 
+	        FROM TB_FIXED_INSP tfi 
+			INNER JOIN TB_SW_ASSET tsa 
+			ON tfi.ASSET_ID = tsa.SW_ASSET_ID
+		)A
+		LEFT JOIN TB_CHARGER tc 
+		ON A.MAINTCE_CHRGR_NO = tc.CHRGR_NO
+		LEFT JOIN TB_COMPANY tc2 
+		ON tc2.CMPNY_NO = tc.POSIT_CMPNY_NO
+		LEFT JOIN TB_COMN_CD_NEW tccn1
+		ON A.MAINTCE_INSP_CYCLE_CD = tccn1.NEW_COMN_CD
+		LEFT JOIN TB_BIZ_SYSTEM   AS tbs1
+     	ON A.BIZ_SYTM_CD  = tbs1.BIZ_SYTM_CD
+     	WHERE 1=1
+     	<if test="searchKeyword1 != '' and searchKeyword1 != null">
+     		AND A.ASSET_DSTNCT = #{searchKeyword1}
+     	</if>
+     	<if test="searchKeyword2 != '' and searchKeyword2 != null">
+     		AND A.FIXED_INSP_YN = #{searchKeyword2}
+     	</if>
+     	<if test="searchKeyword3 != '' and searchKeyword3 != null">
+     		AND A.BIZ_SYTM_CD = #{searchKeyword3}
+     	</if>
+     	<if test="searchKeyword != null and searchKeyword != ''">
+			<if test="searchCondition == 1">
+				AND A.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 2">
+				AND A.PROD_PURP LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+		</if>
+		<if test="selectMonth != '' and selectMonth != null">
+	     	AND A.MAINTCE_INSP_CYCLE_CD = 'ITA0601'
+	     	AND (A.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate},#{selectMonth})
+	    	OR A.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate},#{selectMonth},'%'))
+		</if>
+		<if test="selectQuarter != '' and selectQuarter != null">
+			AND A.MAINTCE_INSP_CYCLE_CD = 'ITA0602'
+			<if test="selectQuarter == '1'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}01'AND '#{selectedDate}03'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}01'AND '#{selectedDate}03')
+			</if>
+			<if test="selectQuarter == '2'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}04'AND '#{selectedDate}06'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}04'AND '#{selectedDate}06')
+			</if>
+			<if test="selectQuarter == '3'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}07'AND '#{selectedDate}09'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}07'AND '#{selectedDate}09')
+			</if>
+			<if test="selectQuarter == '4'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}10'AND '#{selectedDate}12'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}10'AND '#{selectedDate}12')
+			</if>
+		</if>
+		<if test="selectHalf != '' and selectHalf != null">
+			AND A.MAINTCE_INSP_CYCLE_CD = 'ITA0603'
+			<if test="selectHalf == '1'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}01'AND '#{selectedDate}06'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}01'AND '#{selectedDate}06')
+			</if>
+			<if test="selectHalf == '2'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}07'AND '#{selectedDate}12'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}07'AND '#{selectedDate}12')
+			</if>
+		</if>
+		<if test="searchCmpny != '' and searchCmpny != null">
+			AND A.FIXED_INSP_CMPNY_NO =  #{searchCmpny}
+		</if>
+		ORDER BY FIXED_INSP_YN
+     	<!-- 페이징 -->
+		<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+			limit #{recordCountPerPage} offset #{firstIndex}
+		</if>
+	</select>
+	
+	<select id="selectFixedInspListTotCnt" parameterType="truebon.com.opm.fix.model.FixedInspMngVO" resultType="int">
+		SELECT COUNT(DISTINCT(A.ASSET_ID)) totcnt
+		FROM 
+		(	SELECT 
+	 			tha.HW_ASSET_ID AS ASSET_ID
+	 			, 'HW' AS ASSET_DSTNCT
+	 			, tha.MAINTCE_CHRGR_NO
+	 			, tha.MAINTCE_INSP_CYCLE_CD
+	 			, IF(tfi.FIXED_INSP_DATE IS NOT NULL OR tfi.FIXED_INSP_DATE = '', 'Y', 'N') FIXED_INSP_YN
+	 			, tfi.FIXED_INSP_DATE  
+	 			, tfi.FIXED_INSP_CMPNY_NO
+	 			, tha.PROD_NM
+	 			, tha.PROD_PURP
+	 			, tha.BIZ_SYTM_CD
+	 			, tfi.FIXED_INSP_PLN_MON 
+	        FROM TB_FIXED_INSP tfi 
+			INNER JOIN TB_HW_ASSET tha 
+			ON tfi.ASSET_ID = tha.HW_ASSET_ID
+			UNION ALL
+			SELECT 
+	 			tsa.SW_ASSET_ID AS ASSET_ID
+	 			, 'SW' AS ASSET_DSTNCT
+	 			, tsa.MAINTCE_CHRGR_NO
+	 			, tsa.MAINTCE_INSP_CYCLE_CD
+	 			, IF(tfi.FIXED_INSP_DATE IS NOT NULL OR tfi.FIXED_INSP_DATE = '', 'Y', 'N') FIXED_INSP_YN
+	 			, tfi.FIXED_INSP_DATE  
+	 			, tfi.FIXED_INSP_CMPNY_NO
+	 			, tsa.PROD_NM
+	 			, tsa.PROD_PURP
+	 			, tsa.BIZ_SYTM_CD
+	 			, tfi.FIXED_INSP_PLN_MON 
+	        FROM TB_FIXED_INSP tfi 
+			INNER JOIN TB_SW_ASSET tsa  
+			ON tfi.ASSET_ID = tsa.SW_ASSET_ID
+		)A
+		LEFT JOIN TB_CHARGER tc 
+		ON A.MAINTCE_CHRGR_NO = tc.CHRGR_NO
+		LEFT JOIN TB_COMPANY tc2 
+		ON tc2.CMPNY_NO = tc.POSIT_CMPNY_NO
+		LEFT JOIN TB_COMN_CD_NEW tccn1
+		ON A.MAINTCE_INSP_CYCLE_CD = tccn1.NEW_COMN_CD
+		LEFT JOIN TB_BIZ_SYSTEM   AS tbs1
+     	ON A.BIZ_SYTM_CD  = tbs1.BIZ_SYTM_CD
+     	WHERE 1=1
+     	<if test="searchKeyword1 != '' and searchKeyword1 != null">
+     		AND A.ASSET_DSTNCT = #{searchKeyword1}
+     	</if>
+     	<if test="searchKeyword2 != '' and searchKeyword2 != null">
+     		AND A.FIXED_INSP_YN = #{searchKeyword2}
+     	</if>
+     	<if test="searchKeyword3 != '' and searchKeyword3 != null">
+     		AND A.BIZ_SYTM_CD = #{searchKeyword3}
+     	</if>
+     	<if test="searchKeyword != null and searchKeyword != ''">
+			<if test="searchCondition == 1">
+				AND A.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 2">
+				AND A.PROD_PURP LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+		</if>
+		<if test="selectMonth != '' and selectMonth != null">
+	     	AND A.MAINTCE_INSP_CYCLE_CD = 'ITA0601'
+	     	AND (A.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate},#{selectMonth})
+	    	OR A.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate},#{selectMonth},'%'))
+		</if>
+		<if test="selectQuarter != '' and selectQuarter != null">
+			AND A.MAINTCE_INSP_CYCLE_CD = 'ITA0602'
+			<if test="selectQuarter == '1'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}01'AND '#{selectedDate}03'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}01'AND '#{selectedDate}03')
+			</if>
+			<if test="selectQuarter == '2'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}04'AND '#{selectedDate}06'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}04'AND '#{selectedDate}06')
+			</if>
+			<if test="selectQuarter == '3'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}07'AND '#{selectedDate}09'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}07'AND '#{selectedDate}09')
+			</if>
+			<if test="selectQuarter == '4'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}10'AND '#{selectedDate}12'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}10'AND '#{selectedDate}12')
+			</if>
+		</if>
+		<if test="selectHalf != '' and selectHalf != null">
+			AND A.MAINTCE_INSP_CYCLE_CD = 'ITA0603'
+			<if test="selectHalf == '1'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}01'AND '#{selectedDate}06'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}01'AND '#{selectedDate}06')
+			</if>
+			<if test="selectHalf == '2'">
+				AND (A.FIXED_INSP_PLN_MON BETWEEN '#{selectedDate}07'AND '#{selectedDate}12'
+				OR A.FIXED_INSP_DATE BETWEEN '#{selectedDate}07'AND '#{selectedDate}12')
+			</if>
+		</if>
+		<if test="searchCmpny != '' and searchCmpny != null">
+			AND A.FIXED_INSP_CMPNY_NO =  #{searchCmpny}
+		</if>
+	</select>
+	
+	<select id="selectCmpnyList" parameterType="truebon.com.opm.fix.model.FixedInspMngVO"  resultMap="FixedInspMng">
+		 SELECT tc.CMPNY_NM , tc.CMPNY_NO 
+		 FROM TB_FIXED_INSP tfi, TB_COMPANY tc 
+		 WHERE tfi.FIXED_INSP_CMPNY_NO = tc.CMPNY_NO 
+		 GROUP BY tc.CMPNY_NO  
+	</select>
+	
+	<select id="selectAllCmpnyList" parameterType="truebon.com.opm.fix.model.FixedInspMngVO"  resultMap="FixedInspMng">
+		 SELECT CMPNY_NM, CMPNY_NO 
+		 FROM  TB_COMPANY
+		 WHERE CMPNY_NO 
+	</select>
+	
+	<select id="selectFixedInspStus" parameterType="truebon.com.opm.fix.model.FixedInspMngVO" resultType="map">
+		SELECT 
+	     NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '01') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 1MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '01%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 1MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '02') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 2MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '02%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 2MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '03') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 3MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '03%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 3MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '04') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 4MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '04%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 4MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '05') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 5MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '05%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 5MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '06') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 6MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '06%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 6MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '07') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 7MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '07%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 7MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '08') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 8MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '08%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 8MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '09') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 9MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '09%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 9MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '10') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 10MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '10%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 10MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '11') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END) ,0)11MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '11%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 11MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON = CONCAT(#{selectedDate}, '12') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 12MON_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE LIKE CONCAT(#{selectedDate}, '12%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0601' THEN 1 ELSE 0 END),0) 12MON_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON BETWEEN CONCAT(#{selectedDate}, '01') AND CONCAT(#{selectedDate}, '03') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 1QU_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE BETWEEN CONCAT(#{selectedDate}, '0101') AND CONCAT(#{selectedDate}, '0331%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 1QU_RES
+		,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON BETWEEN CONCAT(#{selectedDate}, '04') AND CONCAT(#{selectedDate}, '06') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 2QU_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE BETWEEN CONCAT(#{selectedDate}, '0401') AND CONCAT(#{selectedDate}, '0631%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 2QU_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON BETWEEN CONCAT(#{selectedDate}, '07') AND CONCAT(#{selectedDate}, '09') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 3QU_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE BETWEEN CONCAT(#{selectedDate}, '0701') AND CONCAT(#{selectedDate}, '0931%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 3QU_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON BETWEEN CONCAT(#{selectedDate}, '10') AND CONCAT(#{selectedDate}, '12') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 4QU_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE BETWEEN CONCAT(#{selectedDate}, '1001') AND CONCAT(#{selectedDate}, '1231%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0602' THEN 1 ELSE 0 END),0) 4QU_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON BETWEEN CONCAT(#{selectedDate}, '01') AND CONCAT(#{selectedDate}, '06') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0603' THEN 1 ELSE 0 END),0) 1HALF_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE BETWEEN CONCAT(#{selectedDate}, '0101') AND CONCAT(#{selectedDate}, '0631%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0603' THEN 1 ELSE 0 END),0) 1HALF_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON BETWEEN CONCAT(#{selectedDate}, '07') AND CONCAT(#{selectedDate}, '12') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0603' THEN 1 ELSE 0 END),0) 2HALF_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE BETWEEN CONCAT(#{selectedDate}, '0701') AND CONCAT(#{selectedDate}, '1231%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0603' THEN 1 ELSE 0 END),0) 2HALF_RES
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_PLN_MON BETWEEN CONCAT(#{selectedDate}, '01') AND CONCAT(#{selectedDate}, '12') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0604' THEN 1 ELSE 0 END),0) YEAR_PLN
+	    ,NVL(SUM(CASE WHEN tfi.FIXED_INSP_DATE BETWEEN CONCAT(#{selectedDate}, '0101') AND CONCAT(#{selectedDate}, '1231%') AND tfi.MAINTCE_INSP_CYCLE_CD ='ITA0604' THEN 1 ELSE 0 END),0) YEAR_RES
+	    FROM TB_FIXED_INSP tfi 
+	    <if test="searchCmpny != '' and searchCmpny != null">
+			 WHERE tfi.FIXED_INSP_CMPNY_NO  = #{searchCmpny}
+		</if>
+	</select>
+	
+	<insert id="insertFixedInspStus" parameterType="truebon.com.opm.fix.model.FixedInspMngVO">
+		INSERT INTO TB_FIXED_INSP  (ASSET_ID, FIXED_INSP_CMPNY_NO, MAINTCE_INSP_CYCLE_CD, FIXED_INSP_PLN_MON, REGSTR_ID, AMNDR_ID, RDTT, MDTT)
+		SELECT  HW_ASSET_ID , tc.POSIT_CMPNY_NO, MAINTCE_INSP_CYCLE_CD , #{insertMonth}, #{regstrId}, #{amndrId}, NOW(), NOW()
+		FROM TB_HW_ASSET  
+		LEFT JOIN TB_CHARGER tc 
+		ON MAINTCE_CHRGR_NO = tc.CHRGR_NO 
+		WHERE MAINTCE_CNTR_CD = 'ITA0501'AND #{insertMonth}  BETWEEN AVLBL_BEGIN_DATE AND AVLBL_END_DATE
+		<if test= "insertMonth.substring(4,6) != '01'">
+			<choose>
+				<when test="insertMonth.substring(4,6) == '04' || insertMonth.substring(4,6) == '10'"> 
+					AND MAINTCE_INSP_CYCLE_CD = "ITA0601" || MAINTCE_INSP_CYCLE_CD = "ITA0602" 
+				</when>
+			    <when test="insertMonth.substring(4,6) == '07'"> AND MAINTCE_INSP_CYCLE_CD = "ITA0601" || MAINTCE_INSP_CYCLE_CD = "ITA0602"|| MAINTCE_INSP_CYCLE_CD = "ITA0603" </when>
+				<otherwise> AND MAINTCE_INSP_CYCLE_CD = "ITA0601" </otherwise>
+			</choose>
+		</if>
+		GROUP BY HW_ASSET_ID 
+		UNION 
+		SELECT  SW_ASSET_ID, tc.POSIT_CMPNY_NO, MAINTCE_INSP_CYCLE_CD, #{insertMonth}, #{regstrId}, #{amndrId}, NOW(), NOW() 
+		FROM TB_SW_ASSET  
+		LEFT JOIN TB_CHARGER tc 
+		ON MAINTCE_CHRGR_NO = tc.CHRGR_NO 
+		WHERE MAINTCE_CNTR_CD = 'ITA0501'AND #{insertMonth}  BETWEEN AVLBL_BEGIN_DATE AND AVLBL_END_DATE
+		<if test= "insertMonth.substring(4,6) != '01'">
+			<choose>
+				<when test="insertMonth.substring(4,6) == '04' || insertMonth.substring(4,6) == '10'"> 
+					AND MAINTCE_INSP_CYCLE_CD = "ITA0601" || MAINTCE_INSP_CYCLE_CD = "ITA0602" 
+				</when>
+			    <when test="insertMonth.substring(4,6) == '07'"> AND MAINTCE_INSP_CYCLE_CD = "ITA0601" || MAINTCE_INSP_CYCLE_CD = "ITA0602"|| MAINTCE_INSP_CYCLE_CD = "ITA0603" </when>
+			</choose>
+		</if>
+		GROUP BY SW_ASSET_ID 
+	</insert>
+
+	<!-- 정기점검 삭제  --> 
+	<delete id="deleteFixedInsp" parameterType="truebon.com.opm.fix.model.FixedInspMngVO">
+		DELETE FROM TB_FIXED_INSP 
+		WHERE ASSET_ID = #{assetId}
+		AND FIXED_INSP_PLN_MON = #{fixedInspPlnMon}
+	</delete> 
+   
+	<select id="selectFixedInsp" parameterType="truebon.com.opm.fix.model.FixedInspMngVO" resultMap="FixedInspMng">
+		SELECT 
+        	A.ASSET_ID
+        	, A.ASSET_DSTNCT
+        	, tc.CMPNY_NM
+        	, A.FIXED_INSP_CMPNY_NO AS CMPNY_NO
+        	, tccn1.COMN_CD_NM AS MAINTCE_INSP_CYCLE
+        	, A.FIXED_INSP_YN
+        	, IFNULL(CONCAT(SUBSTR(A.FIXED_INSP_DATE,1,4),'-',SUBSTR(A.FIXED_INSP_DATE,5,2),'-',SUBSTR(A.FIXED_INSP_DATE,7,2)), '') AS FIXED_INSP_DATE
+        	, A.PROD_NM
+        	, A.PROD_PURP
+        	, tbs1.BIZ_SYTM_NM 
+        	, A.FIXED_INSP_PLN_MON 
+        	, SUBSTRING(A.MDTT,1,10)	AS MDTT
+        	, tc3.CHRGR_NM 				AS AMNDR_NM
+		FROM 
+		(	SELECT 
+	 			tha.HW_ASSET_ID AS ASSET_ID
+	 			, 'HW' AS ASSET_DSTNCT
+	 			, tha.MAINTCE_CHRGR_NO
+	 			, tha.MAINTCE_INSP_CYCLE_CD
+	 			, IF(tfi.FIXED_INSP_DATE IS NOT NULL OR tfi.FIXED_INSP_DATE = '', 'Y', 'N') FIXED_INSP_YN
+	 			, tfi.FIXED_INSP_DATE 
+	 			, tfi.FIXED_INSP_CMPNY_NO 
+	 			, tha.PROD_NM
+	 			, tha.PROD_PURP
+	 			, tha.BIZ_SYTM_CD
+	 			, tfi.FIXED_INSP_PLN_MON 
+	 			, tfi.AMNDR_ID 
+	 			, tfi.MDTT 
+	        FROM TB_FIXED_INSP tfi 
+			INNER JOIN TB_HW_ASSET tha 
+			ON tfi.ASSET_ID = tha.HW_ASSET_ID
+			UNION ALL
+			SELECT 
+	 			tha.SW_ASSET_ID AS ASSET_ID
+	 			, 'SW' AS ASSET_DSTNCT
+	 			, tha.MAINTCE_CHRGR_NO
+	 			, tha.MAINTCE_INSP_CYCLE_CD
+	 			, IF(tfi.FIXED_INSP_DATE IS NOT NULL OR tfi.FIXED_INSP_DATE = '', 'Y', 'N') FIXED_INSP_YN
+	 			, tfi.FIXED_INSP_DATE  
+	 			, tfi.FIXED_INSP_CMPNY_NO 
+	 			, tha.PROD_NM
+	 			, tha.PROD_PURP
+	 			, tha.BIZ_SYTM_CD
+	 			, tfi.FIXED_INSP_PLN_MON 
+	 			, tfi.AMNDR_ID 
+	 			, tfi.MDTT 
+	        FROM TB_FIXED_INSP tfi 
+			INNER JOIN TB_SW_ASSET tha 
+			ON tfi.ASSET_ID = tha.SW_ASSET_ID
+		)A
+		LEFT JOIN TB_COMPANY tc
+		ON tc.CMPNY_NO = A.FIXED_INSP_CMPNY_NO
+		LEFT JOIN TB_COMN_CD_NEW tccn1
+		ON A.MAINTCE_INSP_CYCLE_CD = tccn1.NEW_COMN_CD
+		LEFT JOIN TB_BIZ_SYSTEM   AS tbs1
+     	ON A.BIZ_SYTM_CD  = tbs1.BIZ_SYTM_CD
+     	LEFT OUTER JOIN TB_USER tu ON tu.USER_ID = A.AMNDR_ID
+		LEFT OUTER JOIN TB_CHARGER tc3 ON tu.CHRGR_NO = tc3.CHRGR_NO
+     	WHERE A.ASSET_ID = #{assetId}
+     	AND A.FIXED_INSP_PLN_MON = #{fixedInspPlnMon}
+	</select>
+	
+	<update id="updateFixedInsp" parameterType="truebon.com.opm.fix.model.FixedInspMngVO">
+		UPDATE TB_FIXED_INSP 
+		SET FIXED_INSP_DATE	= REPLACE(#{fixedInspDate}, '-', '')
+			, FIXED_INSP_CMPNY_NO = #{cmpnyNo}
+			, RMARK_TEXT = #{rmarkText}
+			, AMNDR_ID = #{amndrId}
+			, MDTT = SYSDATE()
+		WHERE ASSET_ID = #{assetId}
+		AND FIXED_INSP_PLN_MON = #{fixedInspPlnMon}
+	</update>
+   
+</mapper>

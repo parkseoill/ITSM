@@ -1,0 +1,63 @@
+package truebon.com.opm.flr.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.com.cmm.EgovMessageSource;
+import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import truebon.com.opm.chg.model.ChngMngVO;
+import truebon.com.opm.flr.model.FailureMngVO;
+
+/**
+ * @Class Name : FailureMngController.java
+ * @Description : FailureMng Controller class
+ * @Modification Information
+ *
+ * @author 김승현
+ * @since 2023.08.07
+ * @version 1.0
+ * @see
+ *  
+ *  Copyright (C)  All right reserved.
+ */
+
+@Controller
+
+public class FailureMngController {
+
+	/**
+	 * 장애 목록화면 (paging)
+	 * @param searchVO - 조회할 정보가 담긴 FailureMngVO
+	 * @exception Exception
+	 */
+    @RequestMapping(value="/opm/flr/FailureMngList.do")
+    public String FailureMngList(@ModelAttribute("searchVO") FailureMngVO searchVO, ModelMap model) throws Exception {
+    	
+        return "/truebon/com/opm/flr/FailureMngList";
+    } 
+   
+    /**
+     * 장애관리 대장
+     * @param FailureMngVO
+     * @param FailureMngVO
+     * @param status
+     * @return
+     * @throws Exception
+     */
+   @RequestMapping("/opm/flr/FailureLedger.do")
+   public String FailureLedger(@ModelAttribute("FailureMngVO") FailureMngVO FailureMngVO, ModelMap model) throws Exception {
+      
+      return "/truebon/com/opm/flr/FailureLedger";
+   }
+}

@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FailureMngMapper">
+	<resultMap id="FailureMngList" type="truebon.com.fai.mng.model.FailureMngVO">
+		<result property="failrMngtId" column="FAILR_MNGT_ID" />
+		<result property="failrDstnct" column="FAILR_DSTNCT" />
+		<result property="failrKind" column="FAILR_KIND" />
+		<result property="bizSytm" column="BIZ_SYTM" />
+		<result property="hwAssetPurp" column="HW_ASSET_PURP" />
+		<result property="hwType" column="HW_TYPE" />
+		<result property="swAssetPurp" column="SW_ASSET_PURP" />   
+		<result property="swType" column="SW_TYPE" />
+		<result property="failrInfldg" column="FAILR_INFLDG" />
+		<result property="failrEmgdgr" column="FAILR_EMGDGR" />
+		<result property="failrGrd" column="FAILR_GRD" />
+		<result property="failrGrdNm" column="FAILR_GRD_NM" />
+		<result property="failrMngmntPeriod" column="FAILR_MNGMNT_PERIOD" />
+		<result property="svcAbnoYn" column="SVC_ABNO_YN" />
+		<result property="failrInfldgEvltn" column="FAILR_INFLDG_EVLTN" />
+		<result property="mnpBizmanFailrYn" column="MNP_BIZMAN_FAILR_YN" />
+		<result property="failrTitle" column="FAILR_TITLE" />
+		<result property="failrOccurDt" column="FAILR_OCCUR_DT" />
+		<result property="failrCogntDt" column="FAILR_COGNT_DT" />
+		<result property="failrCmpltDt" column="FAILR_CMPLT_DT" />
+		<result property="failrTime" column="FAILR_TIME" />
+		<result property="failrHpng" column="FAILR_HPNG" />
+		<result property="failrCause" column="FAILR_CAUSE" />
+		<result property="failrMngmntMater" column="FAILR_MNGMNT_MATER" />
+		<result property="failrBtrmntMater" column="FAILR_BTRMNT_MATER" />
+		<result property="mangrNm" column="MANGR_NM" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+
+	<select id="selectFailureMngList" parameterType="truebon.com.fai.mng.model.FailureMngVO" resultMap="FailureMngList">
+		SELECT
+			tf.FAILR_MNGT_ID
+			, tccn1.COMN_CD_NM FAILR_DSTNCT
+			, tccn2.COMN_CD_NM FAILR_KIND
+			, tccn3.COMN_CD_NM FAILR_INFLDG
+			, tccn4.COMN_CD_NM FAILR_EMGDGR
+			, tccn5.COMN_CD_NM FAILR_GRD
+			, tccn6.COMN_CD_NM FAILR_INFLDG_EVLTN
+			, tbs.BIZ_SYTM_NM BIZ_SYTM
+			, IFNULL(tha.PROD_PURP, '') AS HW_ASSET_PURP
+			, IFNULL(tccn7.COMN_CD_NM, '') AS HW_TYPE
+			, IFNULL(tsa.PROD_PURP , '') AS SW_ASSET_PURP
+			, IFNULL(tccn8.COMN_CD_NM, '') AS SW_TYPE
+			, tf.FAILR_MNGMNT_PERIOD
+			, tf.SVC_ABNO_YN
+			, tf.MNP_BIZMAN_FAILR_YN
+			, tf.FAILR_TITLE
+			, tf.FAILR_OCCUR_DT
+			, tf.FAILR_COGNT_DT
+			, tf.FAILR_CMPLT_DT
+			, CASE WHEN FAILR_CMPLT_DT IS NULL
+			THEN TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, SYSDATE())
+			ELSE TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, FAILR_CMPLT_DT) END AS
+			FAILR_TIME
+			, tf.FAILR_HPNG
+			, tf.FAILR_CAUSE
+			, tf.FAILR_MNGMNT_MATER
+			, tf.FAILR_BTRMNT_MATER
+			, tf.MANGR_NM
+		FROM TB_FAIL tf
+			LEFT JOIN TB_COMN_CD_NEW AS tccn1
+			ON tf.FAILR_DSTNCT_CD = tccn1.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn2
+			ON tf.FAILR_KIND_CD = tccn2.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn3
+			ON tf.FAILR_INFLDG_CD = tccn3.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn4
+			ON tf.FAILR_EMGDGR_CD = tccn4.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn5
+			ON tf.FAILR_GRD_CD = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn6
+			ON tf.FAILR_INFLDG_EVLTN_CD = tccn6.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM AS tbs
+			ON tf.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_HW_ASSET tha 
+			LEFT JOIN TB_COMN_CD_NEW tccn7 
+			ON tha.HW_TYPE_CD = tccn7.NEW_COMN_CD
+			ON tf.HW_ASSET_ID = tha.HW_ASSET_ID
+			LEFT JOIN TB_SW_ASSET tsa 
+			LEFT JOIN TB_COMN_CD_NEW tccn8
+			ON tsa.SW_TYPE_CD = tccn8.NEW_COMN_CD
+			ON tf.SW_ASSET_ID = tsa.SW_ASSET_ID
+		WHERE 1=1
+		<if test="startDate != '' and startDate != null">
+			AND SUBSTR(REPLACE(tf.FAILR_OCCUR_DT,'-',''),1,8)
+			<![CDATA[ >= ]]>
+			REPLACE(#{startDate},'-','')
+		</if>
+		<if test="endDate != '' and endDate != null">
+			AND SUBSTR(REPLACE(tf.FAILR_OCCUR_DT,'-',''),1,8)
+			<![CDATA[ <= ]]>
+			REPLACE(#{endDate},'-','')
+		</if>
+		<if test="searchKeyword1 != '' and searchKeyword1 != null">
+			AND tf.BIZ_SYTM_CD = #{searchKeyword1}
+		</if>
+		<if test="searchKeyword2 != '' and searchKeyword2 != null">
+			AND tf.FAILR_DSTNCT_CD = #{searchKeyword2}
+		</if>
+		<if test="searchKeyword3 != '' and searchKeyword3 != null">
+			AND tf.FAILR_GRD_CD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != '' and searchKeyword4 != null">
+			<if test='searchKeyword4 == "Y"'>
+				AND (tf.FAILR_CMPLT_DT != '' OR tf.FAILR_CMPLT_DT is not null)
+			</if>
+			<if test='searchKeyword4 == "N"'>
+				AND (tf.FAILR_CMPLT_DT = '' OR tf.FAILR_CMPLT_DT is null)
+			</if>
+		</if>
+		<if test="searchKeyword5 != '' and searchKeyword5 != null">
+			<if test='searchKeyword5 == "Y"'>
+				AND TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, FAILR_CMPLT_DT) <![CDATA[<=]]>
+				tf.FAILR_MNGMNT_PERIOD
+			</if>
+			<if test='searchKeyword5 == "N"'>
+				AND TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, FAILR_CMPLT_DT) <![CDATA[>=]]>
+				tf.FAILR_MNGMNT_PERIOD
+			</if>
+		</if>
+		<if test="searchKeyword != null and searchKeyword != ''">
+		   AND tf.FAILR_TITLE LIKE CONCAT('%',#{searchKeyword},'%')
+		</if>
+<!--     <if test="searchKeyword != null and searchKeyword != ''">
+	         <if test="searchCondition == 1">
+	            AND tha.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+	            OR tsa.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+	         </if>
+	         <if test="searchCondition == 2">
+	            AND tf.FAILR_TITLE LIKE CONCAT('%',#{searchKeyword},'%')
+	         </if>
+      	</if> -->
+		<!-- 페이징 -->
+		<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+			ORDER BY tf.FAILR_CMPLT_DT = '', tf.FAILR_MNGT_ID DESC
+			limit #{recordCountPerPage} offset #{firstIndex}
+		</if>
+	</select>
+
+
+	<select id="selectFailureListTotCnt" parameterType="truebon.com.fai.mng.model.FailureMngVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM TB_FAIL tf
+			LEFT JOIN TB_COMN_CD_NEW AS tccn1
+			ON tf.FAILR_DSTNCT_CD = tccn1.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn2
+			ON tf.FAILR_KIND_CD = tccn2.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn3
+			ON tf.FAILR_INFLDG_CD = tccn3.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn4
+			ON tf.FAILR_EMGDGR_CD = tccn4.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn5
+			ON tf.FAILR_GRD_CD = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn6
+			ON tf.FAILR_INFLDG_EVLTN_CD = tccn6.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM AS tbs
+			ON tf.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_HW_ASSET tha 
+			LEFT JOIN TB_COMN_CD_NEW tccn7 
+			ON tha.HW_TYPE_CD = tccn7.NEW_COMN_CD
+			ON tf.HW_ASSET_ID = tha.HW_ASSET_ID
+			LEFT JOIN TB_SW_ASSET tsa 
+			LEFT JOIN TB_COMN_CD_NEW tccn8
+			ON tsa.SW_TYPE_CD = tccn8.NEW_COMN_CD
+			ON tf.SW_ASSET_ID = tsa.SW_ASSET_ID
+		WHERE 1=1
+		<if test="startDate != '' and startDate != null">
+			AND SUBSTR(REPLACE(tf.FAILR_OCCUR_DT,'-',''),1,8)
+			<![CDATA[ >= ]]>
+			REPLACE(#{startDate},'-','')
+		</if>
+		<if test="endDate != '' and endDate != null">
+			AND SUBSTR(REPLACE(tf.FAILR_OCCUR_DT,'-',''),1,8)
+			<![CDATA[ <= ]]>
+			REPLACE(#{endDate},'-','')
+		</if>
+		<if test="searchKeyword1 != '' and searchKeyword1 != null">
+			AND tf.BIZ_SYTM_CD = #{searchKeyword1}
+		</if>
+		
+		<if test="searchKeyword2 != '' and searchKeyword2 != null">
+			AND tf.FAILR_DSTNCT_CD = #{searchKeyword2}
+		</if>
+		<if test="searchKeyword3 != '' and searchKeyword3 != null">
+			AND tf.FAILR_GRD_CD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != '' and searchKeyword4 != null">
+			<if test='searchKeyword4 == "Y"'>
+				AND tf.FAILR_CMPLT_DT != '' OR tf.FAILR_CMPLT_DT is not
+				null
+			</if>
+			<if test='searchKeyword4 == "N"'>
+				AND tf.FAILR_CMPLT_DT = '' OR tf.FAILR_CMPLT_DT is null
+			</if>
+		</if>
+		<if test="searchKeyword5 != '' and searchKeyword5 != null">
+			<if test='searchKeyword5 == "Y"'>
+				AND (tf.FAILR_CMPLT_DT - tf.FAILR_OCCUR_DT) <![CDATA[<=]]>
+				tf.FAILR_MNGMNT_PERIOD
+			</if>
+			<if test='searchKeyword5 == "N"'>
+				AND (tf.FAILR_CMPLT_DT - tf.FAILR_OCCUR_DT) <![CDATA[>=]]>
+				tf.FAILR_MNGMNT_PERIOD
+			</if>
+		</if>
+		<if test="searchKeyword != null and searchKeyword != ''">
+		   AND tf.FAILR_TITLE LIKE CONCAT('%',#{searchKeyword},'%')
+		</if>
+<!--     <if test="searchKeyword != null and searchKeyword != ''">
+	         <if test="searchCondition == 1">
+	            AND tha.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+	            OR tsa.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+	         </if>
+	         <if test="searchCondition == 2">
+	            AND tf.FAILR_TITLE LIKE CONCAT('%',#{searchKeyword},'%')
+	         </if>
+      	</if> -->
+	</select>
+
+	<delete id="deleteFailure" parameterType="truebon.com.fai.mng.model.FailureMngVO">
+
+	</delete>
+
+	<select id="selectFailureMng" parameterType="truebon.com.fai.mng.model.FailureMngVO" resultType="truebon.com.fai.mng.model.FailureMngVO">
+		SELECT
+			tf.FAILR_MNGT_ID
+			, tccn1.COMN_CD_NM FAILR_DSTNCT
+			, tccn2.COMN_CD_NM FAILR_KIND
+			, tccn3.COMN_CD_NM FAILR_INFLDG
+			, tccn4.COMN_CD_NM FAILR_EMGDGR
+			, tccn5.COMN_CD_NM FAILR_GRD_NM
+			, tccn6.COMN_CD_NM FAILR_INFLDG_EVLTN
+			, tbs.BIZ_SYTM_NM BIZ_SYTM
+			, tf.FAILR_GRD_CD FAILR_GRD
+			, tf.HW_ASSET_ID
+			, tf.SW_ASSET_ID
+			, tf.FAILR_MNGMNT_PERIOD
+			, tf.SVC_ABNO_YN
+			, tf.MNP_BIZMAN_FAILR_YN
+			, tf.FAILR_TITLE
+			, tf.FAILR_OCCUR_DT
+			, tf.FAILR_COGNT_DT
+			, tf.FAILR_CMPLT_DT
+			, tf.FAILR_HPNG
+			, tf.FAILR_CAUSE
+			, tf.FAILR_MNGMNT_MATER
+			, tf.FAILR_BTRMNT_MATER
+			, tf.MANGR_NM
+		FROM TB_FAIL tf
+			LEFT JOIN TB_COMN_CD_NEW AS tccn1
+			ON tf.FAILR_DSTNCT_CD = tccn1.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn2
+			ON tf.FAILR_KIND_CD = tccn2.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn3
+			ON tf.FAILR_INFLDG_CD = tccn3.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn4
+			ON tf.FAILR_EMGDGR_CD = tccn4.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn5
+			ON tf.FAILR_GRD_CD = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn6
+			ON tf.FAILR_INFLDG_EVLTN_CD = tccn6.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM AS tbs
+			ON tf.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_HW_ASSET tha
+			ON tf.HW_ASSET_ID = tha.HW_ASSET_ID
+			LEFT JOIN TB_SW_ASSET tsa
+			ON tf.SW_ASSET_ID = tsa.SW_ASSET_ID
+		WHERE tf.FAILR_MNGT_ID = #{failrMngtId}
+	</select>
+
+	<select id="selectMngmntPeriodGuide" resultType="map">
+		SELECT DISTINCT tbs.BIZ_SYTM_NM ,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS01'AND tfp.FAILR_GRD_CD="FLR0501"
+		   ) GRADE1,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS01'AND tfp.FAILR_GRD_CD="FLR0502"
+		   ) GRADE2,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS01'AND tfp.FAILR_GRD_CD="FLR0503"
+		   ) GRADE3,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS01'AND tfp.FAILR_GRD_CD="FLR0504"
+		   ) GRADE4,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS01'AND tfp.FAILR_GRD_CD="FLR0505"
+		   ) GRADE5
+		FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD 
+		AND tbs.BIZ_SYTM_CD ='SYS01' 
+		UNION ALL 
+		SELECT DISTINCT tbs.BIZ_SYTM_NM ,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS30'AND tfp.FAILR_GRD_CD="FLR0501"
+		   ) ,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS30'AND tfp.FAILR_GRD_CD="FLR0502"
+		   ) ,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS30'AND tfp.FAILR_GRD_CD="FLR0503"
+		   ) ,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS30'AND tfp.FAILR_GRD_CD="FLR0504"
+		   ) ,
+		   (SELECT  tfp.FAILR_MNGMNT_PERIOD FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		      WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD AND tbs.BIZ_SYTM_CD ='SYS30'AND tfp.FAILR_GRD_CD="FLR0505"
+		   ) 
+		FROM TB_FAIL_PERIOD tfp , TB_BIZ_SYSTEM tbs 
+		WHERE tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD 
+		AND tbs.BIZ_SYTM_CD ='SYS30' 
+	</select>
+
+
+	<select id="selectFailureGrd" parameterType="truebon.com.fai.mng.model.FailureMngVO" resultType="truebon.com.fai.mng.model.FailureMngVO">
+		SELECT tfp.FAILR_GRD_CD FAILR_GRD
+			, tccn1.COMN_CD_NM AS FAILR_GRD_NM
+			, tfp.BIZ_SYTM_CD AS BIZ_SYTM
+			, tfp.FAILR_MNGMNT_PERIOD
+		FROM TB_FAIL_GRADE tfg, TB_FAIL_PERIOD tfp
+			LEFT JOIN TB_COMN_CD_NEW AS tccn1
+			ON tfp.FAILR_GRD_CD = tccn1.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM AS tbs
+			ON tfp.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD
+		WHERE tfg.FAILR_GRD_CD = tfp.FAILR_GRD_CD
+			AND FAILR_INFLDG_CD = #{failrInfldg}
+			AND FAILR_EMGDGR_CD = #{failrEmgdgr}
+			AND tbs.BIZ_SYTM_CD = #{bizSytm}
+	</select>
+
+	<update id="updateFailureMng" parameterType="truebon.com.fai.mng.model.FailureMngVO"> 
+		<![CDATA[
+			UPDATE TB_FAIL
+				SET 
+				   FAILR_DSTNCT_CD = #{failrDstnct}
+		         , FAILR_KIND_CD = #{failrKind}
+		         , FAILR_INFLDG_CD = #{failrInfldg}
+		         , FAILR_EMGDGR_CD = #{failrEmgdgr}
+		         , FAILR_GRD_CD = #{failrGrd}        
+		         , FAILR_INFLDG_EVLTN_CD = #{failrInfldgEvltn}
+		         , BIZ_SYTM_CD = #{bizSytm}
+		         , HW_ASSET_ID = #{hwAssetId}
+		         , SW_ASSET_ID = #{swAssetId} 
+		         , FAILR_MNGMNT_PERIOD = #{failrMngmntPeriod} 
+		         , SVC_ABNO_YN = #{svcAbnoYn} 
+		         , MNP_BIZMAN_FAILR_YN = #{mnpBizmanFailrYn} 
+		         , FAILR_TITLE = #{failrTitle} 
+		         , FAILR_OCCUR_DT = #{failrOccurDt} 
+		         , FAILR_COGNT_DT = #{failrCogntDt} 
+		         , FAILR_CMPLT_DT = #{failrCmpltDt} 
+		         , FAILR_HPNG = #{failrHpng} 
+		         , FAILR_CAUSE = #{failrCause} 
+		         , FAILR_MNGMNT_MATER = #{failrMngmntMater} 
+		         , FAILR_BTRMNT_MATER = #{failrBtrmntMater} 
+		         , MANGR_NM = #{mangrNm} 		
+				 , AMNDR_ID= #{amndrId}
+				 , MDTT=sysdate()
+			WHERE FAILR_MNGT_ID = #{failrMngtId}
+		]]>
+	</update>
+
+	<insert id="registFailureMng" parameterType="truebon.com.fai.mng.model.FailureMngVO">
+		<![CDATA[
+			INSERT INTO TB_FAIL
+				(
+				   FAILR_MNGT_ID
+				 , FAILR_DSTNCT_CD
+		         , FAILR_KIND_CD
+		         , FAILR_INFLDG_CD
+		         , FAILR_EMGDGR_CD
+		         , FAILR_GRD_CD       
+		         , FAILR_INFLDG_EVLTN_CD
+		         , BIZ_SYTM_CD
+		         , HW_ASSET_ID
+		         , SW_ASSET_ID
+		         , FAILR_MNGMNT_PERIOD 
+		         , SVC_ABNO_YN
+		         , MNP_BIZMAN_FAILR_YN
+		         , FAILR_TITLE
+		         , FAILR_OCCUR_DT
+		         , FAILR_COGNT_DT
+		         , FAILR_CMPLT_DT 
+		         , FAILR_HPNG
+		         , FAILR_CAUSE 
+		         , FAILR_MNGMNT_MATER 
+		         , FAILR_BTRMNT_MATER 
+		         , MANGR_NM 	
+		         , REGSTR_ID
+				 , RDTT
+				 , AMNDR_ID
+				 , MDTT 				
+				 )
+				 VALUES(
+				       #{failrMngtId}
+					 , #{failrDstnct}
+			         , #{failrKind}
+			         , #{failrInfldg}
+			         , #{failrEmgdgr}
+			         , #{failrGrd}        
+			         , #{failrInfldgEvltn}
+			         , #{bizSytm}
+			         , #{hwAssetId}
+			         , #{swAssetId} 
+			         , #{failrMngmntPeriod} 
+			         , #{svcAbnoYn} 
+			         , #{mnpBizmanFailrYn} 
+			         , #{failrTitle} 
+			         , #{failrOccurDt} 
+			         , #{failrCogntDt} 
+			         , #{failrCmpltDt} 
+			         , #{failrHpng} 
+			         , #{failrCause} 
+			         , #{failrMngmntMater} 
+			         , #{failrBtrmntMater} 
+			         , #{mangrNm} 		
+					 , #{regstrId}
+					 , sysdate() 
+					 , #{amndrId}
+					 , sysdate() 
+				 )
+		]]>
+	</insert>
+
+	<select id="selectFailureEgovMap" parameterType="truebon.com.fai.mng.model.FailureMngVO" resultType="egovMap">
+		SELECT
+			tf.FAILR_MNGT_ID
+			, tccn1.COMN_CD_NM FAILR_DSTNCT
+			, tccn2.COMN_CD_NM FAILR_KIND
+			, tccn3.COMN_CD_NM FAILR_INFLDG
+			, tccn4.COMN_CD_NM FAILR_EMGDGR
+			, tccn5.COMN_CD_NM FAILR_GRD
+			, tccn6.COMN_CD_NM FAILR_INFLDG_EVLTN
+			, tbs.BIZ_SYTM_NM BIZ_SYTM
+			, tf.HW_ASSET_ID
+			, IFNULL(tha.PROD_NM, '') AS HW_ASSET_NM
+			, IFNULL(tha.PROD_PURP, '') AS HW_ASSET_PURP
+			, tf.SW_ASSET_ID
+			, IFNULL(tsa.PROD_NM, '') AS SW_ASSET_NM
+			, IFNULL(tsa.PROD_PURP , '') AS SW_ASSET_PURP
+			, CAST(tf.FAILR_MNGMNT_PERIOD AS CHAR) FAILR_MNGMNT_PERIOD
+			, tf.SVC_ABNO_YN
+			, tf.MNP_BIZMAN_FAILR_YN
+			, tf.FAILR_TITLE
+			, CAST(tf.FAILR_OCCUR_DT AS CHAR) AS FAILR_OCCUR_DT
+			, CAST(tf.FAILR_COGNT_DT AS CHAR) AS FAILR_COGNT_DT
+			, CAST(tf.FAILR_CMPLT_DT AS CHAR) AS FAILR_CMPLT_DT
+	        , CAST(CASE WHEN FAILR_CMPLT_DT IS NULL
+	         THEN TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, SYSDATE())
+	         ELSE TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, FAILR_CMPLT_DT) END AS CHAR)  FAILR_TIME
+			, tf.FAILR_HPNG
+			, tf.FAILR_CAUSE
+			, tf.FAILR_MNGMNT_MATER
+			, tf.FAILR_BTRMNT_MATER
+			, tf.MANGR_NM
+		FROM TB_FAIL tf
+			LEFT JOIN TB_COMN_CD_NEW AS tccn1
+			ON tf.FAILR_DSTNCT_CD = tccn1.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn2
+			ON tf.FAILR_KIND_CD = tccn2.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn3
+			ON tf.FAILR_INFLDG_CD = tccn3.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn4
+			ON tf.FAILR_EMGDGR_CD = tccn4.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn5
+			ON tf.FAILR_GRD_CD = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn6
+			ON tf.FAILR_INFLDG_EVLTN_CD = tccn6.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM AS tbs
+			ON tf.BIZ_SYTM_CD = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_HW_ASSET tha 
+			LEFT JOIN TB_COMN_CD_NEW tccn7 
+			ON tha.HW_TYPE_CD = tccn7.NEW_COMN_CD
+			ON tf.HW_ASSET_ID = tha.HW_ASSET_ID
+			LEFT JOIN TB_SW_ASSET tsa 
+			LEFT JOIN TB_COMN_CD_NEW tccn8
+			ON tsa.SW_TYPE_CD = tccn8.NEW_COMN_CD
+			ON tf.SW_ASSET_ID = tsa.SW_ASSET_ID
+		WHERE 1=1
+		<if test="startDate != '' and startDate != null">
+			AND SUBSTR(REPLACE(tf.FAILR_OCCUR_DT,'-',''),1,8)
+			<![CDATA[ >= ]]>
+			REPLACE(#{startDate},'-','')
+		</if>
+		<if test="endDate != '' and endDate != null">
+			AND SUBSTR(REPLACE(tf.FAILR_OCCUR_DT,'-',''),1,8)
+			<![CDATA[ <= ]]>
+			REPLACE(#{endDate},'-','')
+		</if>
+		<if test="searchKeyword1 != '' and searchKeyword1 != null">
+			AND tf.BIZ_SYTM_CD = #{searchKeyword1}
+		</if>
+		<if test="searchKeyword2 != '' and searchKeyword2 != null">
+			AND tf.FAILR_DSTNCT_CD = #{searchKeyword2}
+		</if>
+		<if test="searchKeyword3 != '' and searchKeyword3 != null">
+			AND tf.FAILR_GRD_CD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != '' and searchKeyword4 != null">
+			<if test='searchKeyword4 == "Y"'>
+				AND tf.FAILR_CMPLT_DT != '' OR tf.FAILR_CMPLT_DT is not null
+			</if>
+			<if test='searchKeyword4 == "N"'>
+				AND tf.FAILR_CMPLT_DT = '' OR tf.FAILR_CMPLT_DT is null
+			</if>
+		</if>
+		<if test="searchKeyword5 != '' and searchKeyword5 != null">
+			<if test='searchKeyword5 == "Y"'>
+				AND TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, FAILR_CMPLT_DT) <![CDATA[<=]]>
+				tf.FAILR_MNGMNT_PERIOD
+			</if>
+			<if test='searchKeyword5 == "N"'>
+				AND TIMESTAMPDIFF(minute, FAILR_OCCUR_DT, FAILR_CMPLT_DT) <![CDATA[>=]]>
+				tf.FAILR_MNGMNT_PERIOD
+			</if>
+		</if>
+		<if test="searchKeyword != null and searchKeyword != ''">
+		   AND tf.FAILR_TITLE LIKE CONCAT('%',#{searchKeyword},'%')
+		</if>
+<!--     <if test="searchKeyword != null and searchKeyword != ''">
+	         <if test="searchCondition == 1">
+	            AND tha.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+	            OR tsa.PROD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+	         </if>
+	         <if test="searchCondition == 2">
+	            AND tf.FAILR_TITLE LIKE CONCAT('%',#{searchKeyword},'%')
+	         </if>
+      	</if> -->
+	</select>
+
+</mapper>

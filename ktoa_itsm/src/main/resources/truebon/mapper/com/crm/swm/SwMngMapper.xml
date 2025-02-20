@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SwMngMapper">
+	<resultMap id="SwMngList"
+		type="truebon.com.crm.swm.model.SwMngVO">
+		<result property="swAssetId" column="SW_ASSET_ID" />
+		<result property="swTypeCd" column="SW_TYPE_CD" />
+		<result property="ntwrkDstnctCd" column="NTWRK_DSTNCT_CD" />
+		<result property="assetStatCd" column="ASSET_STAT_CD" />
+		<result property="assetOwnCd" column="ASSET_OWN_CD" />
+		<result property="bizSytmCd" column="BIZ_SYTM_CD" />
+		<result property="ktoaAssetNo" column="KTOA_ASSET_NO" />
+		<result property="prodPurp" column="PROD_PURP" />
+		<result property="mnftrNm" column="MNFTR_NM" />
+		<result property="prodNm" column="PROD_NM" />
+		<result property="prodCoQty" column="PROD_CO_QTY" />
+		<result property="entrngDate" column="ENTRNG_DATE" />
+		<result property="exanDate" column="EXAN_DATE" />
+		<result property="hostNm" column="HOST_NM" />
+		<result property="eoslDate" column="EOSL_DATE" />
+		<result property="svcDupCnvrConfgYn"
+			column="SVC_DUP_CNVR_CONFG_YN" />
+		<result property="ctrlYn" column="CTRL_YN" />
+		<result property="maintceCntrCd" column="MAINTCE_CNTR_CD" />
+		<result property="maintceInspCycleCd"
+			column="MAINTCE_INSP_CYCLE_CD" />
+		<result property="maintceChrgrNo" column="MAINTCE_CHRGR_NO" />
+		<result property="rmarkText" column="RMARK_TEXT" />
+		<result property="maintceCntrBeginDate"
+			column="MAINTCE_CNTR_BEGIN_DATE" />
+		<result property="maintceCntrEndDate"
+			column="MAINTCE_CNTR_END_DATE" />
+		<result property="lcnId" column="LCN_ID" />
+		<result property="appliHwAssetId" column="APPLI_HW_ASSET_ID" />
+		<result property="maintceCdDc" column="MAINTCE_COMN_CD_DC" />
+		<result property="swTypeCdDc" column="TYPE_COMN_CD_DC" />
+		<result property="delYn" column="DEL_YN" />
+		<result property="dplctText" column="DPLCT_TEXT" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+
+	<insert id="insertSwAsset"
+		parameterType="truebon.com.crm.swm.model.SwMng">
+		<![CDATA[
+        INSERT INTO TB_SW_ASSET (
+        	SW_ASSET_ID,
+            SW_TYPE_CD,
+            NTWRK_DSTNCT_CD,
+            ASSET_STAT_CD,
+            ASSET_OWN_CD,
+            BIZ_SYTM_CD,
+            KTOA_ASSET_NO,
+            PROD_PURP,
+            MNFTR_NM,
+            PROD_NM,
+            PROD_CO_QTY,
+            ENTRNG_DATE,
+            EXAN_DATE,
+            HOST_NM,
+            EOSL_DATE,
+            SVC_DUP_CNVR_CONFG_YN,
+            CTRL_YN,
+            MAINTCE_CNTR_CD,
+            MAINTCE_INSP_CYCLE_CD,
+            MAINTCE_CHRGR_NO,
+            RMARK_TEXT,
+            MAINTCE_CNTR_BEGIN_DATE,
+            MAINTCE_CNTR_END_DATE,
+            LCN_ID,
+            APPLI_HW_ASSET_ID,
+            DEL_YN,
+            DPLCT_TEXT,
+            RDTT,
+            AMNDR_ID,
+            REGSTR_ID,
+            MDTT
+        ) VALUES (
+        	#{swAssetId},
+            #{swTypeCd},
+            #{ntwrkDstnctCd},
+            #{assetStatCd},
+            #{assetOwnCd},
+            #{bizSytmCd},
+            #{ktoaAssetNo},
+            #{prodPurp},
+            #{mnftrNm},
+            #{prodNm},
+            #{prodCoQty},
+            REPLACE(#{entrngDate}, '-', ''),
+            REPLACE(#{exanDate}, '-', ''), 
+            #{hostNm},
+            REPLACE(#{eoslDate}, '-', ''),
+            #{svcDupCnvrConfgYn},
+            #{ctrlYn},
+            #{maintceCntrCd},
+            #{maintceInspCycleCd},
+            #{maintceChrgrNo},
+            #{rmarkText},
+            REPLACE(#{maintceCntrBeginDate}, '-', ''), 
+            REPLACE(#{maintceCntrEndDate}, '-', ''),
+            #{lcnId},
+            #{appliHwAssetId},
+            #{delYn},
+            #{dplctText},
+            SYSDATE(),
+            #{amndrId},
+            #{regstrId},
+            SYSDATE()
+        )
+    ]]>
+	</insert>
+
+	<update id="updateSwAsset"
+		parameterType="truebon.com.crm.swm.model.SwMng">
+		<![CDATA[
+        UPDATE TB_SW_ASSET
+        SET SW_TYPE_CD = #{swTypeCd},
+            NTWRK_DSTNCT_CD = #{ntwrkDstnctCd},
+            ASSET_STAT_CD = #{assetStatCd},
+            ASSET_OWN_CD = #{assetOwnCd},
+            BIZ_SYTM_CD = #{bizSytmCd},
+            KTOA_ASSET_NO = #{ktoaAssetNo},
+            PROD_PURP = #{prodPurp},
+            MNFTR_NM = #{mnftrNm},
+            PROD_NM = #{prodNm},
+            PROD_CO_QTY = #{prodCoQty},
+            ENTRNG_DATE = REPLACE(#{entrngDate}, '-', ''),
+            EXAN_DATE =REPLACE(#{exanDate}, '-', ''),
+            HOST_NM = #{hostNm},
+            EOSL_DATE = REPLACE(#{eoslDate}, '-', ''),
+            SVC_DUP_CNVR_CONFG_YN = #{svcDupCnvrConfgYn},
+            CTRL_YN = #{ctrlYn},
+            MAINTCE_CNTR_CD = #{maintceCntrCd},
+            MAINTCE_INSP_CYCLE_CD = #{maintceInspCycleCd},
+            MAINTCE_CHRGR_NO = #{maintceChrgrNo},
+            RMARK_TEXT = #{rmarkText},
+            MAINTCE_CNTR_BEGIN_DATE = REPLACE(#{maintceCntrBeginDate}, '-', ''),
+            MAINTCE_CNTR_END_DATE = REPLACE(#{maintceCntrEndDate}, '-', ''),
+            LCN_ID = #{lcnId},
+            APPLI_HW_ASSET_ID = #{appliHwAssetId},
+            DEL_YN = #{delYn},
+            DPLCT_TEXT = #{dplctText},
+            AMNDR_ID = #{amndrId},
+            MDTT = SYSDATE()
+        WHERE SW_ASSET_ID = #{swAssetId}
+    	]]>
+	</update>
+
+	<update id="updateSwAssetTargt"
+		parameterType="truebon.com.crm.swm.model.SwMng">
+		UPDATE TB_SW_ASSET
+		SET AMNDR_ID=#{amndrId}
+		, MDTT=sysdate()
+		WHERE 1=1
+		<if test="swAssetId != '' and swAssetId != null">AND
+			SW_ASSET_ID = #{swAssetId}
+		</if>
+		<choose>
+			<when test="arrSwMngtNo.size != 0">
+				AND SW_ASSET_ID IN
+				<foreach collection="arrSwMngtNo" item="item" separator=","
+					open="(" close=")">
+					#{item}
+				</foreach>
+			</when>
+		</choose>
+	</update>
+
+
+	<select id="selectSwAsset"
+		parameterType="truebon.com.crm.swm.model.SwMngVO"
+		resultType="truebon.com.crm.swm.model.SwMngVO">
+		<![CDATA[
+			SELECT
+				ts.SW_ASSET_ID					AS SW_ASSET_ID
+				,ts.SW_TYPE_CD					AS SW_TYPE_CD
+				,ts.NTWRK_DSTNCT_CD 			AS NTWRK_DSTNCT_CD
+				,ts.ASSET_STAT_CD 				AS ASSET_STAT_CD
+				,ts.ASSET_OWN_CD 				AS ASSET_OWN_CD
+				,ts.BIZ_SYTM_CD 				AS BIZ_SYTM_CD
+				, ts.KTOA_ASSET_NO				AS KTOA_ASSET_NO
+				, ts.PROD_PURP					AS PROD_PURP
+				, ts.MNFTR_NM					AS MNFTR_NM
+				, ts.PROD_NM					AS PROD_NM
+				, ts.PROD_CO_QTY				AS PROD_CO_QTY
+				, ts.DPLCT_TEXT					AS DPLCT_TEXT
+				, ts.DEL_YN						AS DEL_YN
+				, CASE 
+				WHEN ts.ENTRNG_DATE != '' THEN  CONCAT(SUBSTRING(ts.ENTRNG_DATE,1,4),'-' ,SUBSTRING(ts.ENTRNG_DATE,5,2),'-' ,SUBSTRING(ts.ENTRNG_DATE,7,2)) 
+					ELSE ts.ENTRNG_DATE
+				  END AS ENTRNG_DATE
+				, ts.HOST_NM					AS HOST_NM
+				, CASE 
+				WHEN ts.EOSL_DATE != '' THEN  CONCAT(SUBSTRING(ts.EOSL_DATE,1,4),'-' ,SUBSTRING(ts.EOSL_DATE,5,2),'-' ,SUBSTRING(ts.EOSL_DATE,7,2)) 
+					ELSE ts.EOSL_DATE
+				  END AS EOSL_DATE				
+				, ts.MAINTCE_CNTR_CD			AS MAINTCE_CNTR_CD
+				, ts.MAINTCE_INSP_CYCLE_CD		AS MAINTCE_INSP_CYCLE_CD
+				, ts.SVC_DUP_CNVR_CONFG_YN			AS SVC_DUP_CNVR_CONFG_YN
+				, ts.RMARK_TEXT					AS RMARK_TEXT
+				, ts.CTRL_YN					AS CTRL_YN
+				, CASE 
+				WHEN ts.MAINTCE_CNTR_BEGIN_DATE != '' THEN  CONCAT(SUBSTRING(ts.MAINTCE_CNTR_BEGIN_DATE,1,4),'-' ,SUBSTRING(ts.MAINTCE_CNTR_BEGIN_DATE,5,2),'-' ,SUBSTRING(ts.MAINTCE_CNTR_BEGIN_DATE,7,2)) 
+					ELSE ts.MAINTCE_CNTR_BEGIN_DATE
+				  END AS MAINTCE_CNTR_BEGIN_DATE
+				, CASE 
+				WHEN ts.MAINTCE_CNTR_END_DATE != '' THEN  CONCAT(SUBSTRING(ts.MAINTCE_CNTR_END_DATE,1,4),'-' ,SUBSTRING(ts.MAINTCE_CNTR_END_DATE,5,2),'-' ,SUBSTRING(ts.MAINTCE_CNTR_END_DATE,7,2)) 
+					ELSE ts.MAINTCE_CNTR_END_DATE
+				  END AS MAINTCE_CNTR_END_DATE
+				, ts.LCN_ID						AS LCN_ID
+				, ts.APPLI_HW_ASSET_ID			AS APPLI_HW_ASSET_ID
+				, CASE 
+				WHEN ts.EXAN_DATE != '' THEN  CONCAT(SUBSTRING(ts.EXAN_DATE,1,4),'-' ,SUBSTRING(ts.EXAN_DATE,5,2),'-' ,SUBSTRING(ts.EXAN_DATE,7,2)) 
+					ELSE ts.EXAN_DATE
+				  END AS EXAN_DATE
+				, CASE 
+				WHEN ts.MAINTCE_CHRGR_NO IS NOT NULL THEN tb.CMPNY_NM ELSE NULL 
+				  END AS MAINTCE_CHR_CMPNY
+			FROM TB_SW_ASSET ts
+			LEFT JOIN TB_CHARGER tc ON ts.MAINTCE_CHRGR_NO = tc.CHRGR_NO
+			LEFT JOIN TB_COMPANY tb ON tb.CMPNY_NO = tc.POSIT_CMPNY_NO
+			WHERE SW_ASSET_ID = #{swAssetId}
+			]]>
+	</select>
+
+	<select id="selectSwAssetList"
+		parameterType="truebon.com.crm.swm.model.SwMngVO"
+		resultMap="SwMngList">
+		SELECT
+		ts.SW_ASSET_ID AS SW_ASSET_ID 
+		,(SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE ts.SW_TYPE_CD = tc.NEW_COMN_CD ) AS SW_TYPE_CD
+		,(SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE ts.NTWRK_DSTNCT_CD = tc.NEW_COMN_CD ) AS NTWRK_DSTNCT_CD
+		,(SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE ts.ASSET_STAT_CD = tc.NEW_COMN_CD ) AS ASSET_STAT_CD
+		,(SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE ts.ASSET_OWN_CD = tc.NEW_COMN_CD ) AS ASSET_OWN_CD
+		,(SELECT tb.BIZ_SYTM_NM FROM TB_BIZ_SYSTEM tb WHERE ts.BIZ_SYTM_CD = tb.BIZ_SYTM_CD ) AS BIZ_SYTM_CD
+		, ts.MNFTR_NM AS MNFTR_NM
+		, ts.PROD_NM AS PROD_NM
+		, ts.PROD_CO_QTY AS PROD_CO_QTY
+		, ts.CTRL_YN AS CTRL_YN
+		, ts.PROD_PURP AS PROD_PURP
+		, (SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE ts.MAINTCE_CNTR_CD = tc.NEW_COMN_CD ) AS MAINTCE_CNTR_CD
+		, (SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE ts.MAINTCE_INSP_CYCLE_CD = tc.NEW_COMN_CD ) AS MAINTCE_INSP_CYCLE_CD
+		, ts.MAINTCE_CHRGR_NO AS MAINTCE_CHRGR_NO
+		, ts.SVC_DUP_CNVR_CONFG_YN AS SVC_DUP_CNVR_CONFG_YN
+		, ts.RMARK_TEXT AS RMARK_TEXT
+		, ts.LCN_ID AS LCN_ID
+		, ts.APPLI_HW_ASSET_ID AS APPLI_HW_ASSET_ID
+		, ts.DEL_YN AS DEL_YN
+		FROM TB_SW_ASSET ts
+		LEFT JOIN TB_BIZ_SYSTEM tb
+		ON ts.BIZ_SYTM_CD =
+		tb.BIZ_SYTM_CD
+		WHERE 1=1
+		<if test="searchBizSytmCd != null and searchBizSytmCd != ''">
+		AND ts.BIZ_SYTM_CD = #{searchBizSytmCd}
+		</if>
+		<choose>
+			<when test="searchKeyword != null and searchKeyword !=''">
+				<if test="searchNtwrkCdList[0] != null and searchNtwrkCdList[0] !=''">
+					AND ts.NTWRK_DSTNCT_CD IN
+					<foreach collection="searchNtwrkCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchSwTypeCdList[0] != null and searchSwTypeCdList[0] !=''">
+					AND ts.SW_TYPE_CD IN
+					<foreach collection="searchSwTypeCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchAssetStatCdList[0] != null and searchAssetStatCdList[0] !=''">
+					AND ts.ASSET_STAT_CD IN
+					<foreach collection="searchAssetStatCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchMaintceCdList[0] != null and searchMaintceCdList[0] !=''">
+					AND ts.MAINTCE_CNTR_CD IN
+					<foreach collection="searchMaintceCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchMaintceInspCdList[0] != null and searchMaintceInspCdList[0] !=''">
+					AND ts.MAINTCE_INSP_CYCLE_CD IN
+					<foreach collection="searchMaintceInspCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+			</when>
+			
+			<otherwise>
+				<if test="searchDelYn != null and searchDelYn !=''">
+					AND ts.DEL_YN = #{searchDelYn}
+				</if>
+				<if test="searchNtwrkCd != null and searchNtwrkCd !=''">
+					AND ts.NTWRK_DSTNCT_CD = #{searchNtwrkCd}
+				</if>
+				<if test="searchSwTypeCd != null and searchSwTypeCd !=''">
+					AND ts.SW_TYPE_CD = #{searchSwTypeCd}
+				</if>
+				<if test="searchAssetStatCd != null and searchAssetStatCd !=''">
+					AND ts.ASSET_STAT_CD = #{searchAssetStatCd}
+				</if>
+				<if test="searchMaintceCd != null and searchMaintceCd !=''">
+					AND ts.MAINTCE_CNTR_CD = #{searchMaintceCd}
+				</if>
+				<if
+					test="searchMaintceInspCd != null and searchMaintceInspCd !=''">
+					AND ts.MAINTCE_INSP_CYCLE_CD = #{searchMaintceInspCd}
+				</if>
+				<if test="searchMnftrNm != null and searchMnftrNm !=''">
+					AND ts.MNFTR_NM LIKE CONCAT('%', #{searchMnftrNm}, '%')
+				</if>
+				<if
+					test="searchProdNm != null and searchProdNm !='' and searchProdNm !='showAll'">
+					AND ts.PROD_NM LIKE CONCAT('%', #{searchProdNm}, '%')
+				</if>
+				<if test="searchBizSytmCd != '' and searchBizSytmCd != null">
+					AND tb.BIZ_SYTM_CD = #{searchBizSytmCd}
+				</if>
+
+			</otherwise>
+
+		</choose>
+
+		<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+			ORDER BY ts.SW_ASSET_ID DESC
+			limit #{recordCountPerPage} offset #{firstIndex}
+		</if>
+
+
+	</select>
+
+	<select id="selectSwAssetListTotCnt"
+		parameterType="truebon.com.crm.swm.model.SwMngVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM TB_SW_ASSET ts
+		LEFT JOIN TB_BIZ_SYSTEM tb
+		ON
+		ts.BIZ_SYTM_CD = tb.BIZ_SYTM_CD
+		WHERE 1=1
+		<choose>
+			<when test="searchKeyword != null and searchKeyword !=''">
+				<if test="searchNtwrkCdList[0] != null and searchNtwrkCdList[0] !=''">
+					AND ts.NTWRK_DSTNCT_CD IN
+					<foreach collection="searchNtwrkCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchSwTypeCdList[0] != null and searchSwTypeCdList[0] !=''">
+					AND ts.SW_TYPE_CD IN
+					<foreach collection="searchSwTypeCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchAssetStatCdList[0] != null and searchAssetStatCdList[0] !=''">
+					AND ts.ASSET_STAT_CD IN
+					<foreach collection="searchAssetStatCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchMaintceCdList[0] != null and searchMaintceCdList[0] !=''">
+					AND ts.MAINTCE_CNTR_CD IN
+					<foreach collection="searchMaintceCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+				<if test="searchMaintceInspCdList[0] != null and searchMaintceInspCdList[0] !=''">
+					AND ts.MAINTCE_INSP_CYCLE_CD IN
+					<foreach collection="searchMaintceInspCdList" item="keyword"
+					separator="," open="(" close=")">
+					#{keyword}
+					</foreach>
+				</if>
+			</when>
+			
+			<otherwise>
+				<if test="searchDelYn != null and searchDelYn !=''">
+					AND ts.DEL_YN = #{searchDelYn}
+				</if>
+				<if test="searchNtwrkCd != null and searchNtwrkCd !=''">
+					AND ts.NTWRK_DSTNCT_CD = #{searchNtwrkCd}
+				</if>
+				<if test="searchSwTypeCd != null and searchSwTypeCd !=''">
+					AND ts.SW_TYPE_CD = #{searchSwTypeCd}
+				</if>
+				<if test="searchAssetStatCd != null and searchAssetStatCd !=''">
+					AND ts.ASSET_STAT_CD = #{searchAssetStatCd}
+				</if>
+				<if test="searchMaintceCd != null and searchMaintceCd !=''">
+					AND ts.MAINTCE_CNTR_CD = #{searchMaintceCd}
+				</if>
+				<if
+					test="searchMaintceInspCd != null and searchMaintceInspCd !=''">
+					AND ts.MAINTCE_INSP_CYCLE_CD = #{searchMaintceInspCd}
+				</if>
+				<if test="searchMnftrNm != null and searchMnftrNm !=''">
+					AND ts.MNFTR_NM LIKE CONCAT('%', #{searchMnftrNm}, '%')
+				</if>
+				<if
+					test="searchProdNm != null and searchProdNm !='' and searchProdNm !='showAll'">
+					AND ts.PROD_NM LIKE CONCAT('%', #{searchProdNm}, '%')
+				</if>
+				<if test="searchBizSytmCd != '' and searchBizSytmCd != null">
+					AND tb.BIZ_SYTM_CD = #{searchBizSytmCd}
+				</if>
+
+			</otherwise>
+
+		</choose>
+	</select>
+	<select id="selectSwAssetEgovMap"
+		parameterType="truebon.com.crm.swm.model.SwMngVO" resultType="egovMap">
+		SELECT
+		ts.SW_ASSET_ID AS SW_ASSET_ID
+		,(SELECT tc.COMN_CD_NM FROM
+		TB_COMN_CD_NEW tc WHERE ts.SW_TYPE_CD =
+		tc.NEW_COMN_CD ) AS SW_TYPE_CD
+		,(SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE ts.NTWRK_DSTNCT_CD
+		=
+		tc.NEW_COMN_CD ) AS NTWRK_DSTNCT_CD
+		,(SELECT tc.COMN_CD_NM FROM
+		TB_COMN_CD_NEW tc WHERE ts.ASSET_STAT_CD =
+		tc.NEW_COMN_CD ) AS
+		ASSET_STAT_CD
+		,(SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE
+		ts.ASSET_OWN_CD =
+		tc.NEW_COMN_CD ) AS ASSET_OWN_CD
+		,(SELECT
+		tb.BIZ_SYTM_NM FROM TB_BIZ_SYSTEM tb WHERE ts.BIZ_SYTM_CD =
+		tb.BIZ_SYTM_CD ) AS BIZ_SYTM_CD
+		, ts.MNFTR_NM AS MNFTR_NM
+		, ts.PROD_NM
+		AS PROD_NM
+		, CAST(ts.PROD_CO_QTY AS CHAR) AS PROD_CO_QTY
+		, ts.CTRL_YN AS
+		CTRL_YN
+		, (SELECT tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE
+		ts.MAINTCE_CNTR_CD
+		= tc.NEW_COMN_CD ) AS MAINTCE_CNTR_CD
+		, (SELECT
+		tc.COMN_CD_NM FROM TB_COMN_CD_NEW tc WHERE
+		ts.MAINTCE_INSP_CYCLE_CD =
+		tc.NEW_COMN_CD ) AS MAINTCE_INSP_CYCLE_CD
+		, ts.MAINTCE_CHRGR_NO AS
+		MAINTCE_CHRGR_NO
+		, ts.SVC_DUP_CNVR_CONFG_YN AS SVC_DUP_CNVR_CONFG_YN
+		,
+		ts.RMARK_TEXT AS RMARK_TEXT
+		, ts.LCN_ID AS LCN_ID
+		, ts.APPLI_HW_ASSET_ID
+		AS APPLI_HW_ASSET_ID
+		, ts.DEL_YN AS DEL_YN
+		FROM TB_SW_ASSET ts
+		WHERE
+		ts.DEL_YN = #{searchDelYn}
+		<if test="searchNtwrkCd != null and searchNtwrkCd !=''">
+			AND ts.NTWRK_DSTNCT_CD = #{searchNtwrkCd}
+		</if>
+		<if test="searchAssetStatCd != null and searchAssetStatCd !=''">
+			AND ts.ASSET_STAT_CD = #{searchAssetStatCd}
+		</if>
+		<if test="searchAssetOwnCd != null and searchAssetOwnCd !=''">
+			AND ts.ASSET_OWN_CD = #{searchAssetOwnCd}
+		</if>
+		<if test="searchMaintceCd != null and searchMaintceCd !=''">
+			AND ts.MAINTCE_CNTR_CD = #{searchMaintceCd}
+		</if>
+		<if test="searchMaintceInspCd != null and searchMaintceInspCd !=''">
+			AND ts.MAINTCE_INSP_CYCLE_CD = #{searchMaintceInspCd}
+		</if>
+		<if test="searchMnftrNm != null and searchMnftrNm !=''">
+			AND ts.MNFTR_NM LIKE CONCAT('%', #{searchMnftrNm}, '%')
+		</if>
+		<if
+			test="searchProdNm != null and searchProdNm !='' and searchProdNm !='showAll'">
+			AND ts.PROD_NM LIKE CONCAT('%', #{searchProdNm}, '%')
+		</if>
+		<if test="recordCountPerPage != 0 and recordCountPerPage != null">
+			limit #{recordCountPerPage} offset #{firstIndex}
+		</if>
+	</select>
+
+	<delete id="deleteSwAsset"
+		parameterType="truebon.com.crm.swm.model.SwMngVO">
+		<![CDATA[
+			DELETE FROM TB_SW_ASSET
+        	WHERE SW_ASSET_ID = #{swAssetId}
+		]]>
+	</delete>
+
+</mapper>

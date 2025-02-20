@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="FailureMngCsMapper">
+   <resultMap id="FailureMngCsList" type="truebon.com.fai.fcs.model.FailureMngCsVO">
+   		<result property="bizSytm" column="BIZ_SYTM"/>   
+   		<result property="failrDstnctHw" column="FAILR_DSTNCT_HW"/>   
+   		<result property="failrDstnctNw" column="FAILR_DSTNCT_NW"/>   
+   		<result property="failrDstnctSw" column="FAILR_DSTNCT_SW"/>   
+   		<result property="failrDstnctAp" column="FAILR_DSTNCT_AP"/>   
+   		<result property="failrDstnctOut" column="FAILR_DSTNCT_OUT"/>   
+   		<result property="failrDstnctEtc" column="FAILR_DSTNCT_ETC"/>   
+   		<result property="failrDstnctTot" column="FAILR_DSTNCT_TOTAL"/>   
+   </resultMap>
+   
+<select id="selectFailureMngCsList" parameterType="truebon.com.fai.fcs.model.FailureMngCsVO" resultMap="FailureMngCsList">
+ SELECT
+  BIZ_SYTM,
+  FAILR_DSTNCT_HW,
+  FAILR_DSTNCT_NW,
+  FAILR_DSTNCT_SW,
+  FAILR_DSTNCT_AP,
+  FAILR_DSTNCT_OUT,
+  FAILR_DSTNCT_ETC,
+  FAILR_DSTNCT_HW + FAILR_DSTNCT_NW + FAILR_DSTNCT_SW + FAILR_DSTNCT_AP + FAILR_DSTNCT_OUT + FAILR_DSTNCT_ETC AS FAILR_DSTNCT_TOTAL
+FROM (
+  SELECT
+    tbs.BIZ_SYTM_NM AS BIZ_SYTM,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0101' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_HW,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0102' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_NW,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0103' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_SW,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0104' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_AP,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0105' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_OUT,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0106' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_ETC
+  FROM TB_BIZ_SYSTEM tbs
+  LEFT JOIN TB_FAIL tf ON tbs.BIZ_SYTM_CD = tf.BIZ_SYTM_CD
+  WHERE tbs.UPPR_BIZ_SYTM_CD = "SYS"
+  <if test="searchKeyword != null and searchKeyword != ''">
+    AND YEAR(tf.FAILR_OCCUR_DT) = #{searchKeyword}
+  </if>
+  GROUP BY tbs.BIZ_SYTM_NM
+) AS subquery
+</select> 
+
+
+<select id="selectFailureMngCsEgoMap" parameterType="truebon.com.fai.fcs.model.FailureMngCsVO" resultType="egovMap">
+ SELECT
+  BIZ_SYTM,
+  CAST(FAILR_DSTNCT_HW AS CHAR) AS FAILR_DSTNCT_HW,
+  CAST(FAILR_DSTNCT_NW AS CHAR) AS FAILR_DSTNCT_NW,
+  CAST(FAILR_DSTNCT_SW AS CHAR) AS FAILR_DSTNCT_SW,
+  CAST(FAILR_DSTNCT_AP AS CHAR) AS FAILR_DSTNCT_AP,
+  CAST(FAILR_DSTNCT_OUT AS CHAR) AS FAILR_DSTNCT_OUT,
+  CAST(FAILR_DSTNCT_ETC AS CHAR) AS FAILR_DSTNCT_ETC
+FROM (
+  SELECT
+    tbs.BIZ_SYTM_NM AS BIZ_SYTM,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0101' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_HW,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0102' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_NW,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0103' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_SW,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0104' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_AP,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0105' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_OUT,
+    COUNT(CASE WHEN tf.FAILR_DSTNCT_CD LIKE 'FLR0106' THEN tf.FAILR_DSTNCT_CD END) AS FAILR_DSTNCT_ETC  
+  FROM TB_BIZ_SYSTEM tbs
+  LEFT JOIN TB_FAIL tf ON tbs.BIZ_SYTM_CD = tf.BIZ_SYTM_CD
+  WHERE tbs.UPPR_BIZ_SYTM_CD = "SYS"
+  <if test="searchKeyword != null and searchKeyword != ''">
+    AND YEAR(tf.FAILR_OCCUR_DT) = #{searchKeyword}
+  </if>
+  GROUP BY tbs.BIZ_SYTM_NM
+) AS subquery
+</select>
+
+</mapper>

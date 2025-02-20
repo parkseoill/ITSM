@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+/**
+ * @Class Name : SwMngList.jsp
+ * @Description : SW자산 관리 목록 화면
+ * @Modification Information
+ * @
+ * @  수정일             수정자             수정내용
+ * @ ----------   --------   ---------------------------
+ * @ 2023.09.26   박서일               최초 생성
+ * @ 2023.10.04   이정하               화면 구현
+ *
+ *  @author 박서일
+ *  @since 2023.09.26
+ *  @version 1.0
+ *  @see
+ *
+ */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SW자산 관리 목록</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+<script type="text/javaScript">
+
+$(document).ready(function () {
+	// 달력
+	$( "#startDate" ).datepicker({
+		changeMonth: true, 
+		changeYear: true,
+		onClose: function( selectedDate ) {    
+		     //시작일(startDate) datepicker가 닫힐때
+		     //종료일(endDate)의 선택할수있는 최소 날짜(minDate)를 선택한 시작일로 지정
+		    $("#endDate").datepicker( "option", "minDate", selectedDate );
+		}
+	});
+	$( "#endDate" ).datepicker({
+		changeMonth: true, 
+		changeYear: true,
+		onClose: function( selectedDate ) {    
+		    // 종료일(endDate) datepicker가 닫힐때
+		    // 시작일(startDate)의 선택할수있는 최대 날짜(maxDate)를 선택한 시작일로 지정
+		    $("#startDate").datepicker( "option", "maxDate", selectedDate );
+		}
+	});
+	
+});
+
+/* ********************************************************
+ * 검색조건 추가 함수, 초기화 함수
+ * 선택한 id의 입력 값을 검색 조건에 추가
+ ******************************************************** */
+var dict = {}; // 다중 검색을 위한 딕셔너리 생성 {'공통코드' : '공통코드명'}
+var initialConditions = "${searchVO.searchCondition}".split(',');
+var initialKeywords = "${searchVO.searchKeyword}".split(',');
+for (var i = 0; i < initialConditions.length; i++) {
+	if (initialConditions[i] !== '') {
+    dict[initialConditions[i]] = initialKeywords[i];
+	}
+}
+//검색 조건 추가
+function addSearchCondition(id) {
+  var selectedValue = $(id).val();
+  if (selectedValue !== '' && !Object.values(dict).includes(selectedValue)) {
+      var keywordText = $(id).find("option:checked").text();
+      dict[selectedValue] = keywordText;
+      updateSearchInputs();
+  }
+}
+//검색 레이블 업데이트
+function updateSearchInputs() {
+	//$('#searchKeyword').val(Object.keys(dict));
+    //$('#searchCondition').val(Object.values(dict));
+    $('#searchLabel').val(Object.values(dict)); 
+}
+
+// 검색조건 초기화
+function resetSearchCondition() {
+    dict = {};
+    updateSearchInputs(); // 검색 입력 필드 업데이트
+    $('#searchNtwrkCd').val("");
+    $('#searchSwTypeCd').val("");
+    $('#searchAssetStatCd').val("");
+    $('#searchMaintceCd').val("");
+    $('#searchMaintceInspCd').val("");
+    $('#searchBizSytmCd').val("");
+    $('#searchMnftrNm').val("");
+    $('#searchProdNm').val("");
+    $('#searchDelYn').val("");
+    
+}
+
+/* ********************************************************
+ * 입력 화면 호출 함수
+ ******************************************************** */
+function insertSwMngList() {
+   	document.swAssetMngForm.action = "<c:url value='/crm/swm/SwMngRegist.do'/>";
+   	document.swAssetMngForm.submit();
+}
+
+/* ********************************************************
+ * 페이징 처리 함수
+ ******************************************************** */
+function linkPage(pageNo){
+	document.swAssetMngForm.pageIndex.value = pageNo;
+	document.swAssetMngForm.action = "<c:url value='/crm/swm/SwMngList.do'/>?searchCondition=${searchVO.searchCondition}&searchKeyword=${searchVO.searchKeyword}";
+   	document.swAssetMngForm.submit();
+}
+
+$(document).ready(function(){
+   $('#pageUnit').change(function(){
+	    document.swAssetMngForm.pageIndex.value = 1;
+		document.swAssetMngForm.action = "<c:url value='/crm/swm/SwMngList.do'/>?searchCondition=${searchVO.searchCondition}&searchKeyword=${searchVO.searchKeyword}";
+	   	document.swAssetMngForm.submit();
+   });
+}); 
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectSwAssetMng() {
+	//searchKeywordCd 칼럼별로 필터링
+	$('input[name="searchNtwrkCdList"]').val(Object.keys(dict).filter(function(keyword) { return keyword.includes('ITA02');})); //ITA02
+	$('input[name="searchSwTypeCdList"]').val(Object.keys(dict).filter(function(keyword) { return keyword.includes('ITA10');})); //ITA10
+	$('input[name="searchAssetStatCdList"]').val(Object.keys(dict).filter(function(keyword) { return keyword.includes('ITA03');})); //ITA03
+	$('input[name="searchMaintceCdList"]').val(Object.keys(dict).filter(function(keyword) { return keyword.includes('ITA05');})); //ITA05
+	$('input[name="searchMaintceInspCdList"]').val(Object.keys(dict).filter(function(keyword) { return keyword.includes('ITA06');})); //ITA06
+
+	document.swAssetMngForm.pageIndex.value = 1;
+	document.swAssetMngForm.action = "<c:url value='/crm/swm/SwMngList.do'/>?searchCondition=" + Object.keys(dict) + "&searchKeyword=" + Object.values(dict);
+	document.swAssetMngForm.submit();
+}
+/* ********************************************************
+ * 상세조회처리 함수
+ ******************************************************** */
+function selectSwAssetMngListDetail(swAssetId) {
+	document.swAssetMngForm.swAssetId.value = swAssetId;
+   	document.swAssetMngForm.action = "<c:url value='/crm/swm/SwMngUpdt.do'/>?searchCondition=${searchVO.searchCondition}&searchKeyword=${searchVO.searchKeyword}";
+	document.swAssetMngForm.submit();
+}
+
+/* ********************************************************
+ * 엔터key 목록조회  함수
+ ******************************************************** */
+function press() {
+    if (event.keyCode==13) {
+    	selectSwAssetMng();
+    }
+}
+
+/* ********************************************************
+ * 엑셀 다운로드하기
+ ******************************************************** */
+ function downloadExcel() {
+	$("#swAssetMngForm").attr("action", "<c:url value='/crm/swm/downloadExcel.do'/>");
+   	$("#swAssetMngForm").submit();
+}
+</script>
+<c:if test="${!empty resultMsg}"><script>alert("${resultMsg}");</script></c:if>
+
+
+</head>
+<body>
+
+	<noscript class="noScriptTitle"> <spring:message code="common.noScriptTitle.msg" />	</noscript>
+
+	<div class="board">
+	<form name="swAssetMngForm" id="swAssetMngForm" action ="<c:url value='/crm/swm/SwMngList.do' />" method="post">
+      <h1>SW자산 관리 목록</h1>
+	  <div style="width:100%; margin-bottom:7px;">
+	  	<p style="display:inline; font-size:15px; padding-left:15px; font-weight: bold;">검색 조건: 
+	  	<input type="text" id="searchLabel" readonly style="width:600px; border:none; font-size:15px;" placeholder="멀티 검색을 원할 경우 아래에서 선택하세요." value="${searchVO.searchKeyword}"/>
+	  	</p>
+	  </div>
+	  <!-- 다중 검색조건  -->
+	  <input type="hidden" name="searchNtwrkCdList" value="${fn:join(searchVO.searchNtwrkCdList, ',')}" />
+	  <input type="hidden" name="searchSwTypeCdList" value="${fn:join(searchVO.searchSwTypeCdList, ',')}" />
+  	  <input type="hidden" name="searchAssetStatCdList" value="${fn:join(searchVO.searchAssetStatCdList, ',')}" />
+	  <input type="hidden" name="searchMaintceCdList" value="${fn:join(searchVO.searchMaintceCdList, ',')}" />
+	  <input type="hidden" name="searchMaintceInspCdList" value="${fn:join(searchVO.searchMaintceInspCdList, ',')}" />
+		  
+	  <!-- 검색조건  -->
+	  <input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
+	  <input type="hidden" name="swAssetId" value="<c:out value='${searchVO.swAssetId}'/>"/>
+      <input type="hidden" name="checkedValueForDel" /><!-- 삭제 키 -->
+	 
+      <div class="search_box">
+        <ul style="text-align:center; display: flex; justify-content: space-around;">
+     
+          <li>
+            <label for="">네트워크 : </label> 
+            <select id="searchNtwrkCd" name="searchNtwrkCd" title="검색조건">
+            <option value=""> == 선택 ==</option>
+              <c:forEach var="item" items="${ntwrkList}" varStatus="status">         
+                <option value='${item.newComnCd}' <c:if test="${searchVO.searchNtwrkCd == item.newComnCd}">selected="selected"</c:if>>${item.comnCdNm}</option>  
+              </c:forEach>
+            </select>
+            <a href="#LINK" onclick="addSearchCondition('#searchNtwrkCd');">
+				<img src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+			</a>
+            </li> 
+          <li style="">
+            <label for="">SW유형 : </label> 
+                 <select id="searchSwTypeCd" name="searchSwTypeCd" title="검색조건">
+            <option value=""> == 선택 ==</option>
+              <c:forEach var="item" items="${swTypeList}" varStatus="status">         
+                <option value='${item.newComnCd}' <c:if test="${searchVO.searchSwTypeCd == item.newComnCd}">selected="selected"</c:if>>${item.comnCdNm}</option>  
+              </c:forEach>
+            </select>
+            <a href="#LINK" onclick="addSearchCondition('#searchSwTypeCd');">
+				<img src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+			</a>
+          </li>
+          <li>
+            <label for="">자산상태 : </label> 
+            <select id="searchAssetStatCd" name="searchAssetStatCd" title="검색조건">
+            <option value=""> == 선택 ==</option>
+              <c:forEach var="item" items="${assetStatList}" varStatus="status">         
+                <option value='${item.newComnCd}' <c:if test="${searchVO.searchAssetStatCd == item.newComnCd}">selected="selected"</c:if>>${item.comnCdNm}</option>  
+              </c:forEach>
+            </select>
+            <a href="#LINK" onclick="addSearchCondition('#searchAssetStatCd');">
+				<img src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+			</a>
+          </li>
+          <li style="">
+            <label for="">유지보수계약 : </label> 
+                 <select id="searchMaintceCd" name="searchMaintceCd" title="검색조건">
+            <option value=""> == 선택 ==</option>
+              <c:forEach var="item" items="${maintceCntrList}" varStatus="status">         
+                <option value='${item.newComnCd}' <c:if test="${searchVO.searchMaintceCd == item.newComnCd}">selected="selected"</c:if>>${item.comnCdNm}</option>  
+              </c:forEach>
+            </select>
+            <a href="#LINK" onclick="addSearchCondition('#searchMaintceCd');">
+				<img src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+			</a>
+          </li>
+          <li>
+            <label for="">점검주기 : </label> 
+            <select id="searchMaintceInspCd" name="searchMaintceInspCd" title="검색조건">
+            <option value=""> == 선택 ==</option>
+              <c:forEach var="item" items="${maintceInspList}" varStatus="status">         
+                <option value='${item.newComnCd}' <c:if test="${searchVO.searchMaintceInspCd == item.newComnCd}">selected="selected"</c:if>>${item.comnCdNm}</option>  
+              </c:forEach>
+            </select>
+            <a href="#LINK" onclick="addSearchCondition('#searchMaintceInspCd');">
+				<img src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+			</a>
+          </li>
+           
+        </ul>
+        <ul style="display: flex; justify-content: space-around; border-top: 1px solid #dddddd; padding-top: 10px; margin-top: 10px;">
+           <li>
+            <label for="">업무시스템 : </label> 
+            <select id="searchBizSytmCd" name="searchBizSytmCd" title="검색조건">
+            <option value=""> == 선택 ==</option>
+              <c:forEach var="item" items="${bizSytmList}" varStatus="status">         
+                <option value='${item.bizSytmCd}' <c:if test="${searchVO.searchBizSytmCd == item.bizSytmCd}">selected="selected"</c:if>>${item.bizSytmNm}</option>  
+              </c:forEach>
+            </select>
+            </li> 
+        <li>
+            <label for="">제조사 : </label>
+             <input id="searchMnftrNm" class="s_input3 vat" name="searchMnftrNm" type="text" value="<c:out value='${searchVO.searchMnftrNm}'/>" size="80" maxlength="60" onkeypress="press();"/>
+          </li> 
+          <li>
+            <label for="">제품명 : </label> 
+             <input id="searchProdNm" class="s_input3 vat" name="searchProdNm" type="text" value="<c:out value='${searchVO.searchProdNm}'/>" size="80" maxlength="60" onkeypress="press();"/>
+          </li>
+          <c:if test="${sessionScope.loginVO.authorCode eq 'ROLE_ADMIN'}">
+		  <li>
+			<label for="">삭제여부 : </label> 
+			<select id="searchDelYn" name="searchDelYn" title="검색조건" >
+				<option value="">== 선택 ==</option>
+				<option value="Y" <c:if test="${searchVO.searchDelYn == 'Y'}">selected="selected"</c:if>>Y</option>
+				<option value="N" <c:if test="${searchVO.searchDelYn == 'N'}">selected="selected"</c:if>>N</option>
+				</select>	
+		  </li>	
+		  </c:if>
+		  <li style="float:right;">					
+		  	<select id="pageUnit" name="pageUnit" title="검색조건" >
+				<option value="10"<c:if test="${searchVO.pageUnit == 10}">selected="selected"</c:if>>10개 보기</option>
+				<option value="20"<c:if test="${searchVO.pageUnit == 20}">selected="selected"</c:if>>20개 보기</option>
+				<option value="30"<c:if test="${searchVO.pageUnit == 30}">selected="selected"</c:if>>30개 보기</option>
+				<option value="50"<c:if test="${searchVO.pageUnit == 50}">selected="selected"</c:if>>50개 보기</option>
+				<option value="100"<c:if test="${searchVO.pageUnit == 100}">selected="selected"</c:if>>100개 보기</option>
+			</select>
+		 </li>
+          <li style="float:right;">
+          	<span class="btn_b"><a href="#LINK" onclick="resetSearchCondition(); return false;">초기화</a></span><!-- 등록 -->
+            <input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectSwAssetMng(); return false;" /><!-- 조회 -->
+            <span class="btn_b"><a href="#LINK" onclick="insertSwMngList();  return false;" title='<spring:message code="button.create" />'><spring:message code="button.create" /></a></span><!-- 등록 -->
+            <!-- <span class="btn_b"><a href="#LINK" onclick="fn_DeleteList(); return false;" title='<spring:message code="button.delete" />'><spring:message code="button.delete" /></a></span><!-- 삭제 -->
+          </li>
+        </ul>
+        
+      </div>
+
+      <table class="board_list">
+        <caption></caption>
+        <colgroup>
+          <col style="width:21px" />
+          <col style="width:21px" />
+          <col style="width:24px" />
+          <col style="width:21px" />
+          <col style="width:35px" />
+          <col style="width:30px" />
+          <col style="width:15px" />
+          <col style="width:15px" />
+          <col style="width:14px" />
+          <col style="width:18px" />
+          <col style="width:24px" />
+          
+          <col style="width:15px" />
+          <col style="width:14px" />
+        
+        </colgroup>
+        <thead>
+          <tr>
+             <th scope="col">SW자산ID</th>
+             <th scope="col">네트워크구분</th>
+             <th scope="col">업무시스템구분</th>
+             <th scope="col">SW유형</th>
+             <th scope="col">제품용도</th>
+             <th scope="col">제품명</th>
+             <th scope="col">자산상태</th>
+             <th scope="col">자산소유</th>
+             <th scope="col">유지보수계약</th>
+             <th scope="col">점검주기</th>
+             <th scope="col">제조사</th>
+             
+             <th scope="col">수량</th>
+             <th scope="col">삭제여부</th>
+          </tr>
+        </thead>
+        <tbody class="ov">
+          <%-- 데이터를 없을때 화면에 메세지를 출력해준다 --%>
+          <c:if test="${fn:length(resultList) == 0}">
+          <tr>
+            <td colspan="12">
+              <spring:message code="common.nodata.msg" />
+            </td>
+          </tr>
+          </c:if>
+           
+          <c:forEach var="result" items="${resultList}" varStatus="status">
+          <tr onclick="selectSwAssetMngListDetail('<c:out value="${result.swAssetId}"/>'); return false;">
+     
+            <td>
+              <c:out value="${result.swAssetId}"/>
+            </td>
+            <td title="<c:out value="${result.ntwrkDstnctCd}"/>" class="Elli">
+              <c:out value="${result.ntwrkDstnctCd}"/>
+            </td>
+            <td title="<c:out value="${result.bizSytmCd}"/>" class="Elli">
+              <c:out value="${result.bizSytmCd}"/>
+            </td>
+            <td title="<c:out value="${result.swTypeCd}"/>" class="Elli">
+              <c:out value="${result.swTypeCd}"/>
+            </td>
+            <td title="<c:out value="${result.prodPurp}"/>" class="Elli">
+              <c:out value="${result.prodPurp}"/>
+            </td>
+            <td title="<c:out value="${result.prodNm}"/>" class="Elli">
+              <c:out value="${result.prodNm}"/>
+            </td>
+            <td title="<c:out  value="${result.assetStatCd}"/>" class="Elli">			    
+              <c:out  value="${result.assetStatCd}"/>
+            </td>
+            <td title="<c:out  value="${result.assetOwnCd}"/>" class="Elli">			    
+              <c:out  value="${result.assetOwnCd}"/>
+            </td>
+            <td title="<c:out value="${result.maintceCntrCd}"/>" class="Elli">
+              <c:out value="${result.maintceCntrCd}"/>
+            </td>
+            <td title="<c:out value="${result.maintceInspCycleCd}"/>" class="Elli">
+              <c:out value="${result.maintceInspCycleCd}"/>
+            </td>
+            <td title="<c:out value="${result.mnftrNm}"/>" class="Elli">
+              <c:out value="${result.mnftrNm}"/>
+            </td>
+            <td title="<c:out value="${result.prodCoQty}"/>" class="Elli">
+              <c:out value="${result.prodCoQty}"/>
+            </td>
+            <td title="<c:out value="${result.delYn}"/>" class="Elli">
+              <c:out value="${result.delYn}"/>
+            </td>
+
+          </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+		<!-- paging navigation -->
+	  <div class="pagination">
+		<ul>
+			<ui:pagination paginationInfo="${paginationInfo}" type="image" jsFunction="linkPage"/>
+		</ul>
+		<p style="float:right;">총  ${paginationInfo.totalRecordCount}개</p>
+	  </div>
+	  
+	  <!-- 엑셀 다운로드 -->
+      <div>
+		<span style="float:right;" class="btn_s2"><a href="#LINK" onclick="downloadExcel(); return false;" title='엑셀 다운로드'>엑셀 다운로드</a></span>
+	  </div>
+    </form>
+    </div>
+</body>
+</html>

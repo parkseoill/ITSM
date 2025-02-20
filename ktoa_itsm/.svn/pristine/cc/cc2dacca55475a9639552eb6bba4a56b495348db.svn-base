@@ -1,0 +1,64 @@
+package truebon.com.opm.sla.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.com.cmm.EgovMessageSource;
+import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import truebon.com.opm.flr.model.FailureMngVO;
+import truebon.com.opm.sla.model.SLAMngVO;
+
+/**
+ * @Class Name : SLAMngController.java
+ * @Description : SLAMng Controller class
+ * @Modification Information
+ *
+ * @author 김승현
+ * @since 2023.08.07
+ * @version 1.0
+ * @see
+ *  
+ *  Copyright (C)  All right reserved.
+ */
+
+@Controller
+
+public class SLAMngController {
+
+	/**
+	 * SLA 목록화면 (paging)
+	 * @param searchVO - 조회할 정보가 담긴 SLAMngVO
+	 * @exception Exception
+	 */
+    @RequestMapping(value="/opm/sla/SLAMngList.do")
+    public String SLAMngList(@ModelAttribute("searchVO") SLAMngVO searchVO, ModelMap model) throws Exception {
+    	
+        return "/truebon/com/opm/sla/SLAMngList";
+    } 
+    
+    /**
+     * SLA관리 대장
+     * @param SLAMngVO
+     * @param SLAMngVO
+     * @param status
+     * @return
+     * @throws Exception
+     */
+   @RequestMapping("/opm/sla/SLAReport.do")
+   public String SLAReport(@ModelAttribute("SLAMngVO") SLAMngVO SLAMngVO, ModelMap model) throws Exception {
+      
+      return "/truebon/com/opm/sla/SLAReport";
+   }
+   
+}

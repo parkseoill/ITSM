@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="SvclifeMapper">
+   <resultMap id="SvclifeList" type="truebon.com.crm.slm.model.SvclifeMngVO">
+   		<result property="hwAssetId" column="HW_ASSET_ID" />
+		<result property="ntwrkDstnct" column="NTWRK_DSTNCT" />
+		<result property="vrtlzDstnct" column="VRTLZ_DSTNCT" />
+		<result property="hwType" column="HW_TYPE" />
+		<result property="hwTypeDtl" column="HW_TYPE_DTL" />
+		<result property="vrtlzType" column="VRTLZ_TYPE" />
+		<result property="upprHwAssetId" column="UPPR_HW_ASSET_ID" />
+		<result property="bizSytm" column="BIZ_SYTM" />
+		<result property="prodPurp" column="PROD_PURP" />
+		<result property="hostNm" column="HOST_NM" />
+		<result property="ipAddr" column="IP_ADDR" />
+		<result property="mnftrNm" column="MNFTR_NM" />
+		<result property="prodNm" column="PROD_NM" />
+		<result property="prodCoQty" column="PROD_CO_QTY" />
+		<result property="assetOwn" column="ASSET_OWN" />
+		<result property="serialno" column="SERIALNO" />
+		<result property="prodlocat" column="PRODLOCAT" />
+		<result property="assetStat" column="ASSET_STAT" />
+		<result property="ctrlYn" column="CTRL_YN" />	
+		<result property="maintceCntr" column="MAINTCE_CNTR" />
+		<result property="maintceCntrBeginDate" column="MAINTCE_CNTR_BEGIN_DATE" />
+		<result property="maintceCntrEndDate" column="MAINTCE_CNTR_END_DATE" />
+		<result property="maintceInspCycle" column="MAINTCE_INSP_CYCLE" />
+		<result property="maintceChrgrNo" column="MAINTCE_CHRGR_NO" />
+		<result property="entrngDate" column="ENTRNG_DATE" />
+		<result property="exanDate" column="EXAN_DATE" />
+		<result property="eoslDate" column="EOSL_DATE" />
+		<result property="appliYn" column="APPLI_YN" />
+		<result property="blcktRwrdTime" column="BLCKT_RWRD_TIME" />
+		<result property="rmarkText" column="RMARK_TEXT" />
+		<result property="osText" column="OS_TEXT" />
+		<result property="cpuText" column="CPU_TEXT" />
+		<result property="mmryText" column="MMRY_TEXT" />
+		<result property="diskText" column="DISK_TEXT" />
+		<result property="svcDupCnvrConfgYn" column="SVC_DUP_CNVR_CONFG_YN" />
+		<result property="dplctText" column="DPLCT_TEXT" />
+		<result property="ktoaAssetNo" column="KTOA_ASSET_NO" />	
+		<result property="delYn" column="DEL_YN" />		
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+        <result property="textYearCo" column="TEXT_YEAR_CO"/>
+        <result property="useYear" column="USE_YEAR"/>
+        <result property="excessYear" column="EXCESS_YEAR"/>
+   </resultMap>
+
+	 <select id="selectSvclifeList" parameterType="truebon.com.crm.slm.model.SvclifeMngVO" resultMap="SvclifeList">
+		SELECT 
+			  tha.HW_ASSET_ID 
+			, tccn1.COMN_CD_NM   NTWRK_DSTNCT
+			, tccn2.COMN_CD_NM   VRTLZ_DSTNCT
+			, tccn3.COMN_CD_NM   HW_TYPE
+			, tccn4.COMN_CD_NM   HW_TYPE_DTL
+			, tccn5.COMN_CD_NM   VRTLZ_TYPE
+			, tha.UPPR_HW_ASSET_ID 
+			, tbs.BIZ_SYTM_NM   BIZ_SYTM
+			, tha.PROD_PURP 
+			, tha.HOST_NM 
+			, tha.IP_ADDR 
+			, tha.MNFTR_NM 
+			, tha.PROD_NM 
+			, tccn7.COMN_CD_NM   ASSET_OWN
+			, tha.SERIALNO 
+			, tha.PRODLOCAT 
+			, tccn8.COMN_CD_NM   ASSET_STAT
+			, tha.CTRL_YN 
+			, tccn9.COMN_CD_NM   MAINTCE_CNTR
+			, tha.MAINTCE_CNTR_BEGIN_DATE 
+			, tha.MAINTCE_CNTR_END_DATE 
+			, tccn10.COMN_CD_NM   MAINTCE_INSP_CYCLE 
+			, tha.MAINTCE_CHRGR_NO 
+			, CASE 
+				WHEN tha.ENTRNG_DATE != '' 
+				THEN  CONCAT(SUBSTRING(tha.ENTRNG_DATE,1,4),'-' ,SUBSTRING(tha.ENTRNG_DATE,5,2),'-' ,SUBSTRING(tha.ENTRNG_DATE,7,2)) 
+				ELSE tha.ENTRNG_DATE
+				END AS ENTRNG_DATE
+			, CASE 
+				WHEN tha.EOSL_DATE != '' 
+				THEN  CONCAT(SUBSTRING(tha.EOSL_DATE,1,4),'-' ,SUBSTRING(tha.EOSL_DATE,5,2),'-' ,SUBSTRING(tha.EOSL_DATE,7,2)) 
+				ELSE tha.EOSL_DATE
+				END AS EOSL_DATE	 
+			, tha.EXAN_DATE 
+			, tha.APPLI_YN 
+			, tha.BLCKT_RWRD_TIME 
+			, tha.RMARK_TEXT 
+			, tha.OS_TEXT 
+			, tha.CPU_TEXT 
+			, tha.MMRY_TEXT 
+			, tha.DISK_TEXT 
+			, tha.SVC_DUP_CNVR_CONFG_YN 
+			, tha.DPLCT_TEXT 
+			, tha.KTOA_ASSET_NO 
+			, tha.REGSTR_ID 
+			, tha.DEL_YN
+			, tha.RDTT 
+			, tha.AMNDR_ID 
+			, tha.MDTT 			
+			, CAST(tdy.TEXT_YEAR_CO AS CHAR) AS TEXT_YEAR_CO 
+			, CASE 
+                WHEN tha.ENTRNG_DATE IS NULL OR TRIM(tha.ENTRNG_DATE) = '' THEN '0'
+                ELSE CAST(YEAR(CURRENT_DATE) - CAST(SUBSTRING(tha.ENTRNG_DATE, 1, 4) AS INT) AS CHAR)
+                END AS USE_YEAR
+            , CASE 
+                WHEN tha.ENTRNG_DATE IS NULL OR TRIM(tha.ENTRNG_DATE) = '' THEN '0'
+                ELSE CAST(((YEAR(CURRENT_DATE) - CAST(SUBSTRING(tha.ENTRNG_DATE, 1, 4) AS INT)) - tdy.TEXT_YEAR_CO) AS CHAR)
+                END AS EXCESS_YEAR
+		 FROM TB_HW_ASSET tha 
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn1 ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn2 ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn3 ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn4 ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn5 ON tha.VRTLZ_TYPE_CD  = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM   AS tbs ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn7 ON tha.ASSET_OWN_CD  = tccn7.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn8 ON tha.ASSET_STAT_CD  = tccn8.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn9 ON tha.MAINTCE_CNTR_CD  = tccn9.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn10 ON tha.MAINTCE_INSP_CYCLE_CD  = tccn10.NEW_COMN_CD	
+			LEFT JOIN TB_DUR_YEAR AS tdy ON tha.HW_TYPE_DTL_CD = tdy.HW_TYPE_DTL_CD
+		 WHERE 1=1	
+		<if test="searchKeyword1 !=null and searchKeyword1 !=''">
+				AND tbs.BIZ_SYTM_CD = #{searchKeyword1} 
+		</if>	
+		<if test="searchKeyword2 !=null and searchKeyword2 !=''">
+				AND tha.HW_TYPE_CD = #{searchKeyword2}
+		</if>
+		<if test="searchKeyword3 !=null and searchKeyword3 !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != null and searchKeyword4 != ''">
+                AND tha.ENTRNG_DATE IS NOT NULL 
+                AND tha.ENTRNG_DATE !='' 
+                AND ((YEAR(CURRENT_DATE) - CAST(SUBSTRING(tha.ENTRNG_DATE, 1, 4) AS INT)) - tdy.TEXT_YEAR_CO) >= #{searchKeyword4}
+        </if>
+        <if test="searchKeyword5 !=null and searchKeyword5 !=''">
+				AND tha.VRTLZ_DSTNCT_CD = #{searchKeyword5}
+		</if>
+		ORDER BY tha.HW_ASSET_ID DESC 
+		limit #{recordCountPerPage} offset #{firstIndex}
+	</select> 
+	
+	<select id="selectSvclifeListTotCnt" parameterType="truebon.com.crm.slm.model.SvclifeMngVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM TB_HW_ASSET tha 
+		LEFT JOIN TB_BIZ_SYSTEM AS tbs ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+		LEFT JOIN TB_DUR_YEAR AS tdy ON tha.HW_TYPE_DTL_CD = tdy.HW_TYPE_DTL_CD
+		WHERE 1=1
+        <if test="searchKeyword1 !=null and searchKeyword1 !=''">
+				AND tbs.BIZ_SYTM_CD = #{searchKeyword1} 
+		</if>	
+		<if test="searchKeyword2 !=null and searchKeyword2 !=''">
+				AND tha.HW_TYPE_CD = #{searchKeyword2}
+		</if>
+		<if test="searchKeyword3 !=null and searchKeyword3 !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != null and searchKeyword4 != ''">
+                AND tha.ENTRNG_DATE IS NOT NULL 
+                AND tha.ENTRNG_DATE !='' 
+                AND ((YEAR(CURRENT_DATE) - CAST(SUBSTRING(tha.ENTRNG_DATE, 1, 4) AS INT)) - tdy.TEXT_YEAR_CO) >= #{searchKeyword4}
+        </if>
+        <if test="searchKeyword5 !=null and searchKeyword5 !=''">
+				AND tha.VRTLZ_DSTNCT_CD = #{searchKeyword5}
+		</if>
+	</select>
+	
+	<select id="selectSvclifeEgoMap" parameterType="truebon.com.crm.slm.model.SvclifeMngVO" resultType="egovMap">
+	SELECT 
+			  tha.HW_ASSET_ID 
+			, tccn1.COMN_CD_NM   NTWRK_DSTNCT
+			, tccn2.COMN_CD_NM   VRTLZ_DSTNCT
+			, tccn3.COMN_CD_NM   HW_TYPE
+			, tccn4.COMN_CD_NM   HW_TYPE_DTL
+			, tccn5.COMN_CD_NM   VRTLZ_TYPE
+			, tha.UPPR_HW_ASSET_ID 
+			, tbs.BIZ_SYTM_NM   BIZ_SYTM
+			, tha.PROD_PURP 
+			, tha.HOST_NM 
+			, tha.IP_ADDR 
+			, tha.MNFTR_NM 
+			, tha.PROD_NM 
+			, tccn7.COMN_CD_NM   ASSET_OWN
+			, tha.SERIALNO 
+			, tha.PRODLOCAT 
+			, tccn8.COMN_CD_NM   ASSET_STAT
+			, tha.CTRL_YN 
+			, tccn9.COMN_CD_NM   MAINTCE_CNTR
+			, tha.MAINTCE_CNTR_BEGIN_DATE 
+			, tha.MAINTCE_CNTR_END_DATE 
+			, tccn10.COMN_CD_NM   MAINTCE_INSP_CYCLE 
+			, tha.MAINTCE_CHRGR_NO 
+			, CASE 
+				WHEN tha.ENTRNG_DATE != '' 
+				THEN  CONCAT(SUBSTRING(tha.ENTRNG_DATE,1,4),'-' ,SUBSTRING(tha.ENTRNG_DATE,5,2),'-' ,SUBSTRING(tha.ENTRNG_DATE,7,2)) 
+				ELSE tha.ENTRNG_DATE
+				END AS ENTRNG_DATE
+			, CASE 
+				WHEN tha.EOSL_DATE != '' 
+				THEN  CONCAT(SUBSTRING(tha.EOSL_DATE,1,4),'-' ,SUBSTRING(tha.EOSL_DATE,5,2),'-' ,SUBSTRING(tha.EOSL_DATE,7,2)) 
+				ELSE tha.EOSL_DATE
+				END AS EOSL_DATE	 
+			, tha.EXAN_DATE 
+			, tha.APPLI_YN 
+			, tha.BLCKT_RWRD_TIME 
+			, tha.RMARK_TEXT 
+			, tha.OS_TEXT 
+			, tha.CPU_TEXT 
+			, tha.MMRY_TEXT 
+			, tha.DISK_TEXT 
+			, tha.SVC_DUP_CNVR_CONFG_YN 
+			, tha.DPLCT_TEXT 
+			, tha.KTOA_ASSET_NO 
+			, tha.REGSTR_ID 
+			, tha.DEL_YN
+			, tha.RDTT 
+			, tha.AMNDR_ID 
+			, tha.MDTT 			
+			, CAST(tdy.TEXT_YEAR_CO AS CHAR) AS TEXT_YEAR_CO 
+			, CASE 
+                WHEN tha.ENTRNG_DATE IS NULL OR TRIM(tha.ENTRNG_DATE) = '' THEN '0'
+                ELSE CAST(YEAR(CURRENT_DATE) - CAST(SUBSTRING(tha.ENTRNG_DATE, 1, 4) AS INT) AS CHAR)
+                END AS USE_YEAR
+            , CASE 
+                WHEN tha.ENTRNG_DATE IS NULL OR TRIM(tha.ENTRNG_DATE) = '' THEN '0'
+                ELSE CAST(((YEAR(CURRENT_DATE) - CAST(SUBSTRING(tha.ENTRNG_DATE, 1, 4) AS INT)) - tdy.TEXT_YEAR_CO) AS CHAR)
+                END AS EXCESS_YEAR
+		 FROM TB_HW_ASSET tha 
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn1 ON tha.NTWRK_DSTNCT_CD = tccn1.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn2 ON tha.VRTLZ_DSTNCT_CD = tccn2.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn3 ON tha.HW_TYPE_CD = tccn3.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn4 ON tha.HW_TYPE_DTL_CD = tccn4.NEW_COMN_CD
+		 	LEFT JOIN TB_COMN_CD_NEW AS tccn5 ON tha.VRTLZ_TYPE_CD  = tccn5.NEW_COMN_CD
+			LEFT JOIN TB_BIZ_SYSTEM   AS tbs ON tha.BIZ_SYTM_CD  = tbs.BIZ_SYTM_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn7 ON tha.ASSET_OWN_CD  = tccn7.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn8 ON tha.ASSET_STAT_CD  = tccn8.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn9 ON tha.MAINTCE_CNTR_CD  = tccn9.NEW_COMN_CD
+			LEFT JOIN TB_COMN_CD_NEW AS tccn10 ON tha.MAINTCE_INSP_CYCLE_CD  = tccn10.NEW_COMN_CD	
+			LEFT JOIN TB_DUR_YEAR AS tdy ON tha.HW_TYPE_DTL_CD = tdy.HW_TYPE_DTL_CD
+		 WHERE 1=1	
+		<if test="searchKeyword1 !=null and searchKeyword1 !=''">
+				AND tbs.BIZ_SYTM_CD = #{searchKeyword1} 
+		</if>	
+		<if test="searchKeyword2 !=null and searchKeyword2 !=''">
+				AND tha.HW_TYPE_CD = #{searchKeyword2}
+		</if>
+		<if test="searchKeyword3 !=null and searchKeyword3 !=''">
+				AND tha.ASSET_STAT_CD = #{searchKeyword3}
+		</if>
+		<if test="searchKeyword4 != null and searchKeyword4 != ''">
+                AND tha.ENTRNG_DATE IS NOT NULL 
+                AND tha.ENTRNG_DATE !='' 
+                AND ((YEAR(CURRENT_DATE) - CAST(SUBSTRING(tha.ENTRNG_DATE, 1, 4) AS INT)) - tdy.TEXT_YEAR_CO) >= #{searchKeyword4}
+        </if>
+        <if test="searchKeyword5 !=null and searchKeyword5 !=''">
+				AND tha.VRTLZ_DSTNCT_CD = #{searchKeyword5}
+		</if>
+		ORDER BY tha.HW_ASSET_ID DESC 
+		limit #{recordCountPerPage} offset #{firstIndex}
+	</select>
+</mapper>

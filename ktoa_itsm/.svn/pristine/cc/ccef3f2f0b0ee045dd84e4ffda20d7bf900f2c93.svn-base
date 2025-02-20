@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+ /**
+  * @Class Name : FixedInspStus.jsp
+  * @Description : 정기점검현황 조회 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.08.07   김승현               최초 생성
+  *
+  *  @author 김승현
+  *  @since 2023.08.07
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>정기점검현황</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+
+<script language="javascript1.2" type="text/javaScript">
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectFixedInspMng() {
+	document.fixedInspMngForm.pageIndex.value = 1;
+	document.fixedInspMngForm.action = "<c:url value='/opm/fix/FixedInspMngList.do'/>";
+	document.fixedInspMngForm.submit();
+}
+
+/* ********************************************************
+ * 날짜체크처리 함수
+ ******************************************************** */
+function checkDate(){
+   var getDate = document.getElementById('selectedDate').value;
+   if(getDate != ""){
+      document.WorkScheduleMngForm.checkDate.value = getDate.concat('01');
+   }else{
+      alert("년도를 입력해주세요.");
+   } 
+}
+
+$(function() {
+	   //날짜 조회 달력
+	   $('.sdate').datepicker( {
+	        changeYear: true,
+	        showButtonPanel: true,
+	        gotoCurrent: true,
+	        currentText:"현재연도",
+	        dateFormat: 'yy',
+	        stepMonths: 12,
+	        beforeShow: function(input) {
+	            $(input).datepicker("widget").addClass('hide-month-calendar');
+	        },
+	        onClose: function(dateText, inst) { 
+	            $(this).datepicker('setDate', new Date(inst.selectedYear, 1));
+	            $(this).datepicker("widget").removeClass('hide-month-calendar');
+	        } 
+	}); 
+});
+</script>
+<style>
+.viewTable {
+	border-top: 2px solid #0c4ca4;
+}
+
+.viewTable thead th{
+	color: #222;
+	font-size: 13px;
+	font-weight: 400;
+	background: #f4f4f4;
+	padding: 8px 0;
+	border: 1px solid #d9d9d9;
+}
+
+.viewTable tbody td {
+	/* text-align: center; */
+	padding: 8px 5px;
+	border: 1px solid #d9d9d9;
+}
+</style>
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+
+<div class="board">
+	<h1>정기점검현황</h1>
+	<form name="fixedInspStusForm" id="fixedInspStusForm" action="<c:url value = '/opm/fix/FixedInspStus.do'/>" method="POST">
+		<div class="search_box">
+			<ul>
+				<li>
+					<label for="">날짜(년) :</label>
+					<input id="selectedDate" name="selectedDate" type="text" class="sdate" value="<c:out value='${searchVO.selectedDate}'/>" /> 
+					<input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectReplaceOffdayMng(); return false;"/> <!-- 조회 --> 
+				</li>
+			</ul>
+		</div>
+		<table class="viewTable" style="width:40%">
+			<colgroup>
+				<col style="width: 100px">
+			</colgroup>
+			<thead>
+				<tr>
+					<th>점검구분</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>점검율</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>월 점검</td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>분기 점검</td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>반기 점검</td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>합계</td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="viewTable">
+			<colgroup>
+				<col style="width: 100px">
+			</colgroup>
+			<thead>
+				<tr>
+					<th rowspan="2" align="center">점검주기</th>
+					<th colspan="2" align="center">1월</th>
+					<th colspan="2" align="center">2월</th>
+					<th colspan="2" align="center">3월</th>
+					<th colspan="2" align="center">4월</th>
+					<th colspan="2" align="center">5월</th>
+					<th colspan="2" align="center">6월</th>
+					<th colspan="2" align="center">7월</th>
+					<th colspan="2" align="center">8월</th>
+					<th colspan="2" align="center">9월</th>
+					<th colspan="2" align="center">10월</th>
+					<th colspan="2" align="center">11월</th>
+					<th colspan="2" align="center">12월</th>
+				</tr>
+				<tr>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>월 점검</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="viewTable" style="width:39%">
+			<colgroup>
+				<col style="width: 100px">
+			</colgroup>
+			<thead>
+				<tr>
+					<th rowspan="2" align="center">점검주기</th>
+					<th colspan="2" align="center">1분기</th>
+					<th colspan="2" align="center">2분기</th>
+					<th colspan="2" align="center">3분기</th>
+					<th colspan="2" align="center">4분기</th>
+				</tr>
+				<tr>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>분기 점검</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="viewTable" style="width: 30%">
+			<colgroup>
+				<col style="width: 100px">
+			</colgroup>
+			<thead>
+				<tr>
+					<th rowspan="2" align="center">점검주기</th>
+					<th colspan="2" align="center">상반기</th>
+					<th colspan="2" align="center">하반기</th>
+				</tr>
+				<tr>
+					<th>계획</th>
+					<th>실적</th>
+					<th>계획</th>
+					<th>실적</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>분기 점검</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+</body>
+</html>

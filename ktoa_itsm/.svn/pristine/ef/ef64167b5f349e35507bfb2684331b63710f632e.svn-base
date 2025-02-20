@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%
+	/**
+* @Class Name : ReplaceOffdayMng.jsp
+* @Description : 대휴관리
+* @Modification Information
+* @
+* @  수정일             수정자             수정내용
+* @ ----------   --------   ---------------------------
+* @ 2023.02.03   김승현            최초 생성
+*
+*  @author 김승현
+*  @since 2023.02.03
+*  @version 1.0
+*  @see
+*
+*/
+%>
+
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+
+<title>대휴관리</title>
+<!-- 공통 CSS -->
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/truebon/com/dlm/rep/replace.css' />">
+
+<script language="javascript1.2" type="text/javaScript">
+
+
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectReplaceOffdayMng() {
+   document.ReplaceOffdayMng.action = "<c:url value='/dlm/rep/ReplaceOffdayMng.do'/>";
+   document.ReplaceOffdayMng.submit();
+}
+
+/* ********************************************************
+ * 등록 화면 호출 함수
+ ******************************************************** */
+function insertReplaceMngList() {
+   	document.ReplaceOffdayMng.action = "<c:url value='/dlm/rep/RepalceOffdayRegist.do'/>";
+   	document.ReplaceOffdayMng.submit();
+}
+
+/* ********************************************************
+ * 날짜체크처리 함수
+ ******************************************************** */
+function checkDate(){
+   var getDate = document.getElementById('selectedDate').value;
+   if(getDate != ""){
+      document.WorkScheduleMngForm.checkDate.value = getDate.concat('01');
+   }else{
+      alert("년도를 입력해주세요.");
+   } 
+}
+
+/* ********************************************************
+ * 날짜 초기화 함수
+ ******************************************************** */
+function initializeDate(){
+   document.getElementById("selectedDate").value = null;
+}
+
+$(function() {
+   //기간 조회 달력
+   $('.sdate').datepicker( {
+        changeYear: true,
+        showButtonPanel: true,
+        gotoCurrent: true,
+        currentText:"현재연도",
+        dateFormat: 'yy',
+        stepMonths: 12,
+        beforeShow: function(input) {
+            $(input).datepicker("widget").addClass('hide-month-calendar');
+        },
+        onClose: function(dateText, inst) { 
+            $(this).datepicker('setDate', new Date(inst.selectedYear, 1));
+            $(this).datepicker("widget").removeClass('hide-month-calendar');
+        } 
+    });    
+
+   $(".colorChange").each(function(){
+      if($(this).find('#hdayNm').html() != ""){
+         $(this).find('#dyweek').css('color','#FF0000');
+      }
+   });
+   
+   
+   $("#currDate").val(getToday('yyyy-mm-dd'));
+   // 달력 생성
+   $('#currDate').datepicker({
+      onSelect: function(dateText){
+      console.log("Selected date:"+dateText+",current value"+this.value);
+      }
+   });
+   
+
+});
+
+$(document).ready(function() {
+
+	var selectNm = '';
+	
+	/*관리지일 떄 대휴 목록의 첫번째 정보로 상세 조회*/
+	if($('input[name="authorCode"]').val() == 'ROLE_ADMIN'){
+		selectNm = $('.replaceTr:first').find('td:eq(0)').text();
+	}else{ 
+	/*일반 사용자일 떄 로그인 된 정보로 상세 조회*/
+		selectNm = $('input[name="name"]').val();
+	}
+	
+	getReplaceDetail(selectNm);
+	getReplaceUseDetail(selectNm);
+	
+	$('.replaceTr:first').removeClass('highlight1');
+	$('.replaceTr:first').addClass('highlight1');
+
+	/* ********************************************************
+	 * 대휴 발생 현황, 대휴 사용 현황 선택 처리 함수
+	 ******************************************************** */
+	 
+	//초깃값 설정
+	$('.replaceList').show();
+	$('.replaceDetailList').show();
+	$('.replaceUseList').show();
+	$('.replaceDetailUseList').hide();
+  
+	$("input[name='repselect']").change(function(){
+		var chkValue = $('input[name="repselect"]:checked').val();
+
+		//발생대휴 선택
+		if(chkValue == '발생'){
+			$('.replaceDetailList').show();
+			$('.replaceDetailUseList').hide();
+			$('.delBtn').show();
+		}else{
+		//사용대휴 선택
+			$('.replaceDetailUseList').show();
+			$('.replaceDetailList').hide();
+			$('.delBtn').hide();
+		}
+	});
+	//삭제 선택
+	$("#deletechk_All").click(function() {
+		if($("#deletechk_All").is(":checked")) $("input[name=deletechk]").prop("checked", true);
+		else $("input[name=deletechk]").prop("checked", false);
+	});
+
+	$("input[name=deletechk]").click(function() {
+		var total = $("input[name=deletechk]").length;
+		var checked = $("input[name=deletechk]:checked").length;
+
+		if(total != checked) $("#deletechk_All").prop("checked", false);
+		else $("#deletechk_All").prop("checked", true); 
+	});
+	
+	//대휴 삭제 처리 함수
+	$(".delBtn").click(function() {
+		
+	    let checkSrs = "";
+	    let checkedCount = 0;
+	    
+	    $("input[name=deletechk]").each(function() {
+	    	if($(this).is(":checked") == true) {
+	    		checkSrs += checkedCount==0? $(this).val() : "," + $(this).val();
+	    		checkedCount++;
+	    	}
+	    });
+
+	    if(checkedCount ==0){
+			alert("선택된 대휴가 없습니다.");
+			return false;
+	    }
+
+	    if(confirm("<spring:message code="common.delete.msg" />")){	//삭제하시겠습니까?
+	    	$("#ReplaceOffdaydelete").attr("action", "<c:url value='/dlm/rep/ReplaceOffdaydelete.do'/>");
+	    	$("#ReplaceOffdaydelete").submit();
+	    }
+	});
+
+	/* ********************************************************
+	 * 선택한 담당자별 대휴 발생 상세 조회
+	 ******************************************************** */
+	function getReplaceDetail(selectNm){  
+		
+		var selectedDate = $("#selectedDate").val();
+		
+		$.ajax({
+		   url: "<c:url value='/dlm/rep/ReplaceOffdayList.do'/>",
+		   type: "POST", 
+		    data:{
+		       "selectNm":selectNm,
+		       "selectedDate":selectedDate
+		    },
+			dataType: 'json',
+			success : function(data){
+		      	//$('#detailReoffTb > tbody').empty(); //테이블 초기화
+		      	var results = data.replaceList;
+		      	var str = '<tr>';
+		
+		      	var checkbox = '';
+		      	
+		      $.each(results, function(i){
+		    	  
+				if($('input[name="authorCode"]').val() == 'ROLE_ADMIN'){
+					checkbox = '<td><input type="checkbox" name="deletechk" id="deletechk" value='+results[i].chrgrNo+','+results[i].repOffdayDate+'></td>'
+				}else{ 
+					checkbox = '</td><td>';
+				}
+		         str += 
+		         checkbox + 
+		         '<td>' + results[i].chrgrNm + 
+		         '</td><td>' + results[i].repOffdayDate + 
+		         '</td><td>' + results[i].repOffdayCnt + 
+		         '일</td><td>' + results[i].repOffdayRsn + 
+		         '</td></tr>';
+		      });
+		      $("#detailReoffTb").append(str);
+		   },
+		   error :function(){
+		      alert("<spring:message code="comCopBlog.articleBlogList.validate.occurError" />");//에러가 발생했습니다.
+		   }
+		});
+	}
+	
+	/* ********************************************************
+	 * 선택한 담당자별 대휴 사용 상세 조회
+	 ******************************************************** */
+	function getReplaceUseDetail(selectNm){
+		
+		var selectedDate = $("#selectedDate").val();
+		
+		$.ajax({
+		   url: "<c:url value='/dlm/rep/ReplaceOffdayUseList.do'/>",
+		   type: "POST", 
+		    data:{
+		       "selectNm":selectNm,
+		       "selectedDate":selectedDate
+		    },
+		   dataType: 'json',
+		   success : function(data){
+		      $('#detailReoffUseTb > tbody').empty(); //테이블 초기화
+		      var results = data.replaceUseList;
+		      var str = '<tr>';
+	
+		      $.each(results, function(i){
+		         str += 
+		         '</td><td>'+
+		         '<td>' + results[i].chrgrNm + 
+		         '</td><td>' + results[i].dlalzDate + 
+		         '</td><td>' + results[i].useRep + 
+		         '일</td><td>' + results[i].remarkText + 
+		         '</td></tr>';
+		      });
+		      $("#detailReoffUseTb").append(str);
+		      
+		   },
+		   error :function(){
+		      alert("<spring:message code="comCopBlog.articleBlogList.validate.occurError" />");//에러가 발생했습니다.
+		   }
+		}); 
+	}
+	
+	$('.replaceTr').click(function() {
+		//현재 row의 정보 가져오기 
+		var thisRow = $(this).closest('tr'); 
+		
+		//현재 row의 내용 가져오기
+		var selectNm = thisRow.find('td:eq(0)').text();
+		
+		$('tr').removeClass('highlight1');
+		$(this).addClass('highlight1');
+		
+		var chkValue = $('input[name="repselect"]:checked').val();
+
+		getReplaceDetail(selectNm);
+		getReplaceUseDetail(selectNm);
+
+	});
+	
+	/* ********************************************************
+	 * 대휴 발생 현황, 대휴 사용 현황 라디오 버튼 처리 함수
+	 ******************************************************** */
+	//초깃값 설정
+	$('.replaceDetailUseList').hide();
+	$('.replaceDetailList').show();
+     
+	$("input[name='repselect']").change(function(){
+		
+		 var chkValue = $('input[name="repselect"]:checked').val();
+		 if(chkValue == '발생'){
+	            $('.replaceDetailList').show();
+				$('.delBtn').show();
+	            $('.replaceDetailUseList').hide();
+		 }else{
+				$('.replaceDetailUseList').show();
+				$('.replaceDetailList').hide();
+				$('.delBtn').hide();
+		 }
+	});
+});
+
+
+<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if> //수정 메세지 창
+
+</script>
+
+<style>
+html, body {
+	height: 100%;
+}
+
+.board{
+	height: 74%;
+}
+.listTable > div{
+	float:left;
+	margin-top:7px;
+	margin-left: 1%;
+}
+
+tr.highlight1 {
+	background-color: #eef3fb;
+}
+</style>
+
+</head>
+<body>
+	<noscript class="noScriptTitle">
+		<spring:message code="common.noScriptTitle.msg" />
+	</noscript>
+	<!-- 자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다. -->
+
+	<div class="board">
+		<!-- 타이틀 -->
+		<h1>대휴 관리</h1>
+		<form name="ReplaceOffdayMng" id="ReplaceOffdayMng" action="<c:url value='/dlm/rep/RepalceOffdayRegist.do' />" method="post">
+			<input type="hidden" name="name" id="name" value="${loginVO.name}" />
+			<input type="hidden" name="authorCode" value="<c:out value='${sessionScope.loginVO.authorCode}'/>"/>
+			<!-- 달력 -->
+			<div class="search_box">
+				<ul class="search_box-ul_bottom">
+					<li><label for="">날짜(년) : </label> <input id="selectedDate" name="selectedDate" type="text" class="sdate" value="<c:out value='${searchVO.selectedDate}'/>" /> 
+						<input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectReplaceOffdayMng(); return false;"/> <!-- 조회 --> 
+						<span class="btn_b"><a href="#LINK'/>" onclick="initializeDate(); return false;">초기화</a></span> <!-- 초기화 --> 
+						<c:if test='${loginVO.authorCode eq "ROLE_ADMIN" || loginVO.chrgrNo == "0001"}'>
+							<span class="btn_b"><a href="#LINK" onclick="insertReplaceMngList(); return false;" title='<spring:message code="button.create" />'><spring:message code="button.create" /></a></span><!-- 등록 -->
+						</c:if>
+					</li>
+				</ul>
+			</div>
+		</form>
+		<div class="contentDiv">
+			<div class="repOffDayInfo">
+				<div class="remindDaysDiv">
+					<p class="remindDays">잔여대휴</p>
+					<p class="remindDaysTxt">
+						<span>${totRemainingRep}</span> 일
+					</p>
+				</div>
+				<div class="daysDiv">
+					<p style="padding-bottom: 13px;">
+						<span class="totalDays">총 대휴</span> <strong class="days"><span class="totalDaysTxt">${totRep}</span> 일</strong>
+					</p>
+	
+					<p>
+						<span class="useDays">사용대휴</span> <strong class="days"><span class="useDaysTxt">${totUseRep}</span> 일</strong>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="listTable">
+			<c:if test='${loginVO.authorCode eq "ROLE_ADMIN" || loginVO.chrgrNo == "0001"}'>
+			<div class="replaceList" style="width: 35%; height: 100%;">
+				<!-- 대휴 현황 테이블 -->
+				<table class="board_list" style="position: sticky; top: 0px;">
+					<colgroup>
+						<col style="width: 25%" />
+					</colgroup>
+					<thead >
+						<tr >
+							<th scope="col">성명</th>
+							<th scope="col">발생대휴</th>
+							<th scope="col">사용대휴</th>
+							<th scope="col">잔여대휴</th>
+						</tr>
+					</thead>
+				</table>
+				<table class="board_list" style="border-top: none;">
+					<colgroup>
+						<col style="width: 25%" />
+					</colgroup>
+					<tbody class="ov">
+						<%-- 데이터가 없을때 화면에 메세지를 출력해준다 --%>
+						<c:if test="${fn:length(replaceList) == 0}">
+							<tr>
+								<td colspan="2"><spring:message code="common.nodata.msg" /></td>
+							</tr>
+						</c:if>
+						<c:forEach var="result" items="${replaceList}" varStatus="status">
+							<tr class="replaceTr" style="text-align: center;">
+								<td>${result.chrgrNm}</td>
+								<td>${result.repSum}일</td>
+								<td>${result.useRepSum}일</td>
+								<td>${result.remainingRep}일</td>
+							</tr>
+						</c:forEach>
+						<c:if test="${fn:length(replaceList) != 0}">
+							<tr class="sum" style="position: sticky; top: 0px;">
+								<td style="border-bottom-width: 0px;">합계</td>
+								<td style="border-bottom-width: 0px;">${totRep}일</td>
+								<td style="border-bottom-width: 0px;">${totUseRep}일</td>
+								<td style="border-bottom-width: 0px;">${totRemainingRep}일</td>
+							</tr>
+						</c:if>
+					</tbody>
+				</table>
+			</div>		
+			</c:if>
+			
+			<div style="width: 46%; height: 100%; ">
+				<!-- 대휴 발생 현황(상세) 테이블 -->
+				<div class="replaceDetailList" >
+					<table class="board_list" style="position: sticky; top: 0px;">
+						<colgroup>
+							<col style="width: 7%" />
+							<col style="width: 15%" />
+							<col style="width: 25%" />
+							<col style="width: 15%" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col"><c:if test="${loginVO.authorCode eq 'ROLE_ADMIN'}"><input type="checkbox" id="deletechk_All"></c:if></th>
+								<th scope="col">성명</th>
+								<th scope="col">근무일</th>
+								<th scope="col">발생대휴</th>
+								<th scope="col">사유</th>
+							</tr>
+						</thead>
+					</table>
+					<form name="ReplaceOffdaydelete" id="ReplaceOffdaydelete" action="<c:url value='/dlm/rep/ReplaceOffdaydelete.do' />" method="post">
+						<table class="board_list" id="detailReoffTb" style="border-top: none;">
+							<colgroup>
+								<col style="width: 7%" />
+								<col style="width: 15%" />
+								<col style="width: 25%" />
+								<col style="width: 15%" />
+							</colgroup>
+							<tbody class="ov" style="overflow: auto;">
+								<%-- 데이터가 없을때 화면에 메세지를 출력해준다 --%>
+								<c:if test="${fn:length(replaceList) == 0}">
+									<tr>
+										<td colspan="5"><spring:message code="common.nodata.msg" /></td>
+									</tr>
+								</c:if>
+							</tbody>
+						</table>
+					</form>
+				</div>
+	
+				<!-- 대휴 사용 현황(상세) 테이블 -->
+				<div class="replaceDetailUseList">
+					<table class="board_list" style="position: sticky; top: 0px;">
+						<colgroup>
+							<col style="width: 7%" />
+							<col style="width: 15%" />
+							<col style="width: 25%" />
+							<col style="width: 15%" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col"></th>
+								<th scope="col">성명</th>
+								<th scope="col">사용일</th>
+								<th scope="col">사용대휴</th>
+								<th scope="col">비고</th>
+							</tr>
+						</thead>
+					</table>
+					<table class="board_list" id="detailReoffUseTb" style="border-top: none;">
+						<colgroup>
+							<col style="width: 7%" />
+							<col style="width: 15%" />
+							<col style="width: 25%" />
+							<col style="width: 15%" />								
+						</colgroup>
+						<tbody class="ov">
+							<%-- 데이터가 없을때 화면에 메세지를 출력해준다 --%>
+							<c:if test="${fn:length(replaceUseList) == 0}">
+								<tr>
+									<td colspan="5"><spring:message code="common.nodata.msg" /></td>
+								</tr>
+							</c:if>
+						</tbody>
+					</table>
+				</div>
+				<!-- 대휴 발생 현황, 대휴 사용 현황 선택 -->
+				<div class="repSelect">
+					<input type="radio" name="repselect" id="repselect" value="발생" checked="checked"><label for="repselect">대휴 발생 현황</label> 
+					<input type="radio" name="repselect" id="repselectUse" value="사용"><label for="repselectUse">대휴 사용 현황</label>
+				</div>
+				<c:if test='${loginVO.authorCode eq "ROLE_ADMIN"}'><button class="delBtn">선택 삭제</button></c:if><!-- 삭제 -->
+			</div>
+		</div>
+	</div>
+</body>
+</html>

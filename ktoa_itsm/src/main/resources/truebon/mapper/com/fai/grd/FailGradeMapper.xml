@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="FailGradeMapper">
+
+	<resultMap id="FailGradeList"
+		type="truebon.com.fai.grd.model.FailGradeVO">
+		<result property="failrInfldgCd" column="FAILR_INFLDG_CD" />
+		<result property="failrEmgdgrCd" column="FAILR_EMGDGR_CD" />
+		<result property="failrGrdCd" column="FAILR_GRD_CD" />
+		<result property="failrInfldgNm" column="FAILR_INFLDG_NM" />
+		<result property="failrEmgDgrNm" column="FAILR_EMGDGR_NM" />
+		<result property="failrGrdNm" column="FAILR_GRD_NM" />
+		<result property="rmarkText" column="RMARK_TEXT" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+
+
+	<select id="selectFailGradeList"
+		parameterType="truebon.com.fai.grd.model.FailGradeVO"
+		resultType="truebon.com.fai.grd.model.FailGradeVO">
+		SELECT
+		tfg.FAILR_INFLDG_CD AS FAILR_INFLDG_CD,
+		tc2.COMN_CD_NM AS FAILR_INFLDG_NM,
+		MAX(CASE WHEN tfg.FAILR_EMGDGR_CD = 'FLR0401' THEN tc.COMN_CD_NM ELSE NULL END) AS G1,
+		MAX(CASE WHEN tfg.FAILR_EMGDGR_CD = 'FLR0402' THEN tc.COMN_CD_NM ELSE NULL END) AS G2,
+		MAX(CASE WHEN tfg.FAILR_EMGDGR_CD = 'FLR0403' THEN tc.COMN_CD_NM ELSE NULL END) AS G3
+		FROM TB_FAIL_GRADE tfg
+		LEFT OUTER JOIN TB_COMN_CD_NEW tc
+		ON tfg.FAILR_GRD_CD = tc.NEW_COMN_CD
+		LEFT OUTER JOIN TB_COMN_CD_NEW tc2
+		ON tfg.FAILR_INFLDG_CD = tc2.NEW_COMN_CD
+		GROUP BY tfg.FAILR_INFLDG_CD
+	</select>
+
+
+	<select id="selectFailGradeListTotCnt"
+		parameterType="truebon.com.fai.grd.model.FailGradeVO" resultType="int">
+		SELECT
+		COUNT(*) totcnt
+		FROM TB_FAIL_GRADE tfg
+		LEFT OUTER JOIN
+		TB_COMN_CD_NEW tc
+		ON tfg.FAILR_GRD_CD = tc.NEW_COMN_CD
+		LEFT OUTER JOIN
+		TB_COMN_CD_NEW tc2
+		ON tfg.FAILR_INFLDG_CD = tc2.NEW_COMN_CD
+		GROUP BY
+		tfg.FAILR_INFLDG_CD
+	</select>
+
+	<select id="selectFailGrade"
+		parameterType="truebon.com.fai.grd.model.FailGradeVO"
+		resultType="truebon.com.fai.grd.model.FailGradeVO">
+		SELECT
+		tc.COMN_CD_NM AS FAILR_INFLDG_NM,
+		tc2.COMN_CD_NM AS FAILR_EMGDGR_NM,
+		tc3.COMN_CD_NM AS FAILR_GRD_NM, tfg.RMARK_TEXT,
+		tfg.FAILR_INFLDG_CD AS FAILR_INFLDG_CD,
+		tfg.FAILR_EMGDGR_CD AS FAILR_EMGDGR_CD,
+		tfg.FAILR_GRD_CD AS FAILR_GRD_CD,
+		tfg.RMARK_TEXT AS RMARK_TEXT
+		FROM
+		ktoa_itsm.TB_FAIL_GRADE tfg
+		LEFT OUTER JOIN ktoa_itsm.TB_COMN_CD_NEW tc
+		ON tc.NEW_COMN_CD = tfg.FAILR_INFLDG_CD
+		LEFT OUTER JOIN
+		ktoa_itsm.TB_COMN_CD_NEW tc2
+		ON tc2.NEW_COMN_CD = tfg.FAILR_EMGDGR_CD
+		LEFT OUTER JOIN ktoa_itsm.TB_COMN_CD_NEW tc3
+		ON tc3.NEW_COMN_CD = tfg.FAILR_GRD_CD
+		WHERE tfg.FAILR_INFLDG_CD = #{failrInfldgCd} AND
+		tfg.FAILR_EMGDGR_CD = #{failrEmgdgrCd}
+	</select>
+
+	<update id="updateFailGrade"
+		parameterType="truebon.com.fai.grd.model.FailGradeVO">
+		UPDATE TB_FAIL_GRADE 
+		SET
+			FAILR_GRD_CD = #{failrGrdCd},
+			RMARK_TEXT = #{rmarkText},
+			AMNDR_ID = #{amndrId},
+			MDTT = SYSDATE()
+		WHERE FAILR_INFLDG_CD = #{failrInfldgCd} AND FAILR_EMGDGR_CD = #{failrEmgdgrCd}
+	</update>
+	
+	<select id="selectGradeList" parameterType="truebon.com.opm.com.model.ComnCdNewVO" resultType="truebon.com.opm.com.model.ComnCdNewVO">
+		SELECT
+		tccn.NEW_COMN_CD AS NEW_COMN_CD,
+		tccn.COMN_CD_NM  AS COMN_CD_NM
+		FROM ktoa_itsm.TB_COMN_CD_NEW tccn
+		WHERE tccn.UPPR_NEW_COMN_CD = 'FLR05'
+	</select>
+
+</mapper>

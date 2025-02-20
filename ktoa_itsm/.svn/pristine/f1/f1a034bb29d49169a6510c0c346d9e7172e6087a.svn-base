@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%
+ /**
+  * @Class Name : CompuSytmList.jsp
+  * @Description : 전산시스템현황 화면
+  * @Modification Information
+  * @
+  * @  수정일                    수정자                   수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.10.19   이미현                   최초 생성
+  *
+  *  @author 이미현
+  *  @since 2023.10.19
+  *  @version 1.0
+  *  @see
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>전산시스템현황</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+</head>
+
+<script language="javascript1.2" type="text/javascript">
+/* ********************************************************
+ * 엔터key 목록조회  함수
+ ******************************************************** */
+function press() {
+    if (event.keyCode==13) {
+    	selectCompuSytm();
+    }
+}
+
+/* ********************************************************
+ * 엑셀 다운로드하기
+ ******************************************************** */
+ function downloadExcel() {
+	 document.compuSytmForm.action = "<c:url value='/crm/csc/downloadExcel.do'/>";
+	 document.compuSytmForm.submit();
+}
+</script>
+
+<c:if test="${!empty resultMsg}">
+    <script>
+        alert("${resultMsg}");
+    </script>
+</c:if>
+
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+
+<div class="board">
+	<h1>전산시스템 현황</h1>
+</div>	
+	
+<form name="compuSytmForm" action="<c:url value='/crm/csc/CompuSytmList.do'/>" method="post">
+	<div class="search_box">
+	<ul>
+	       <li>
+	           <label for="">자산상태 : </label> &nbsp;
+	           <select id="searchKeyword" name="searchKeyword" title="검색조건">
+	           <option value=""> ==선택== </option>
+               <c:forEach var="asset" items="${assetStatCdList}" varStatus="status">         
+					<option value="${asset.comnCdId}" <c:if test="${searchVO.searchKeyword == asset.comnCdId}">selected="selected"</c:if>>${asset.comnCdNm}</option>  
+			   </c:forEach> 
+	           </select>
+	        </li> 
+	        <li style="float:right;">
+	            <input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectCompuSytm(); return false;" /><!-- 조회 -->
+	        </li>
+	</ul>
+	</div>
+	
+	<table class="board_list">
+	<caption></caption>
+	<colgroup>
+			<col style="width:15px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" />
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+	    </colgroup>
+	    <thead>
+	        <tr>
+			   <th scope="col">업무시스템</th>
+			   <th scope="col">서버</th>
+			   <th scope="col">VM</th>
+			   <th scope="col">네트워크</th>
+			   <th scope="col">보안장비</th>
+			   <th scope="col">스토리지</th>
+			   <th scope="col">백업장비</th>
+			   <th scope="col">기반시설</th>
+			   <th scope="col">기타장비</th>
+			   <th scope="col">SW</th>
+			   <th scope="col">총계</th>
+	        </tr>
+	    </thead>
+	    
+	    <tbody class="ov">
+          <c:forEach var="result" items="${compuSytmList}" varStatus="status"> 
+          <tr>
+          <td>
+			 <c:out value="${result.bizSytm}"/>     <!--업무시스템  -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.hwTypeServer}"/>     <!--HW유형 (서버)  -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.vrType}"/>     <!--가상화(VM) 구분 -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.hwTypeNtwrk}"/>     <!--HW유형 (네트워크) -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.hwTypeSecurity}"/>     <!--HW유형 (보안장비) -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.hwTypeStorage}"/>     <!--HW유형 (스토리지) -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.hwTypeBackup}"/>     <!--HW유형 (백업장비) -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.hwTypeBase}"/>     <!--HW유형 (기반시설) -->
+		  </td>
+		 
+		  <td>
+			 <c:out value="${result.hwTypeEtc}"/>     <!--HW유형 (기타장비) -->
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.swTypeCount}"/>     <!--SW유형 (전체) -->
+		  </td>
+		  
+          <td>
+			 <c:out value="${result.totalTypeCount}"/>     <!--HW+SW (총합계) -->
+		  </td>
+          </tr>
+            </c:forEach> 
+
+	    </tbody>
+	</table>
+	
+	
+	
+	<!-- 소계 -->
+	<table class="board_list">
+	
+	<caption></caption>
+	<colgroup>
+			<col style="width:15px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+	</colgroup>
+	
+	 <tbody class="ov">
+	 
+	 <c:forEach var="result" items="${compuSytmList}" varStatus="status"> 
+		  <tr>
+			<c:out value="${result.hwTypeNtwrkSt}"/> 
+		  </tr>
+		  
+		  <tr>
+			 <c:out value="${result.vrTypeSt}"/> 
+		  </tr>
+		  
+		  <tr>
+			 <c:out value="${result.hwTypeSecuritySt}"/> 
+		  </tr>
+		  
+		  <tr>
+			<c:out value="${result.hwTypeStorageSt}"/> 
+		  </tr>
+		  
+		  <tr>
+			 <c:out value="${result.hwTypeBackupSt}"/> 
+		  </tr>
+		  
+		  <tr>
+			<c:out value="${result.hwTypeBaseSt}"/> 
+		  </tr>
+		 
+		  <tr>
+			<c:out value="${result.hwTypeEtcSt}"/> 
+		  </tr>
+		  
+		  <tr>
+			<c:out value="${result.swTypeCountSt}"/> 
+		  </tr>
+		  
+          <tr>
+			 <c:out value="${result.totalTypeCountSt}"/> 
+		  </tr>
+	 </c:forEach>
+	 </tbody>
+	</table>
+	
+
+	
+	<!--HW합계  -->
+	<table class="board_list">
+	<caption></caption>
+	<colgroup>
+			<col style="width:15px" /> 
+			<col style="width:10px" />
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+	</colgroup>
+	    
+	    <tbody class="ov">
+        <tr>
+          <td>
+			 HW 합계
+		  </td>
+		  
+		  <td colspan="10">
+		     <c:out value="${hwTypeSum}"/> 
+		  </td>
+
+        </tr>
+	    </tbody>
+	</table>
+	
+	<!--SW합계  -->
+	<table class="board_list">
+	<caption></caption>
+	<colgroup>
+			<col style="width:15px" /> 
+			<col style="width:10px" />
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+	</colgroup>
+	    
+	    <tbody class="ov">
+        <tr>
+          <td>
+			 SW 합계
+		  </td>
+		  
+		  <td colspan="10">
+		     <c:out value="${swTypeSum}"/> 
+		  </td>
+		  
+        </tr>
+	    </tbody>
+	</table>
+	
+	
+	<br><br>
+	<!--엑셀 다운로드-->
+    <div style="float:right;">
+			<span class="btn_s2"><a href="#LINK" onclick="downloadExcel(); return false;" title='엑셀 다운로드'>엑셀 다운로드</a></span><!-- 엑셀 다운로드 -->
+    </div>
+	 
+	</form>
+
+</body>
+</html>

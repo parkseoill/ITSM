@@ -1,0 +1,293 @@
+package truebon.com.dlm.dla.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import javax.annotation.Resource;
+
+import org.hsqldb.lib.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.ModelAndView;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.com.cmm.EgovMessageSource;
+import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.util.EgovUserDetailsHelper;
+import egovframework.com.utl.wed.web.EgovWebEditorImageController;
+import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import truebon.com.dlm.dla.model.Dlalz;
+import truebon.com.dlm.dla.model.DlalzVO;
+import truebon.com.dlm.dla.service.DlalzQRService;
+import truebon.com.sys.chr.model.ChargerVO;
+import truebon.com.sys.chr.service.ChargerService;
+
+
+@Controller
+@SessionAttributes(types=Dlalz.class)
+public class DlalzQRController {
+
+	/* Validator */
+	@Autowired
+	private DefaultBeanValidator beanValidator;
+
+	/** EgovPropertyService */
+    @Resource(name = "propertiesService")
+    protected EgovPropertyService propertiesService;
+	
+	/** EgovMessageSource */
+    @Resource(name="egovMessageSource")
+    EgovMessageSource egovMessageSource;
+	
+    /** 근태  Service */
+    @Resource(name = "DlalzQRService")
+    private DlalzQRService dlalzQRService;
+    
+    /** 담당자 Service */
+    @Resource(name = "ChargerService")
+    private ChargerService chargerService;
+    
+    /** 로그설정 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(DlalzQRController.class);
+    
+    /**
+     * 근태QR 출근 등록화면
+     * @param DlalzVO
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/dlm/dla/DlalzQRAtRegist.do")
+    public String DlalzQRAtRegist(
+            @ModelAttribute("dlalzVO") DlalzVO dlalzVO,
+            Model model)
+            throws Exception {
+        
+    	model.addAttribute("dlalzVO", dlalzVO);
+        return "/truebon/com/dlm/dla/DlalzQRAtRegist";
+    }
+
+    /**
+     * 근태QR 출근, 퇴근 등록
+     * @param DlalzVO
+     * @param bindingResult
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/dlm/dla/insertDlalzQRRegist.do")
+    public ModelAndView insertDlalzQRRegist(
+            @ModelAttribute("dlalzVO") DlalzVO dlalzVO,
+            BindingResult bindingResult,
+            Model model)
+            throws Exception {
+    	String resultMsg    = "";
+    	
+    	ModelAndView mav = new ModelAndView("jsonView");
+    	
+    	try {
+    		// 담당자 확인
+	    	DlalzVO dlalzVO2 = new DlalzVO();
+	    	dlalzVO2 = dlalzQRService.selectDlalzQR(dlalzVO);
+	    	
+	    	// 현재 시간 생성
+	    	LocalDateTime currDateTime = LocalDateTime.now();
+	    	String formatedCurrDateTime = currDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	    	String formatedCurrTime = currDateTime.format(DateTimeFormatter.ofPattern("HH"));
+	    	System.out.println("formatedCurrDateTime:"+formatedCurrDateTime);
+	    	
+	    	if("AT".equals(dlalzVO.getAtLeGubun())) {
+	    		if(dlalzVO2==null) {
+		    		resultMsg = "담당자 정보가 없거나 월 데이터가 없습니다.<br/><br/>관리자에게 문의 바랍니다.";
+		    	} else if(!StringUtil.isEmpty(dlalzVO2.getAtendTime())) {
+		    		resultMsg = dlalzVO2.getChrgrNm() + "님 이미 출근 처리되었습니다.";
+		    	} else {
+		    		dlalzVO2.setWrkTypeCd("1");
+		    		if(dlalzVO2.getDlalzDstnctCd().equals("2") || dlalzVO2.getChrgrRoleCd().equals("04"))
+		    		{
+		    			dlalzVO2.setDlalzDstnctCd("1");
+		    			if(!dlalzVO2.getOffdayTypeCd().equals("4")) {
+		    				dlalzVO2.setOffdayTypeCd(null);
+		    			}		    				    			
+		    		}	    			
+	    			if("04".equals(dlalzVO2.getChrgrRoleCd())) {
+	    				dlalzVO2.setOffdayTypeCd(null);
+	    			}	
+	    			if(Integer.parseInt(formatedCurrTime) >= 18) {
+	    				dlalzVO2.setWrkTimeCd("2");
+	    			}else {
+	    				dlalzVO2.setWrkTimeCd("1");
+	    			}	    			
+		    		
+		    		int iResult = 0;
+		    		dlalzVO2.setAtendTime(formatedCurrDateTime);
+		    		LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+		    		if(user==null) {
+		    			dlalzVO2.setAmndrId("system");
+		    		}
+		    		else {
+			    		dlalzVO2.setAmndrId(user.getId());
+		    		}		    	
+		    		iResult = dlalzQRService.updateDlalzQR(dlalzVO2);
+		    		if(iResult>0) {
+		    			resultMsg = dlalzVO2.getChrgrNm() + "님 출근 처리되었습니다.";	
+		    		} else {
+		    			resultMsg = dlalzVO2.getChrgrNm() + "님 출근 처리가 실패하였습니다.<br/><br/>관리자에게 문의 바랍니다.";
+		    		}
+		    	}
+	    	} else if("LE".equals(dlalzVO.getAtLeGubun())) {
+	    		if(dlalzVO2==null) {
+		    		resultMsg = "담당자 정보가 없거나 월 데이터가 없습니다.<br/><br/>관리자에게 문의 바랍니다.";
+	    		} else if(StringUtil.isEmpty(dlalzVO2.getAtendTime())) {
+	    			resultMsg = dlalzVO2.getChrgrNm() + "님 금일 출근정보가 없습니다.<br/><br/>야근 후 퇴근이라면 출근한 날로 변경하여 퇴근 처리 바랍니다.";
+	    		} else if(!StringUtil.isEmpty(dlalzVO2.getLeofcTime())) {
+		    		resultMsg = dlalzVO2.getChrgrNm() + "님 이미 퇴근 처리되었습니다.";
+		    	} else {
+		    		int iResult = 0;
+		    		dlalzVO2.setLeofcTime(formatedCurrDateTime);
+		    		LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+		    		if(user==null) {
+		    			dlalzVO2.setAmndrId("system");
+		    		}
+		    		else {
+			    		dlalzVO2.setAmndrId(user.getId());
+		    		}		  
+		    		iResult = dlalzQRService.updateDlalzQR(dlalzVO2);
+		    		if(iResult>0) {
+		    			resultMsg = dlalzVO2.getChrgrNm() + "님 퇴근 처리되었습니다.";	
+		    		} else {
+		    			resultMsg = dlalzVO2.getChrgrNm() + "님 퇴근 처리가 실패하였습니다.<br/><br/>관리자에게 문의 바랍니다.";
+		    		}
+		    	}
+	    	} else {
+	    		resultMsg = "잘못된 요청으로 처리가 실패하였습니다.<br/><br/>관리자에게 문의 바랍니다.";
+	    	}
+	    	
+    	} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+    	}
+    		
+    	mav.addObject("resultMsg", resultMsg);
+    	
+    	return mav;
+    }
+    
+    /**
+	 * 근태QR 출퇴근 목록화면 (pageing)
+	 * @param searchVO - 조회할 정보가 담긴 DlalzVO
+	 * @exception Exception
+	 */
+    @RequestMapping(value="/dlm/dla/DlalzQRList.do")
+    public ModelAndView DlalzQRList(@ModelAttribute("searchVO") DlalzVO searchVO, 
+    		ModelMap model)
+            throws Exception {	
+    	
+    	ModelAndView mav = new ModelAndView("jsonView");
+    	
+    	/** EgovPropertyService.sample */
+    	searchVO.setPageUnit(propertiesService.getInt("pageUnit"));
+    	searchVO.setPageSize(propertiesService.getInt("pageSize"));
+    	
+    	/** pageing */
+    	PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(searchVO.getPageIndex());
+		paginationInfo.setRecordCountPerPage(searchVO.getPageUnit());
+		paginationInfo.setPageSize(searchVO.getPageSize());
+		
+		searchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
+		searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+		
+		// 목록
+        List<DlalzVO> dlalzList = dlalzQRService.selectDlalzQRList(searchVO);
+        model.addAttribute("resultList", dlalzList);
+        model.addAttribute("searchVO", searchVO);
+        
+        int totCnt = dlalzQRService.selectDlalzQRListTotCnt(searchVO);
+		paginationInfo.setTotalRecordCount(totCnt);
+        model.addAttribute("paginationInfo", paginationInfo);
+        
+        
+        mav.addObject("paginationInfo", paginationInfo);
+        mav.addObject("resultList", dlalzList);
+        
+        return mav;
+    }
+    
+    /**
+     * 근태QR 퇴근 등록화면
+     * @param DlalzVO
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/dlm/dla/DlalzQRLeRegist.do")
+    public String DlalzQRLeRegist(
+            @ModelAttribute("dlalzVO") DlalzVO dlalzVO,
+            Model model)
+            throws Exception {
+        
+    	model.addAttribute("dlalzVO", dlalzVO);
+        return "/truebon/com/dlm/dla/DlalzQRLeRegist";
+    }
+    
+    /**
+	 * 근태 QR코드관리 목록화면 (pageing)
+	 * @param searchVO - 조회할 정보가 담긴 DlalzVO
+	 * @exception Exception
+	 */
+    @RequestMapping(value="/dlm/dla/DlalzQRCodeMngList.do")
+    public String DlalzQRCodeMngList(@ModelAttribute("searchVO") ChargerVO searchVO, 
+    		ModelMap model)
+            throws Exception {
+    	
+    	/** EgovPropertyService.sample */
+    	searchVO.setPageUnit(propertiesService.getInt("pageUnit"));
+    	searchVO.setPageSize(propertiesService.getInt("pageSize"));
+    	
+    	/** pageing */
+    	PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(searchVO.getPageIndex());
+		paginationInfo.setRecordCountPerPage(searchVO.getPageUnit());
+		paginationInfo.setPageSize(searchVO.getPageSize());
+		
+		searchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
+		searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+		
+		// 담당자구분코드(공통코드ID(ISM001))(KTOA(1), 위탁운영(2), 협력업체(3), 기타(4))
+		List<String> arrChrgrDstnctCd = new ArrayList<String>();
+		arrChrgrDstnctCd.add("1");
+		arrChrgrDstnctCd.add("2");
+		searchVO.setArrChrgrDstnctCd(arrChrgrDstnctCd);
+		//로그인 사용자 QR 목록 
+    	LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+    	if(user.getAuthorCode().equals("ROLE_USER") || (user.getAuthorCode().equals("ROLE_COSN_OPR"))){
+			if(searchVO.getSearchKeyword() == "") {
+				searchVO.setSearchCondition("6");
+				searchVO.setChrgrNo(user.getChrgrNo());
+			}
+		}
+				
+		// 목록
+        List<ChargerVO> dlalzQRMngList = chargerService.selectChargerList(searchVO);
+        model.addAttribute("resultList", dlalzQRMngList);
+        model.addAttribute("searchVO", searchVO);
+        
+        int totCnt = chargerService.selectChargerListTotCnt(searchVO);
+		paginationInfo.setTotalRecordCount(totCnt);
+        model.addAttribute("paginationInfo", paginationInfo);
+        return "/truebon/com/dlm/dla/DlalzQRCodeMngList";
+    }
+}

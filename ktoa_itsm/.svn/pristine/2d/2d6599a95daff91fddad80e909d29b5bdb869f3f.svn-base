@@ -1,0 +1,41 @@
+package truebon.com.dlm.rep.dao;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import truebon.com.dlm.rep.model.ReplaceVO;
+
+@Repository("ReplaceDAO")
+public class ReplaceDAO extends EgovComAbstractDAO {
+   
+    public List<ReplaceVO> selectReplaceList(ReplaceVO searchVO) throws Exception {
+        return selectList("ReplaceMapper.selectReplaceList", searchVO);
+    }    
+    
+    public List<ReplaceVO> selectDetailReplaceList(ReplaceVO searchVO) throws Exception {
+        return selectList("ReplaceMapper.selectDetailReplaceList", searchVO);
+    }    
+    
+    public List<ReplaceVO> selectDetailReplaceUseList(ReplaceVO ReplaceVO) throws Exception {
+        return selectList("ReplaceMapper.selectDetailReplaceUseList", ReplaceVO);
+    }   
+
+    public void insertReOffday(ReplaceVO searchVO ) throws Exception {
+       insert("ReplaceMapper.insertReOffday", searchVO);
+    }
+    
+    public List<ReplaceVO> selectChrgrName(ReplaceVO ReplaceVO) throws Exception {
+        return selectList("ReplaceMapper.selectChrgrName", ReplaceVO);
+    }
+    
+    public List<ReplaceVO> selectOffdayWrk(ReplaceVO ReplaceVO) throws Exception {
+        return selectList("ReplaceMapper.selectOffdayWrk", ReplaceVO);
+    }
+
+	public void deleteReOffday(ReplaceVO searchVO) {
+		delete("ReplaceMapper.deleteReOffday", searchVO);
+	}   
+    
+}

@@ -1,0 +1,135 @@
+@charset "UTF-8";
+
+.listTable {
+	height: 108%;
+}
+
+/* 달력 날짜 선택 안보이게 */
+.hide-calendar .ui-datepicker-calendar {
+	display: none;
+}
+
+.hide-month-calendar .ui-datepicker-calendar {
+	display: none;
+}
+
+.hide-month-calendar .ui-datepicker-month {
+	display: none;
+}
+
+
+.replaceDetailList th, td, .replaceDetailUseList th, td {
+	border-bottom: 1px solid #444444;
+	padding: 10px;
+}
+.sum{
+	text-align: center; 
+	font-weight: bolder; 
+	background: #f4f4f4;
+	bottom: 0px;
+}
+
+.contentDiv{
+	position:relative;
+	float: left; 
+	min-width: 200px;;
+	width: 16.8%;
+	height:105%;
+	text-align: center; 
+	border-top: 2px solid #4688d2; 
+	margin-top:7px;
+}
+.repOffDayInfo{
+	position: absolute; 
+	left: 50%; 
+	top: 50%; 
+	transform: translate(-50%, -50%);
+}
+.remindDaysDiv{
+	width: 100%; 
+	text-align: center; 
+}
+.remindDays {
+	font-size: 20px; 
+	font-weight: bold;
+}
+.remindDaysTxt {
+	font-size: 30px; 
+	margin-top: 10px;
+}
+.remindDaysTxt span{
+	color: #4688d2; 
+	font-weight: bolder;
+}
+.daysDiv{
+	width: 190px; 
+	margin-top: 35%; 
+	display: inline-block; 
+	text-align: center;
+}
+.daysDiv p{
+	font-size: 20px;
+}
+.totalDays, .useDays{
+	font-weight: bold;
+}
+.totalDaysTxt, .useDaysTxt{
+	font-weight: bold; 
+	color: #4688d2;
+}
+.days{
+	float:right;
+}
+
+.replaceList{
+	float: left;
+	border: 1px solid #ddd;
+}
+
+.replaceList > div{
+	border-bottom-width: 0px;
+}
+
+.replaceDetailList, .replaceDetailUseList{
+	display: inline-block;
+	height: 94.5%;
+	overflow: auto;
+	border:1px solid #ddd; 
+}
+
+.delBtn{
+	float: right;
+}
+
+/* 발생, 사용 라디오 버튼 */
+.repSelect{
+	float: left;
+    width: fit-content;
+    border: 1px solid #666;
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: no-wrap;
+}
+.repSelect input{ 
+	display: none; 
+}
+
+.repSelect label{
+    padding: 5px 11px;
+    border-right: 1px solid #ccc;
+    cursor: pointer;
+    font-size:12px;
+    font-weight:bold;
+}
+.repSelect label:last-of-type{ border-right: 0; }
+
+.repSelect label:hover{
+    background: #eee;
+}
+.repSelect input:checked + label{
+    background: #4688d2;
+    color: #fff;
+}
+/* 발생, 사용 라디오 버튼 */

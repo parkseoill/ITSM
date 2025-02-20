@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="HdcftInputCntMapper">
+
+	<resultMap id="HdcftInputCntList" type="truebon.com.sys.cnt.model.HdcftInputCntVO">
+		<result property="chrgrNm" column="CHRGR_NM" />
+		<result property="month01" column="MONTH_01" />
+		<result property="month02" column="MONTH_02" />
+		<result property="month03" column="MONTH_03" />
+		<result property="month04" column="MONTH_04" />
+		<result property="month05" column="MONTH_05" />
+		<result property="month06" column="MONTH_06" />
+		<result property="month07" column="MONTH_07" />
+		<result property="month08" column="MONTH_08" />
+		<result property="month09" column="MONTH_09" />
+		<result property="month10" column="MONTH_10" />
+		<result property="month11" column="MONTH_11" />
+		<result property="month12" column="MONTH_12" />		
+		<result property="monthSum" column="MONTH_SUM" />		
+	</resultMap>
+   
+
+   
+	<select id="selectHdcftInputCntList" parameterType="truebon.com.sys.cnt.model.HdcftInputCntVO" resultMap="HdcftInputCntList">   
+		SELECT DISTINCT tc.CHRGR_NM
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202301%" THEN td.DLALZ_DATE else null end)  as MONTH_01
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202302%" THEN td.DLALZ_DATE else null end)  as MONTH_02
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202303%" THEN td.DLALZ_DATE else null end)  as MONTH_03
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202304%" THEN td.DLALZ_DATE else null end)  as MONTH_04
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202305%" THEN td.DLALZ_DATE else null end)  as MONTH_05
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202306%" THEN td.DLALZ_DATE else null end)  as MONTH_06
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202307%" THEN td.DLALZ_DATE else null end)  as MONTH_07
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202308%" THEN td.DLALZ_DATE else null end)  as MONTH_08
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202309%" THEN td.DLALZ_DATE else null end)  as MONTH_09
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202310%" THEN td.DLALZ_DATE else null end)  as MONTH_10
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202311%" THEN td.DLALZ_DATE else null end)  as MONTH_11
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "202312%" THEN td.DLALZ_DATE else null end)  as MONTH_12
+			, COUNT(CASE WHEN td.DLALZ_DATE LIKE "2023%" THEN td.DLALZ_DATE else null end)  as MONTH_SUM
+		FROM  TB_DLALZ td, TB_CHARGER tc 
+		WHERE tc.CHRGR_NO = td.CHRGR_NO 
+		AND tc.USE_YN ="Y"
+		AND tc.CHRGR_NM !="관리자"
+		AND tc.CHRGR_NM !="박래준"
+		AND td.AMNDR_ID !="webmaster"
+		AND td.AMNDR_ID !="system"
+		AND td.DLALZ_DATE LIKE "2023%"
+		GROUP BY tc.CHRGR_NM
+		ORDER BY FIELD(tc.CHRGR_ROLE_CD, 10,01,05,06,07,08,04) , tc.CHRGR_NO;
+    </select> 
+   
+      
+   
+   
+   
+</mapper>
+   
+   
+   

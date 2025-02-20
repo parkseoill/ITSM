@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>멀티 수정 팝업</title>
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/truebon/com/dlm/dla/timepicki.css?afterxs' />">
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+
+<script language="javascript1.2" type="text/javaScript">
+
+$(document).ready(function(){
+	$.datepicker.setDefaults($.datepicker.regional['ko']); 
+ 	$( "#fixedInspDate").datepicker({
+ 		changeMonth: true, 
+ 		changeYear: true,
+ 		changeHour: true,
+        gotoCurrent: true,
+        showButtonPanel:true,
+        // 캘린더 하단에 버튼 패널을 표시한다(오늘날짜로이동버튼, 닫기버튼). 
+        currentText: '오늘', // 오늘날짜로이동되는 버튼의 텍스트 변경 
+        closeText: '닫기'  // 닫기버튼의 텍스트 변경 
+ 	});
+ 	$('#fixedInspDate').datepicker('setDate', 'today');
+}); 
+
+/* ********************************************************
+ * 멀티 수정 처리 함수
+ ******************************************************** */
+ function fixedInspMltplUpdt() {
+	if(confirm("<spring:message code="common.update.msg" />")){   //수정하시겠습니까?
+		$("#fixedInspMltplUpdtForm").attr("action", "<c:url value='/opm/fix/FixedInspMltplUpdt.do'/>");
+		$("#fixedInspMltplUpdtForm").submit();
+		opener.parent.location.reload();
+		window.close();
+	}
+}
+
+</script>
+</head>
+<body>
+	<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+	<div class="popup">
+		<form name="fixedInspMltplUpdtForm" id="fixedInspMltplUpdtForm" action="<c:url value = '/opm/fix/MltplUpdtPopup.do'/>" method="POST">
+		<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
+		<input type="hidden" name="checkedValueForDel" value="<c:out value='${searchVO.checkedValueForDel}'/>"/>
+			<table class="wTable">
+				<colgroup>
+					<col style="width:100px">
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>점검월</th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>점검 주기</th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>점검 건수</th>
+						<td class="left">${searchVO.checkedCount}</td>
+					</tr>
+					<tr>
+						<th>점검일</th>
+						<td class="left">				
+							<input type="text" id="fixedInspDate" name="fixedInspDate" title="점검일" type="time" value="${searchVO.fixedInspDate}" style="width:140px; padding-left:5px;"/>
+						</td>
+					</tr>
+					<tr>
+						<th>비고 내용</th>
+						<td class="left">
+							<textarea id="rmarkText" name="rmarkText" title="비고 내용"  style="width:100%; height:30px; padding:5px;">${searchVO.rmarkText}</textarea>			
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+		<!-- 하단 버튼 -->
+		<div class="btn">	
+			<input class="s_submit" type="submit" value='<spring:message code="button.update" />' onclick="fixedInspMltplUpdt(); return false;" /><!-- 수정 -->	
+		</div>
+	</div>
+</body>
+</html>

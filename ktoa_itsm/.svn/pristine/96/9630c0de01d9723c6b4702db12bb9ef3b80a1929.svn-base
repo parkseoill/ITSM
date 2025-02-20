@@ -1,0 +1,157 @@
+package truebon.com.dlm.wrk.service.impl;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.util.EgovUserDetailsHelper;
+import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
+
+import truebon.com.dlm.wrk.dao.*;
+import truebon.com.dlm.wrk.model.Work;
+import truebon.com.dlm.wrk.model.WorkVO;
+import truebon.com.dlm.wrk.service.WorkService;
+
+@Service("WorkService")
+public class WorkServiceImpl extends EgovAbstractServiceImpl implements WorkService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkServiceImpl.class);
+
+	@Resource(name = "WorkDAO")
+	private WorkDAO workDAO;
+
+	/**
+	 * tb_work를 조회한다.
+	 * 
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return tb_dlalz 목록
+	 * @exception Exception
+	 */
+	public List<WorkVO> selectWorkList(WorkVO searchVO) throws Exception {
+
+		LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+		if (user.getAuthorCode().equals("ROLE_USER") || user.getAuthorCode().equals("ROLE_COSN_OPR")) {
+			if (searchVO.getSearchKeyword() == "")
+				searchVO.setSearchKeyword(user.getChrgrNo());
+		}
+		LocalDate currentdate = LocalDate.now();
+		if (searchVO.getSelectedDate() == "") {
+			searchVO.setSelectedDate(currentdate.format(DateTimeFormatter.ofPattern("yyyy-MM")));
+		}
+		return workDAO.selectWorkList(searchVO);
+	}
+
+	/**
+	 * 연차 사용 갯수를 조회한다.
+	 * 
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return tb_dlalz 목록
+	 * @exception Exception
+	 */
+	public List<WorkVO> selectOffday(WorkVO searchVO) throws Exception {
+		LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+		searchVO.setChrgrNm(user.getName());
+		return workDAO.selectOffday(searchVO);
+	}
+
+	/**
+	 * tb_rework를 조회한다.
+	 * 
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return tb_dlalz 목록
+	 * @exception Exception
+	 */
+	public List<WorkVO> selectRmark(WorkVO searchVO) throws Exception {
+		LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+		if (user.getAuthorCode().equals("ROLE_USER") || user.getAuthorCode().equals("ROLE_COSN_OPR")) {
+			if (searchVO.getSearchKeyword() == "")
+				searchVO.setSearchKeyword(user.getChrgrNo());
+		}
+		LocalDate currentdate = LocalDate.now();
+		if (searchVO.getSelectedDate() == "") {
+			searchVO.setSelectedDate(currentdate.format(DateTimeFormatter.ofPattern("yyyy-MM")));
+		}
+		return workDAO.selectRmark(searchVO);
+	}
+
+	/**
+	 * tb_work을 수정한다.
+	 * 
+	 * @param vo - 수정할 정보가 담긴 Work
+	 * @return void형
+	 * @exception Exception
+	 */
+	public void updateWork(Work vo) throws Exception {
+		LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+		vo.setAmndrId(user.getId());
+		workDAO.updateWork(vo);
+	}
+
+	/**
+	 * tb_rework을 수정한다.
+	 * 
+	 * @param vo - 수정할 정보가 담긴 Work
+	 * @return void형
+	 * @exception Exception
+	 */
+	public void updateResWork(Work vo) throws Exception {
+		LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();
+		vo.setAmndrId(user.getId());
+		workDAO.updateResWork(vo);
+	}
+
+	/**
+	 * 마감 컬럼 이동
+	 * 
+	 * @param vo - 수정할 정보가 담긴 Work
+	 * @return void형
+	 * @exception Exception
+	 */
+	public void closing(Work vo) throws Exception {
+		workDAO.closing(vo);
+	}
+
+	/**
+	 * 마감 데이터 생성
+	 * 
+	 * @param vo - 수정할 정보가 담긴 Work
+	 * @return void형
+	 * @exception Exception
+	 */
+	public void insertClosing(Work vo) throws Exception {
+		workDAO.insertClosing(vo);
+	}
+
+	/**
+	 * OP 일괄 입력
+	 * 
+	 * @param vo - 수정할 정보가 담긴 Work
+	 * @return void형
+	 * @exception Exception
+	 */
+	public void updateOp(Work vo) throws Exception {
+		workDAO.updateOp(vo);
+	}
+
+	/**
+	 * PM 날짜 등록
+	 * 
+	 * @param vo - 수정할 정보가 담긴 Work
+	 * @return void형
+	 * @exception Exception
+	 */
+
+	public void insertPM(WorkVO searchVO) {
+		workDAO.insertPM(searchVO);
+		
+	}
+
+
+}

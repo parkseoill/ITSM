@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.19.1.final using JasperReports Library version 6.19.1-867c00bf88cd4d784d404379d6c05e1b419e8a4c  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TruebonUserMonthReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dadd0f4b-49b1-4ae1-b823-fccd114f692d">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ktoa_itsm.jrdax"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="jrParam1" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT    D.ACRSLT_TEXT as TEXT, B.CHRGR_NM 
+FROM TB_CHARGER B  LEFT OUTER JOIN  ( 
+	SELECT DISTINCT (A.ACRSLT_TEXT), A.PLN_TEXT,A.BIZ_DLNG_CHRGR_NO FROM
+		TB_BIZ_DETL_REPORT A
+		LEFT OUTER JOIN 
+		TB_BIZ_REPORT C 
+		ON A.BIZ_REPORT_ID = C.BIZ_REPORT_ID 
+		WHERE  A.RDTT BETWEEN CONCAT(REPLACE($P{jrParam1},'-',''),"01") AND CONCAT(REPLACE($P{jrParam1},'-',''),"31")	AND C.BIZ_REPORT_KIND_CD = '02' 
+)D
+ON D.BIZ_DLNG_CHRGR_NO = B.CHRGR_NO 
+WHERE B.COSN_DEPT_NO ='0005' AND B.CHRGR_ROLE_CD != '04' AND B.CHRGR_NM != '관리자' 
+AND B.USE_YN ="Y"
+GROUP BY B.CHRGR_NM 
+ORDER BY FIELD(B.CHRGR_ROLE_CD, 10,01,05,06,07,08,04) , FIELD(B.CHRGR_NO, 0002, 0003 )DESC ,FIELD(B.CHRGR_NM, '최호용','박서일','김승현'), B.CHRGR_NO;]]>
+	</queryString>
+	<field name="TEXT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TEXT"/>
+		<property name="com.jaspersoft.studio.field.label" value="TEXT"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="TB_BIZ_DETL_REPORT"/>
+	</field>
+	<field name="CHRGR_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CHRGR_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="CHRGR_NM"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="TB_CHARGER"/>
+		<fieldDescription><![CDATA[담당자명]]></fieldDescription>
+	</field>
+	<title>
+		<band height="75" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="17" y="0" width="519" height="50" backcolor="#E6E6E6" uuid="21edbadb-6189-4038-a565-910f5d61df15"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은고딕" size="22"/>
+				</textElement>
+				<textFieldExpression><![CDATA["[ 월간 업무 보고 ]"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="17" y="50" width="90" height="20" backcolor="#C9C9C9" uuid="61310992-72c4-451a-97c0-a43e5a414a59"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" ○ 담당자"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="280" y="50" width="90" height="20" backcolor="#C9C9C9" uuid="920366fd-27b6-4c61-b48a-beb036fdf206"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" ○ 월"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="50" width="166" height="20" uuid="d063cbd8-9078-4c00-a5d2-f1235d7287d3"/>
+				<box leftPadding="5">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{jrParam1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="107" y="50" width="173" height="20" backcolor="#FFFFFF" uuid="39b6787d-a897-4e1b-91a5-c9f751b4ecd4"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" 전체"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="160" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="ContainerHeight" mode="Transparent" x="107" y="-5" width="429" height="160" isPrintWhenDetailOverflows="true" uuid="377496b7-62d1-4917-9289-66fa0ebcfb36">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TEXT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement stretchType="ContainerHeight" mode="Opaque" x="17" y="-5" width="90" height="160" isPrintWhenDetailOverflows="true" backcolor="#C9C9C9" uuid="1197745d-d464-431d-a8d9-762b3fdbd265"/>
+				<box leftPadding="5">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="맑은고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHRGR_NM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

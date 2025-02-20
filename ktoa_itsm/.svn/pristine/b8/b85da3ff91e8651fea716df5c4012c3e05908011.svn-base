@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<%--
+ /**
+  * @Class Name : SwMngUpdt.jsp
+  * @Description : SW전산자원 수정 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.10.04       이정하    	      최초 생성
+  * @ 2023.10.13       이정하    	      팝업, validate 기능 추가
+  *
+  *  @author 이정하
+  *  @since 2023.10.04
+  *  @version 1.0
+  *  @see
+  *
+  */
+--%>
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="validator"
+	uri="http://www.springmodules.org/tags/commons-validator"%>
+<c:set var="ImgUrl"
+	value="${pageContext.request.contextPath}/images/egovframework/com/sym/mnu/mpm/" />
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SW전산자원 수정</title>
+<link href="<c:url value="/css/egovframework/com/com.css"/>"
+	rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>"
+	rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet"
+	href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<script type="text/javascript"
+	src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+<!-- validator 클라이언트 -->
+<script type="text/javascript" src="<c:url value="/validator.do" />"></script>
+<validator:javascript formName="swMngVO" staticJavascript="false"
+	xhtml="true" cdata="false" />
+<script type="text/javaScript">
+$(document).ready(function() {
+		// 담당자 선택 화면 호출 함수
+		$('#popupMaintceChrList').click(function(e) {
+			e.preventDefault();
+			var pagetitle = $(this).attr("title");
+			var page = "<c:url value='/crm/swm/SwMngUserPopup.do'/>";
+			var $dialog = $('<div style="overflow:hidden;padding: 0px 0px 0px 0px;"></div>')
+						.html('<iframe style="border: 0px; " src="'+ page+ '" width="100%" height="100%"></iframe>')
+						.dialog({
+							autoOpen : false,
+							modal : true,
+							width : 500,
+							height : 550,
+							title : pagetitle});
+			$dialog.dialog('open');
+			});
+		// 라이센스 선택 화면 호출 함수
+		$('#popupLcnIdList').click(function(e) {
+			e.preventDefault();
+			var pagetitle = $(this).attr("title");
+			var page = "<c:url value='/crm/swm/SwMngLcnPopup.do'/>";
+			var $dialog = $('<div style="overflow:hidden;padding: 0px 0px 0px 0px;"></div>')
+						.html('<iframe style="border: 0px; " src="'+ page+ '" width="100%" height="100%"></iframe>')
+						.dialog({
+							autoOpen : false,
+							modal : true,
+							width : 500,
+							height : 550,
+							title : pagetitle});
+			$dialog.dialog('open');
+			});
+		// 어플라이언스HW ID 선택 화면 호출 함수
+		$('#popupAppliHwIdList').click(function(e) {
+			e.preventDefault();
+			var pagetitle = $(this).attr("title");
+			var page = "<c:url value='/crm/swm/SwMngHwPopup.do'/>";
+			var $dialog = $('<div style="overflow:hidden;padding: 0px 0px 0px 0px;"></div>')
+						.html('<iframe style="border: 0px; " src="'+ page+ '" width="100%" height="100%"></iframe>')
+						.dialog({
+							autoOpen : false,
+							modal : true,
+							width : 1000,
+							height : 550,
+							title : pagetitle});
+		$dialog.dialog('open');
+		});
+});
+
+/* ********************************************************
+ * 
+ * 달력 박스 날짜 세팅
+ ******************************************************** */
+$(document).ready(function() {
+	$.datepicker.setDefaults($.datepicker.regional['ko']);
+	$("#entrngDate, #exanDate, #eoslDate").datepicker({
+		changeMonth : true,
+		changeYear : true,
+		gotoCurrent : true,
+		showButtonPanel : true, // 캘린더 하단에 버튼 패널을 표시한다(오늘날짜로이동버튼, 닫기버튼). 
+		currentText : '오늘', // 오늘날짜로이동되는 버튼의 텍스트 변경 
+		closeText : '닫기' // 닫기버튼의 텍스트 변경 
+	});
+// 달력 설정 조건 추가
+	$("#maintceCntrBeginDate").datepicker({
+		changeMonth : true,
+		changeYear : true,
+		onClose : function(selectedDate) {
+		//시작일(beginDate) datepicker가 닫힐때
+		//종료일(endDate)의 선택할수있는 최소 날짜(minDate)를 선택한 시작일로 지정
+		$("#maintceCntrEndDate").datepicker("option",
+				"minDate", selectedDate);
+		}
+});
+	$("#maintceCntrEndDate").datepicker({
+		changeMonth : true,
+		changeYear : true,
+		onClose : function(selectedDate) {
+		// 종료일(endDate) datepicker가 닫힐때
+		// 시작일(beginDate)의 선택할수있는 최대 날짜(maxDate)를 선택한 시작일로 지정
+		$("#maintceCntrBeginDate").datepicker("option","maxDate", selectedDate);
+		}
+		});
+});
+
+		//오늘 버튼 클릭 시 오늘 날짜로 이동
+	$.datepicker._gotoToday = function(id) {
+		$(id).datepicker('setDate', 'today');
+	};
+
+	/* ********************************************************
+	*  검색조건 업데이트
+	******************************************************** */
+	function updateSearchInputs() {
+		var conditions = "${searchVO.searchCondition}".split(',');
+		$('input[name="searchNtwrkCdList"]').val(conditions.filter(condition => condition.includes('ITA02')));
+		$('input[name="searchSwTypeCdList"]').val(conditions.filter(condition => condition.includes('ITA10')));
+		$('input[name="searchAssetStatCdList"]').val(conditions.filter(condition => condition.includes('ITA03')));
+		$('input[name="searchMaintceCdList"]').val(conditions.filter(condition => condition.includes('ITA05')));
+		$('input[name="searchMaintceInspCdList"]').val(conditions.filter(condition => condition.includes('ITA06')));
+	}
+
+	/* ********************************************************
+	 * 목록조회  함수
+	 ******************************************************** */
+	function selectList() {
+		updateSearchInputs();
+		var objForm = document.getElementById("swAssetMngForm");
+		objForm.action = "<c:url value='/crm/swm/SwMngList.do'/>?searchCondition=${searchVO.searchCondition}&searchKeyword=${searchVO.searchKeyword}";
+		objForm.submit();
+		}
+
+	/* ********************************************************
+	 * 수정처리 함수
+	 ******************************************************** */
+	function updateSwMng() {
+		// 폼체크
+		if ($("#ntwrkDstnctCd").val() == null
+				|| $("#ntwrkDstnctCd").val() == ""
+				|| $("#ntwrkDstnctCd").val() == "--선택하세요--") {
+			alert("네트워크을 선택해 주세요");
+			$("#ntwrkDstnctCd").focus();
+		} else if ($("#swTypeCd").val() == null || $("#swTypeCd").val() == ""
+				|| $("#swTypeCd").val() == "--선택하세요--") {
+			alert("SW유형을 선택해 주세요");
+		} else if ($("#assetOwnCd").val() == null
+				|| $("#assetOwnCd").val() == ""
+				|| $("#swTypeCd").val() == "--선택하세요--") {
+			alert("자산소유코드를 선택해 주세요");
+			$("#assetOwnCd").focus();
+		} else if ($("#assetStatCd").val() == null
+				|| $("#assetStatCd").val() == ""
+				|| $("#assetStatCd").val() == "--선택하세요--") {
+			alert("자산상태코드를 선택해 주세요");
+			$("#assetStatCd").focus();
+		} else if ($("#bizSytmCd").val() == null || $("#bizSytmCd").val() == ""
+				|| $("#bizSytmCd").val() == "--선택하세요--") {
+			alert("업무시스템코드를 선택해 주세요");
+			$("#bizSytmCd").focus();
+		} else if ($("#prodCoQty").val() == null || $("#prodCoQty").val() == "") {
+			alert("제품수량을 입력해 주세요");
+			$("#prodCoQty").focus();
+		} else if ($("#prodPurp").val() == null || $("#prodPurp").val() == "") {
+			alert("제품용도를 입력해 주세요");
+			$("#prodPurp").focus();
+		} else if ($("#ctrlYn").val() == null || $("#ctrlYn").val() == ""
+				|| $("#ctrlYn").val() == "--선택--") {
+			alert("관제여부를 선택해 주세요");
+			$("#ctrlYn").focus();
+		} else if ($("#svcDupCnvrConfgYn").val() == null
+				|| $("#svcDupCnvrConfgYn").val() == ""
+				|| $("#svcDupCnvrConfgYn").val() == "--선택--") {
+			alert("서비스이중화구성여부를 선택해 주세요");
+			$("#svcDupCnvrConfgYn").focus();
+		} else if ($("#delYn").val() == null || $("#delYn").val() == ""
+				|| $("#delYn").val() == "--선택--") {
+			alert("삭제유무를 선택해 주세요");
+			$("#delYn").focus();
+		} else {
+			// 유지보수계약코드 필드가 선택되지 않은 경우, 기본값을 'N'으로 설정
+			if ($("#maintceCntrCd").val() == null
+					|| $("#maintceCntrCd").val() == "") {
+				$("#maintceCntrCd").val("ITA0504");
+			}
+
+			var objForm = document.getElementById("swAssetMngForm");
+			updateSearchInputs();
+			if (confirm("<spring:message code="common.update.msg" />")) {
+				if (!validateSwMngVO(objForm)) {
+					return;
+				} else {
+					objForm.action = "<c:url value='/crm/swm/SwMngList.do'/>?searchCondition=${searchVO.searchCondition}&searchKeyword=${searchVO.searchKeyword}";
+					objForm.submit();
+				}
+			}
+		}
+	}
+
+	/* ********************************************************
+	 * 삭제처리함수
+	 ******************************************************** */
+	function deleteSwMng() {
+		var objForm = document.getElementById("swAssetMngForm");
+
+		if (confirm("<spring:message code="common.delete.msg"/>")) {
+			objForm.action = "<c:url value='/crm/swm/deleteSwMng.do' />";
+			objForm.submit();
+		}
+	}
+	/* ********************************************************
+	 * 요청 분류 선택 함수(유지보수, 이중화)
+	 ******************************************************** */
+	function initializeType() {
+		var mc = $('#maintceCntrCd option:selected').val();
+		if (mc !== "ITA0501") {
+			// 'Y'가 아닌경우 비활성화
+			$("#maintceCntrBeginDate").val('');
+			$("#maintceCntrEndDate").val('');
+			$("#maintceInspCycleCd").prop("disabled", true).val('');
+			$('#maintceCntrBeginDate').datepicker('disable');
+			$('#maintceCntrEndDate').datepicker('disable');
+		} else {
+			$("#maintceInspCycleCd").prop("disabled", false);
+			$('#maintceCntrBeginDate').datepicker('enable');
+			$('#maintceCntrEndDate').datepicker('enable');
+		}
+
+	}
+
+	$(document).ready(function() {
+		//initializeType();
+		$('#maintceCntrCd').change(function() {
+			//initializeType();
+			var temp = $('#maintceInspCycleCd option:selected').val();
+			$.ajax({
+				url : "<c:url value='/crm/swm/SwMaintceType.do'/>",
+				type : 'POST',
+				data : {
+				"newComnCd" : temp
+				},
+				dataType : 'json',
+				success : function(data) {
+					/* $(data.swMaintceCycleCdList).each(function(i){		   						   				
+					$("#maintceInspCycleCd").append("<option value='"+ data.swMaintceCycleCdList[i].newComnCd +"'>"+ data.swMaintceCycleCdList[i].comnCdNm +"</option>");		   			
+					}); */
+					},
+				error : function() {
+				alert("<spring:message code="comCopBlog.articleBlogList.validate.occurError" />");//에러가 발생했습니다.	
+					}
+				});
+		});
+
+	});
+
+	function clearText(id) { $(id).val("");}
+</script>
+<c:if test="${!empty resultMsg}"> <script>alert("${resultMsg}");</script></c:if>
+</head>
+<body>
+
+	<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+	<!-- 자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다. -->
+
+	<form:form commandName="swMngVO" id="swAssetMngForm"
+		name="swAssetMngForm" method="post"
+		action="${pageContext.request.contextPath}/crm/swm/updateSwMngUpdt.do">
+		<!-- 검색조건 유지  -->
+		<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>" />
+		<input type="hidden" name="pageUnit" value="${searchVO.pageUnit}">
+		<input type="hidden" name="searchNtwrkCd" value="<c:out value='${searchVO.searchNtwrkCd}'/>" />
+		<input type="hidden" name="searchBizSytmCd" value="<c:out value='${searchVO.searchBizSytmCd}'/>" />
+		<input type="hidden" name="searchSwTypeCd" value="<c:out value='${searchVO.searchSwTypeCd}'/>" />
+		<input type="hidden" name="searchAssetStatCd" value="<c:out value='${searchVO.searchAssetStatCd}'/>" />
+		<input type="hidden" name="searchMaintceCd" value="<c:out value='${searchVO.searchMaintceCd}'/>" />
+		<input type="hidden" name="searchMaintceInspCd" value="<c:out value='${searchVO.searchMaintceInspCd}'/>" />
+		<input type="hidden" name="searchMnftrNm" value="<c:out value='${searchVO.searchMnftrNm}'/>" />
+		<input type="hidden" name="searchProdNm" value="<c:out value='${searchVO.searchProdNm}'/>" />
+
+		<input type="hidden" name="searchNtwrkCdList" value="${fn:join(searchVO.searchNtwrkCdList, ',')}" />
+		<input type="hidden" name="searchSwTypeCdList" value="${fn:join(searchVO.searchSwTypeCdList, ',')}" />
+		<input type="hidden" name="searchAssetStatCdList" value="${fn:join(searchVO.searchAssetStatCdList, ',')}" />
+		<input type="hidden" name="searchMaintceCdList" value="${fn:join(searchVO.searchMaintceCdList, ',')}" />
+		<input type="hidden" name="searchMaintceInspCdList" value="${fn:join(searchVO.searchMaintceInspCdList, ',')}" />
+
+		<input type="hidden" id="searchKeyword" value="${searchVO.searchKeyword}" />
+		<input type="hidden" id="searchCondition" value="${searchVO.searchCondition}" />
+
+		<div class="wTableFrm">
+			<!-- 타이틀 -->
+			<h2>SW전산자원 수정</h2>
+			<!-- 상단 버튼 -->
+			<div class="btn">
+				<!-- 수정 -->
+				<input class="s_submit" type="submit"
+					value='<spring:message code="button.update" />'
+					onclick="updateSwMng(); return false;" />
+				<!-- 삭제 -->
+				<!--<span class="btn_s"><a href="#LINK" onclick="deleteSwMng(); return false;"><spring:message code="button.delete" /></a></span>-->
+				<!-- 목록 -->
+				<span class="btn_s"><a href="#LINK'/>"
+					onclick="selectList(); return false;"><spring:message
+							code="button.list" /></a></span>
+			</div>
+			<table class="wTable">
+				<colgroup>
+					<col style="width: 15%" />
+					<col style="width: 35%" />
+					<col style="width: 15%" />
+					<col style="width: 35%" />
+					<col style="" />
+				</colgroup>
+				<tr>
+					<th>SW자산ID <span class="pilsu">*</span></th>
+					<td class="left"><form:input path="swAssetId" id="swAssetId"
+							title="SW자산ID" readonly="true" class="readOnlyClass"
+							cssStyle="width:140px; padding-left:5px;" />
+						<div>
+							<form:errors path="swAssetId" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>네트워크 <span class="pilsu">*</span></th>
+					<td class="left"><form:select path="ntwrkDstnctCd"
+							id="ntwrkDstnctCd" title="네트워크" cssClass="txt"
+							cssStyle="width:220px;">
+							<form:option value="" label="--선택하세요--" />
+							<form:options items="${ntwrkList}" itemLabel="comnCdNm"
+								itemValue="newComnCd" />
+						</form:select>
+						<div>
+							<form:errors path="ntwrkDstnctCd" cssClass="error" />
+						</div></td>
+					<th>SW유형(세부구분) <span class="pilsu">*</span></th>
+					<td class="left"><form:select path="swTypeCd" id="swTypeCd"
+							title="SW유형" cssClass="txt" cssStyle="width:220px;">
+							<form:option value="" label="--선택하세요--" />
+							<c:forEach items="${swTypeList}" var="swType">
+								<form:option value="${swType.newComnCd}">${swType.comnCdNm} - ${swType.comnCdDc}
+            					</form:option>
+							</c:forEach>
+						</form:select>
+						<div>
+							<form:errors path="swTypeCd" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>자산소유 <span class="pilsu">*</span></th>
+					<td class="left"><form:select path="assetOwnCd"
+							id="assetOwnCd" title="자산소유" cssClass="txt"
+							cssStyle="width:220px;">
+							<form:option value="" label="--선택하세요--" />
+							<form:options items="${assetOwnList}" itemLabel="comnCdNm"
+								itemValue="newComnCd" />
+						</form:select>
+						<div>
+							<form:errors path="assetOwnCd" cssClass="error" />
+						</div></td>
+					<th>시스템<span class="pilsu">*</span></th>
+					<td class="left"><form:select path="bizSytmCd" id="bizSytmCd"
+							title="시스템" cssClass="txt" cssStyle="width:220px;">
+							<form:option value="" label="--선택하세요--" />
+							<form:options id="bizSytmCd" items="${bizSytmList}"
+								itemLabel="bizSytmNm" itemValue="bizSytmCd" />
+						</form:select>
+						<div>
+							<form:errors path="bizSytmNm" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>자산상태 <span class="pilsu">*</span></th>
+					<td class="left"><form:select path="assetStatCd"
+							id="assetStatCd" title="자산상태" cssClass="txt"
+							cssStyle="width:220px;">
+							<form:option value="" label="--선택하세요--" />
+							<form:options items="${assetStatList}" itemLabel="comnCdNm"
+								itemValue="newComnCd" />
+						</form:select>
+						<div>
+							<form:errors path="assetStatCd" cssClass="error" />
+						</div></td>
+					<th>제품수량<span class="pilsu">*</span></th>
+					<td class="left"><form:input path="prodCoQty" id="prodCoQty"
+							maxlength="10" title="제품수량" cssStyle="width:220px;" />
+						<div>
+							<form:errors path="prodCoQty" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>제품용도<span class="pilsu">*</span></th>
+					<td class="left" colspan="3"><form:textarea path="prodPurp"
+							maxlength="1000" title="제품용도" cssStyle="width:100%; height:50px;" />
+						<div>
+							<form:errors path="prodPurp" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>서비스이중화구성여부<span class="pilsu">*</span></th>
+					<td class="left"><form:select path="svcDupCnvrConfgYn"
+							id="svcDupCnvrConfgYn" title="서비스이중화구성여부" cssClass="txt"
+							cssStyle="width:100px;">
+							<form:option value="" label="--선택--" />
+							<form:option value="Y" label="Y" />
+							<form:option value="N" label="N" />
+						</form:select></td>
+					<th>관제여부<span class="pilsu">*</span></th>
+					<td class="left"><form:select path="ctrlYn" id="ctrlYn"
+							title="관제여부" cssClass="txt" cssStyle="width:100px;">
+							<form:option value="" label="--선택--" />
+							<form:option value="Y" label="Y" />
+							<form:option value="N" label="N" />
+						</form:select></td>
+				</tr>
+				<tr>
+					<th>이중화 내용</th>
+					<td class="left"><form:textarea path="dplctText"
+							maxlength="100" title="이중화내용" cssStyle="width:220px;" />
+						<div>
+							<form:errors path="dplctText" cssClass="error" />
+						</div></td>
+					<th>삭제유무<span class="pilsu">*</span></th>
+					<td class="left"><form:select path="delYn" id="delYn"
+							title="삭제유무" cssClass="txt" cssStyle="width:100px;">
+							<form:option value="" label="--선택--" />
+							<form:option value="Y" label="Y" />
+							<form:option value="N" label="N" />
+						</form:select></td>
+				</tr>
+				<tr>
+					<th>유지보수 계약</th>
+					<td class="left"><form:select path="maintceCntrCd"
+							id="maintceCntrCd" title="유지보수계약" cssClass="txt"
+							cssStyle="width:220px;">
+							<form:option value="" label="--선택하세요--" />
+							<c:forEach items="${maintceCntrList}" var="maintceCntr">
+								<form:option value="${maintceCntr.newComnCd}">
+                				${maintceCntr.comnCdNm} - ${maintceCntr.comnCdDc}
+            					</form:option>
+							</c:forEach>
+						</form:select></td>
+					<th>유지보수 담당자</th>
+					<td class="left"><form:input path="maintceChrCmpny"
+							id="maintceChrCmpny" title="유지보수 담당자" readonly="true"
+							class="readOnlyClass" cssStyle="width:140px; padding-left:5px;"
+							onClick="clearText('#maintceChrCmpny');" /> <a
+						id="popupMaintceChrList" href="#LINK" target="_blank"
+						title="담당자 선택"> <img
+							src="<c:url value='/images/egovframework/com/cmm/icon/search2.gif' />"
+							alt='' />(담당자 선택)
+					</a> <form:input type="hidden" path="maintceChrgrNo"
+							id="maintceChrgrNo" />
+						<div>
+							<form:errors path="maintceChrgrNo" cssClass="error" />
+						</div></td>
+
+				</tr>
+				<tr>
+					<th>유지보수 점검주기</th>
+					<td class="left"><form:select path="maintceInspCycleCd"
+							id="maintceInspCycleCd" title="유지보수 점검주기" cssClass="txt"
+							cssStyle="width:220px;">
+							<form:option value="" label="--선택하세요--" />
+							<form:options items="${maintceInspList}" itemLabel="comnCdNm"
+								itemValue="newComnCd" />
+						</form:select></td>
+
+					<th>유지보수계약 시작일자</th>
+					<td class="left" colspan="3"><form:input
+							path="maintceCntrBeginDate" id="maintceCntrBeginDate"
+							maxlength="250" title="유지보수 계약시작일자"
+							cssStyle="width:150px; padding-left:5px;" readonly="true"
+							class="readOnlyClass"
+							onClick="clearText('#maintceCntrBeginDate');" />
+						<div>
+							<form:errors path="maintceCntrBeginDate" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>어플라이언스HW ID</th>
+					<td class="left"><form:input path="appliHwAssetId"
+							id="appliHwAssetId" title="어플라이언스HW ID"
+							cssStyle="width:140px; padding-left:5px;" readonly="true"
+							class="readOnlyClass" onClick="clearText('#appliHwAssetId');" />
+						<a id="popupAppliHwIdList" href="#LINK" target="_blank"
+						title="어플라이언스HW ID"> <img
+							src="<c:url value='/images/egovframework/com/cmm/icon/search2.gif' />"
+							alt='' />(하드웨어 선택)
+					</a>
+						<div>
+							<form:errors path="appliHwAssetId" cssClass="error" />
+						</div></td>
+					<th>유지보수계약 종료일자</th>
+					<td class="left" colspan="3"><form:input
+							path="maintceCntrEndDate" id="maintceCntrEndDate" maxlength="250"
+							title="유지보수 계약종료일자" cssStyle="width:150px; padding-left:5px;"
+							readonly="true" class="readOnlyClass"
+							onClick="clearText('#maintceCntrEndDate');" />
+						<div>
+							<form:errors path="maintceCntrEndDate" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>제품명</th>
+					<td class="left"><form:input path="prodNm" maxlength="100"
+							title="제품명" cssStyle="width:220px;" />
+						<div>
+							<form:errors path="prodNm" cssClass="error" />
+						</div></td>
+					<th>제조사명</th>
+					<td class="left"><form:input path="mnftrNm" maxlength="100"
+							title="제조사명" cssStyle="width:220px;" />
+						<div>
+							<form:errors path="mnftrNm" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>호스트명</th>
+					<td class="left"><form:input path="hostNm" maxlength="20"
+							title="호스트명" cssStyle="width:220px;" />
+						<div>
+							<form:errors path="hostNm" cssClass="error" />
+						</div></td>
+					<th>KTOA자산번호</th>
+					<td class="left"><form:input path="ktoaAssetNo"
+							maxlength="100" title="KTOA자산번호" cssStyle="width:220px;" />
+						<div>
+							<form:errors path="ktoaAssetNo" cssClass="error" />
+						</div></td>
+				</tr>
+				<tr>
+					<th>EOSL일자</th>
+					<td class="left"><form:input path="eoslDate" id="eoslDate"
+							maxlength="250" title="EOSL일자"
+							cssStyle="width:150px; padding-left:5px;" readonly="true"
+							class="readOnlyClass" onClick="clearText('#eoslDate');" /></td>
+					<th>입고날짜</th>
+					<td class="left"><form:input path="entrngDate" id="entrngDate"
+							maxlength="250" title="입고날짜"
+							cssStyle="width:150px; padding-left:5px;" readonly="true"
+							class="readOnlyClass" onClick="clearText('#entrngDate');" /></td>
+				</tr>
+				<tr>
+					<th>라이센스 ID</th>
+					<td class="left"><form:input path="lcnId" id="lcnId"
+							title="라이센스 ID" readonly="true" class="readOnlyClass"
+							cssStyle="width:140px; padding-left:5px;"
+							onClick="clearText('#lcnId');" /> <a id="popupLcnIdList"
+						href="#LINK" target="_blank" title="라이센스 ID"> <img
+							src="<c:url value='/images/egovframework/com/cmm/icon/search2.gif' />"
+							alt='' />(라이센스 선택)
+					</a>
+						<div>
+							<form:errors path="lcnId" cssClass="error" />
+						</div></td>
+					<th>검수날짜</th>
+					<td class="left"><form:input path="exanDate" id="exanDate"
+							maxlength="250" title="검수날짜"
+							cssStyle="width:150px; padding-left:5px;" readonly="true"
+							class="readOnlyClass" onClick="clearText('#exanDate');" /></td>
+				</tr>
+				<tr>
+					<th>비고</th>
+					<td class="left" colspan="3"><form:textarea path="rmarkText"
+							maxlength="2000" title="비고" cssStyle="width:100%; height:50px;" />
+						<div>
+							<form:errors path="rmarkText" cssClass="error" />
+						</div></td>
+				</tr>
+
+			</table>
+
+			<!-- 하단 버튼 -->
+			<div class="btn">
+				<!-- 수정 -->
+				<input class="s_submit" type="submit" value='<spring:message code="button.update" />' onclick="updateSwMng(); return false;" />
+				<!-- 삭제 -->
+				<!--<span class="btn_s"><a href="#LINK" onclick="deleteSwMng(); return false;"><spring:message code="button.delete" /></a></span>-->
+
+				<!-- 목록 -->
+				<span class="btn_s"><a href="#LINK'/>" onclick="selectList(); return false;"><spring:message code="button.list" /></a></span>
+			</div>
+			<div style="clear: both;"></div>
+		</div>
+	</form:form>
+</body>
+</html>

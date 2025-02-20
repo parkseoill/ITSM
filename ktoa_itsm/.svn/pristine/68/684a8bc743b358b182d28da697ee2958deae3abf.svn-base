@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+ /**
+  * @Class Name : FailureMngCsList.jsp
+  * @Description : 장애관리 현황 조회 화면
+  * @Modification Information
+  * @
+  * @  수정일                   수정자                   수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.10.23   이미현                  최초 생성
+  *
+  *  @author 이미현
+  *  @since 2023.10.23
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>장애관리 현황 목록</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+
+
+<script language="javascript1.2" type="text/javascript">
+
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectFailureMngCs() {
+    document.failureMngCsForm.pageIndex.value = 1; 
+	document.failureMngCsForm.action = "<c:url value='/fai/fcs/FailureMngCsList.do'/>";
+	document.failureMngCsForm.submit();
+}
+
+/* ********************************************************
+ * 엔터key 목록조회  함수
+ ******************************************************** */
+function press() {
+    if (event.keyCode==13) {
+    	selectFailureMngCs();
+    }
+}
+
+/* ********************************************************
+ * 엑셀 다운로드하기
+ ******************************************************** */
+ function downloadExcel() {
+	 document.failureMngCsForm.action = "<c:url value='/fai/fcs/downloadExcel.do'/>";
+	 document.failureMngCsForm.submit();
+}
+</script>
+
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+
+<div class="board">
+	<h1>장애관리 현황 목록</h1>
+</div>
+
+<form name="failureMngCsForm" action="<c:url value='/fai/fcs/FailureMngCsList.do'/>" method="post">
+	<div class="search_box">
+	<ul>
+	       <li>
+	           <label for="">년 도 : </label> &nbsp; 
+	           <input id="searchKeyword" name="searchKeyword" 
+	           type="text" value="<c:out value='${searchVO.searchKeyword}'/>" 
+	           size="20" maxlength="20" placeholder="숫자만 입력해주세요" onkeypress="press();">
+	        </li>
+	        
+	        <li style="float:right;">
+	            <input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectFailureMngCs(); return false;" /><!-- 조회 -->
+	        </li>
+	</ul>
+	</div>
+	
+	<table class="board_list">
+	<caption></caption>
+	<colgroup>
+			<col style="width:15px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" /> 
+			<col style="width:10px" />  
+	    </colgroup>
+	    <thead>
+	        <tr>
+			   <th scope="col">업무시스템</th>
+			   <th scope="col">H/W</th>
+			   <th scope="col">N/W</th>
+			   <th scope="col">S/W</th>
+			   <th scope="col">AP</th>
+			   <th scope="col">외부</th>
+			   <th scope="col">기타</th>
+			   <th scope="col">총계</th>
+	        </tr>
+	    </thead>
+	    
+	    <tbody class="ov">
+           <c:forEach var="result" items="${failureMngCsList}" varStatus="status">
+          <tr>
+          <td>
+			 <c:out value="${result.bizSytm}"/>     
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.failrDstnctHw}"/>    
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.failrDstnctNw}"/>     
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.failrDstnctSw}"/>     
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.failrDstnctAp}"/>     
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.failrDstnctOut}"/>     
+		  </td>
+		  
+		  <td>
+			 <c:out value="${result.failrDstnctEtc}"/>     
+		  </td>
+		 
+		  <td>
+			 <c:out value="${result.failrDstnctTot}"/>     
+		  </td>
+		  
+          </tr>
+          </c:forEach>
+          
+	    </tbody>
+	</table>
+	
+	<br>
+	<!-- 엑셀 다운로드  -->
+    <div style="float:right;">
+			<span class="btn_s2"><a href="#LINK" onclick="downloadExcel(); return false;" title='엑셀 다운로드'>엑셀 다운로드</a></span>
+    </div>
+	 
+	</form>
+
+</body>
+</html>

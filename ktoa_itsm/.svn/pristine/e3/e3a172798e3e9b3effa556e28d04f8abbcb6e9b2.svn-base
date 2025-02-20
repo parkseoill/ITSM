@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<%--
+ /**
+  * @Class Name : LcnMngRegist.jsp
+  * @Description : 라이센스 등록 화면
+  * @Modification Information
+  * @
+  * @ 수정일               수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.09.26   김승현            최초 생성
+  *
+  *  @author 김승현
+  *  @since 2023.09.26
+  *  @version 1.0
+  *  @see
+  *
+  */
+--%>
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator" %>
+<c:set var="ImgUrl" value="${pageContext.request.contextPath}/images/egovframework/com/sym/mnu/mpm/"/>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>라이센스 등록</title>
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 유효성 검사 -->
+<script src="<c:url value='/js/egovframework/com/cmm/utl/EgovCmmUtl.js' />"></script>
+<!-- validator 클라이언트 -->
+<script type="text/javascript" src="<c:url value="/validator.do" />"></script>
+<validator:javascript formName="lcnVO" staticJavascript="false" xhtml="true" cdata="false"/>
+
+<script language="javascript1.2" type="text/javaScript">
+
+/* ********************************************************
+ * 입력처리 함수
+ ******************************************************** */
+function insertLcnMng(){
+	var objForm = document.getElementById("lcnMngForm");
+	if(!validateLcnVO(objForm)){
+		return;
+	}else{
+		objForm.submit();
+	}
+}
+
+/* ********************************************************
+ * 목록조회  함수
+ ******************************************************** */
+function selectList(){
+	location.href = "<c:url value='/crm/lcm/LcnMngList.do' />";
+}
+
+</script>
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+<!-- 자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다. -->
+
+<form:form commandName="lcnVO" id="lcnMngForm" name="lcnMngForm" method="post" action="${pageContext.request.contextPath}/crm/lcm/inseartLcnMngRegist.do">
+
+<div class="wTableFrm">
+	<!-- 타이틀 -->
+	<h2>라이센스 등록</h2>
+	
+	<!-- 등록폼 -->
+	<table class="wTable">
+		<colgroup>
+			<col style="width: 15%">
+		</colgroup>
+		<tr>
+			<th>제품명<span class="pilsu">*</span></th>
+			<td class="left">
+				<form:input path="prodNm" title="제품명" cssStyle="width:40%"/>
+			</td>
+		</tr>
+		<tr>
+			<th>라이센스 번호</th>
+			<td class="left">
+				<form:input path="lcnNo" title="라이센스 번호" cssStyle="width:40%"/>
+			</td>
+		</tr>
+		<tr>
+			<th>라이센스 내용</th>
+			<td class="left">
+				<form:textarea path="lcnText" title="라이센스 내용" rows="5" cols="100" cssStyle="width:84%; height:170px; padding:5px;"/>
+			</td>
+		</tr>
+		<tr>
+			<th>라이센스 파일명</th>
+			<td class="left">
+				<form:textarea path="lcnFileNm" title="라이센스 파일명" rows="5" cols="100" cssStyle="width:84%; height:170px; padding:5px;"/>
+			</td>
+		</tr>
+	</table>
+	
+	<!-- 하단 버튼 -->
+	<div class="btn">
+		<input class="s_submit" type="submit" value='<spring:message code="button.create" />' onclick="insertLcnMng(); return false;" /><!-- 등록 -->
+		<span class="btn_s"><a href="#LINK'/>" onclick="selectList(); return false;"><spring:message code="button.list"/></a></span><!-- 목록 -->
+	</div>
+	<div style="clear:both;"></div>
+</div>
+
+</form:form>
+</body>
+</html>

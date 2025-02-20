@@ -1,0 +1,120 @@
+package egovframework.com.cmm.dsb.model;
+
+/**
+ * 대시보드를 위한 VO 클래스를 정의한다
+ * @author 최호용
+ * @since 2023.06.30
+ * @version 1.0
+ * @see
+ *  
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *   
+ *	수정일			수정자 		수정내용
+ *  ----------	   ------      -----------------------
+ *	2023.06.30		최호용		최초 생성
+ *
+ * </pre>
+ */
+
+public class DashBoardOffdayVO {
+	/** 일요일 */
+	private String sun_date = "";
+	
+	/** 토요일 */
+	private String satur_date = "";
+
+	/** 공휴일 구분 코드 */
+	private String offday_cd = "";
+	
+	/** 반차 구분 코드 */
+	private String hlfday_cd = "";
+	
+	/** 이름 */
+	private String chrgr_nm = "";
+	
+	/** 공휴일 날짜 */
+	private String offday_date = "";
+
+	/** 공휴일 구분 코드(오늘) */
+	private String offday_cd_today = "";
+	
+	/** 반차 구분 코드(오늘) */
+	private String hlfday_cd_today = "";
+	
+	/** 이름(오늘) */
+	private String chrgr_nm_today = "";
+
+	public String getOffday_cd() {
+		return offday_cd;
+	}
+
+	public void setOffday_cd(String offday_cd) {
+		this.offday_cd = offday_cd;
+	}
+
+	public String getHlfday_cd() {
+		return hlfday_cd;
+	}
+
+	public void setHlfday_cd(String hlfday_cd) {
+		this.hlfday_cd = hlfday_cd;
+	}
+
+	public String getChrgr_nm() {
+		return chrgr_nm;
+	}
+
+	public void setChrgr_nm(String chrgr_nm) {
+		this.chrgr_nm = chrgr_nm;
+	}
+
+	public String getOffday_date() {
+		return offday_date;
+	}
+
+	public void setOffday_date(String offday_date) {
+		this.offday_date = offday_date;
+	}
+
+	public String getSun_date() {
+		return sun_date;
+	}
+
+	public void setSun_date(String sun_date) {
+		this.sun_date = sun_date;
+	}
+
+	public String getSatur_date() {
+		return satur_date;
+	}
+
+	public void setSatur_date(String satur_date) {
+		this.satur_date = satur_date;
+	}
+
+	public String getOffday_cd_today() {
+		return offday_cd_today;
+	}
+
+	public void setOffday_cd_today(String offday_cd_today) {
+		this.offday_cd_today = offday_cd_today;
+	}
+
+	public String getHlfday_cd_today() {
+		return hlfday_cd_today;
+	}
+
+	public void setHlfday_cd_today(String hlfday_cd_today) {
+		this.hlfday_cd_today = hlfday_cd_today;
+	}
+
+	public String getChrgr_nm_today() {
+		return chrgr_nm_today;
+	}
+
+	public void setChrgr_nm_today(String chrgr_nm_today) {
+		this.chrgr_nm_today = chrgr_nm_today;
+	}
+
+}

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<%--
+ /**
+  * @Class Name : DlalzMngUpdt.jsp
+  * @Description : 근태 수정 화면
+  * @Modification Information
+  * @
+  * @ 수정일               수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2022.05.31   이유리            최초 생성
+  *
+  *  @author 이유리
+  *  @since 2022.05.31
+  *  @version 1.0
+  *  @see
+  *
+  */
+--%>
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator" %>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>근태관리 수정</title>
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/truebon/com/dlm/dla/timepicki.css?afterxs' />">
+<script src="<c:url value='/js/truebon/com/dlm/dla/timepicki.js?assdsa' />"></script>
+
+<!-- 달력 기본 설정 -->
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+
+<!-- validator 클라이언트 -->
+<script type="text/javascript" src="<c:url value="/validator.do" />"></script>
+<validator:javascript formName="dlalzVO" staticJavascript="false" xhtml="true" cdata="false"/>
+<script language="javascript1.2" type="text/javaScript">
+<!--
+/* ********************************************************
+ * 수정처리 함수
+ ******************************************************** */
+function updateDlalzMng() {
+	var objForm = document.getElementById("dlalzMngForm");
+	if(confirm("<spring:message code="common.save.msg" />")){
+		if(!validateDlalzVO(objForm)){
+			return;
+		}else{
+			$('#securBonduYn').prop("disabled", false);
+			objForm.submit();
+		}
+	}
+}
+
+/* ********************************************************
+ * 목록조회  함수
+ ******************************************************** */
+function selectList(){
+	var objForm = document.getElementById("dlalzMngForm");
+	objForm.action = "<c:url value='/dlm/dla/DlalzMngList.do' />";
+	objForm.submit();
+}
+
+/* ********************************************************
+ * 날짜 초기화 함수
+ ******************************************************** */
+function initializeA(){
+	document.getElementById("datepicker").value = null;
+	document.getElementById("timepicker").value = null;
+}
+
+function initializeL(){
+	document.getElementById("datepicker2").value = null;
+	document.getElementById("timepicker2").value = null;
+}
+
+<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if>
+	$(document).ready(function(){
+		$( "#datepicker" ).datepicker({
+			changeMonth: true, 
+			changeYear: true,
+			onClose: function( selectedDate ) {    
+			     //시작일(startDate) datepicker가 닫힐때
+			     //종료일(endDate)의 선택할수있는 최소 날짜(minDate)를 선택한 시작일로 지정
+			    $("#datepicker2").datepicker( "option", "minDate", selectedDate );
+			},
+		});
+		$( "#datepicker2" ).datepicker({
+			changeMonth: true, 
+			changeYear: true,
+			nextText: '다음 달',
+			onClose: function( selectedDate ) {    
+			    // 종료일(endDate) datepicker가 닫힐때
+			    // 시작일(startDate)의 선택할수있는 최대 날짜(maxDate)를 선택한 시작일로 지정
+			    $("#datepicker").datepicker( "option", "maxDate", selectedDate );
+			},
+		});
+		
+		function getDate(){
+			var atendDateV =$('#datepicker').val();
+			var leofcDateV =$('#datepicker2').val();
+			var getDlalzDate = $('#dlalzDate').val();
+			if(atendDateV == ''){
+				$('#datepicker').val(getDlalzDate);
+			}
+			if(leofcDateV == ''){
+				$('#datepicker2').val(getDlalzDate);
+			}
+		}
+		
+		initUpdt();
+		function initUpdt(){
+			var chkValue = $('input[name="dlalzDstnctCd"]:checked').val();
+			if(chkValue == "1"){
+				$('#hlfOffdayCB').hide();
+				$('#hlfOffdayCB').val('');
+				if($('#offdayTypeCd').val() != '4'){
+					$('#offdayTypeCd').val("").prop("selected", true);
+				}
+				//$('#offdayTypeCd').prop("disabled", true);	
+				$('#wrkTimeCd').prop("disabled", false);
+				$('#wrkTypeCd').prop("disabled", false);
+				$('#datepicker').datepicker('enable');
+				$('#timepicker').prop("disabled", false);
+				$('#datepicker2').datepicker('enable');
+				$('#timepicker2').prop("disabled", false);
+				$('#securBonduYn').prop("disabled", false);
+				$('#initB2').show();
+				$('#initB1').show();
+				getDate();
+			}else if(chkValue == "2"){
+				$('#hlfOffdayCB').hide();
+				$('#hlfOffdayCB').val('');
+				$('#wrkTimeCd').val("").prop("selected", true);
+				$('#wrkTypeCd').val("").prop("selected", true);
+				$('#offdayTypeCd').prop("disabled", false);
+				$('#wrkTimeCd').prop("disabled", true);
+				$('#wrkTypeCd').prop("disabled", true);
+				$('#datepicker').datepicker('disable');
+				$('#timepicker').prop("disabled", true);
+				$('#datepicker2').datepicker('disable');
+				$('#timepicker2').prop("disabled", true);
+				$('#securBonduYn').prop("disabled", true);
+				$('#initB2').hide();
+				$('#initB1').hide();
+			}else{
+				$('#hlfOffdayCB').show();
+				$('#offdayTypeCd').prop("disabled", false);
+				$('#wrkTimeCd').prop("disabled", false);
+				$('#wrkTypeCd').prop("disabled", false);
+				$('#datepicker').datepicker('enable');
+				$('#timepicker').prop("disabled", false);
+				$('#datepicker2').datepicker('enable');
+				$('#timepicker2').prop("disabled", false);	
+				$('#securBonduYn').prop("disabled", false);
+				$('#initB2').show();
+				$('#initB1').show();
+				getDate();
+			}
+		}
+		
+		function getValue(){
+			var chkValue = $('input[name="dlalzDstnctCd"]:checked').val();
+			if(chkValue == "1"){
+				$('#wrkTimeCd').val("1").prop("selected", true);
+				$('#wrkTypeCd').val("1").prop("selected", true);
+			}else if(chkValue == "2"){
+				initializeA();
+				initializeL();
+			}else{
+				$('#wrkTimeCd').val("1").prop("selected", true);
+				$('#wrkTypeCd').val("1").prop("selected", true);
+			}
+		}
+		
+		$('input[name="dlalzDstnctCd"]').change(function(){
+			$('#securBonduYn').val("N").prop("selected", true);
+			getValue();
+			initUpdt();
+		});
+		
+		<c:if test="${sessionScope.loginVO.authorCode eq 'ROLE_USER'}">
+      		var loginUserNm = "${sessionScope.loginVO.name}";
+	        if($('#chrgrNm').val() != loginUserNm){
+	        	disabled();
+	        }
+		</c:if>	
+	});
+	
+	function disabled() {
+		$(".dlalzDstnctCd").attr("disabled", true);
+		$("#wrkTimeCd").attr("disabled", true);
+		$("#securBonduYn").attr("disabled", true);
+		$("#datepicker").datepicker('disable');
+		$("#timepicker").attr("disabled", true);
+		$("#datepicker2").datepicker('disable');
+		$("#timepicker2").attr("disabled", true);
+		$("#offdayTypeCd").attr("disabled", true);
+		$("#hlfOffdayCB").attr("disabled", true);
+		$("#wrkTypeCd").attr("disabled", true);
+		$("#rmarkText").attr("disabled", true);
+	}
+	
+ --> 
+</script>
+</head>
+<body>
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript><!-- 자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다. -->
+
+<form:form commandName="dlalzVO" id="dlalzMngForm" name="dlalzVO" method="post" action="${pageContext.request.contextPath}/dlm/dla/updateDlalzMngUpdt.do">
+<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
+<input type="hidden" name="searchKeyword" value="<c:out value='${searchVO.searchKeyword}'/>"/>
+<input type="hidden" name="searchKeyword2" value="<c:out value='${searchVO.searchKeyword2}'/>"/>
+<input type="hidden" name="searchKeyword3" value="<c:out value='${searchVO.searchKeyword3}'/>"/>
+<input type="hidden" name="searchKeyword4" value="<c:out value='${searchVO.searchKeyword4}'/>"/>
+<input type="hidden" name="searchKeyword5" value="<c:out value='${searchVO.searchKeyword5}'/>"/>
+<input type="hidden" name="searchKeyword6" value="<c:out value='${searchVO.searchKeyword6}'/>"/>
+<input type="hidden" name="selectedDate" value="<c:out value='${searchVO.selectedDate}'/>"/>
+
+<div class="wTableFrm">
+	<!-- 타이틀 -->
+	<h2>근태 수정</h2><!-- 근태 수정 -->
+
+	<!-- 등록폼 -->
+	<table class="wTable">
+		<colgroup>
+			<col style="width:15%" />
+			<col style="" />
+		</colgroup>
+ 		<tr>
+			<th>근태 유형 <span class="pilsu">*</span></th>
+			<td class="left" colspan="3">
+			 	<form:radiobutton path="dlalzDstnctCd" class="dlalzDstnctCd" id="wrk" value="1" label="전일 근무" />
+				<form:radiobutton path="dlalzDstnctCd" class="dlalzDstnctCd" id="off" value="2" label="전일 휴무" />
+				<form:radiobutton path="dlalzDstnctCd" class="dlalzDstnctCd" id="hlfOff" value="3" label="반일 휴무" />  
+				<form:errors path="dlalzDstnctCd" />
+			</td>
+		</tr> 
+			<tr>
+			<th>출퇴근일 <span class="pilsu">*</span></th><!-- 출퇴근일 -->
+			<td class="left" colspan="3">
+			    <form:input path="dlalzDate" id="dlalzDate" maxlength="10" title="출퇴근일" cssStyle="width:29%" readonly="true"/><!-- 출퇴근일 -->
+      			<form:errors path="dlalzDate" />
+			</td>
+		</tr>
+		<tr>
+			<th>성명 <span class="pilsu">*</span></th><!-- 성명 -->
+			<td class="left">
+				<form:input type="hidden" path="chrgrNo" id="chrgrNo"/>
+					<form:errors path="chrgrNo" cssClass="error" />
+				<form:input path="chrgrNm" id="chrgrNm" maxlength="10" title="성명" cssStyle="width:70%" readonly="true"/><!-- 성명 -->
+      			<form:errors path="chrgrNm" /> 
+			</td>
+			
+			<th>소속 <span class="pilsu">*</span></th><!-- 소속 -->
+			<td class="left">
+			    <form:input path="cmpnyNm" maxlength="10" title="소속" cssStyle="width:70px" readonly="true"/><!-- 소속 -->
+      			<form:errors path="cmpnyNm" />
+			</td>
+		</tr>
+		<tr>
+			<th>근무 시간 </th><!-- 근무 시간 -->
+			<td class="left">
+			    <form:select path="wrkTimeCd" id="wrkTimeCd" title="근무시간 코드" cssClass="txt" cssStyle="width:30%;">
+					<form:option value="" label="--선택하세요--" />
+					<form:options items="${wrkTimeCdList}" itemValue="comnCd" itemLabel="comnCdNm" />
+				</form:select>
+			    <form:errors path="wrkTimeCd" cssClass="error" />
+			</td>
+			
+			<th>보안 당직 여부 </th><!-- 보안 당직 여부 -->
+			<td class="left">
+            	<form:select path="securBonduYn" id="securBonduYn" title="보안 당직 여부" cssClass="txt" cssStyle="width:30%;">
+					<form:option value="Y"  label=" O "/>
+					<form:option value="N"  label=" ✖  "/>
+            	</form:select>
+                <div><form:errors path="securBonduYn" cssClass="error"/></div>
+			</td>
+		</tr>
+			<tr>
+			<th>출근시간 </th><!-- 출근시간 -->
+			<td class="left">
+				<form:input path="atendTimeD" id="datepicker" maxlength="10" title="출근일" cssStyle="width:80px; float:left;" readonly="true" /><!-- 출근시간 -->
+      			<form:errors path="atendTimeD" />
+      			<form:input path="atendTimeT" type="time" id="timepicker" title="출근시간" cssStyle="width:95px; margin-left:15px;"></form:input><!-- 출근시간 -->
+      			<form:errors path="atendTimeT" />
+      			<c:if test="${sessionScope.loginVO.authorCode eq 'ROLE_ADMIN' || sessionScope.loginVO.chrgrNo == searchVO.chrgrNo}">
+      				<input class="btn_s" id="initB1" type="button" value='초기화' onclick="initializeA(); return false;" /><!-- 초기화 -->
+				</c:if>
+			</td>
+			<th>퇴근시간 </th><!-- 퇴근시간 -->
+			<td class="left">
+				<form:input path="leofcTimeD" id="datepicker2" maxlength="10" title="퇴근일" cssStyle="width:80px; float:left;" readonly="true" /><!-- 퇴근시간 -->
+      			<form:errors path="leofcTimeD" />
+      			<form:input path="leofcTimeT" type="time" id="timepicker2" title="퇴근시간" cssStyle="width:95px; margin-left:15px;"></form:input><!-- 퇴근시간 -->
+      			<form:errors path="leofcTimeT" />
+      			<c:if test="${sessionScope.loginVO.authorCode eq 'ROLE_ADMIN' || sessionScope.loginVO.chrgrNo == searchVO.chrgrNo}">
+					<input class="btn_s" id="initB2" type="button" value='초기화' onclick="initializeL(); return false;" /><!-- 초기화 -->
+				</c:if>
+			</td>
+		</tr>
+		<tr>
+			<th>휴무 유형 </th><!-- 휴무 유형 -->
+			<td class="left">
+			    <form:select path="offdayTypeCd" id="offdayTypeCd" title="휴무 유형" cssClass="txt" cssStyle="width:35%">
+					<form:option value="" label="--선택하세요--" />
+					<form:options items="${offdayTypeCdList}" itemValue="comnCd" itemLabel="comnCdNm" />
+				</form:select>
+			    <form:errors path="offdayTypeCd" cssClass="error" />
+			    <form:select path="hlfdayOffdayDstnctCd" id="hlfOffdayCB" title="반일 휴무 유형" cssClass="txt" cssStyle="width:35%">
+					<form:option value="" label="--선택하세요--" />
+					<form:options items="${hlfdayOffdayDstnctCdList}" itemValue="comnCd" itemLabel="comnCdNm" />
+				</form:select>
+			    <div><form:errors path="hlfdayOffdayDstnctCd" cssClass="error" /></div>
+			</td>
+			<th>근무 유형 </th><!-- 근무 유형 -->
+			<td class="left">
+			    <form:select path="wrkTypeCd" id="wrkTypeCd" title="근무 유형" cssClass="txt" cssStyle="width:70%">
+					<form:option value="" label="--선택하세요--" />
+					<form:options items="${wrkTypeCdList}" itemValue="comnCd" itemLabel="comnCdNm" />
+				</form:select>
+			    <div><form:errors path="wrkTypeCd" cssClass="error" /></div>
+			</td>
+		</tr>
+		<tr>
+			<th>비고 </th><!-- 비고 -->
+			<td class="left" colspan="3">
+			    <form:textarea path="rmarkText" id="rmarkText" rows="7" cols="75" cssClass="txaClass" title="비고" cssStyle="height:50px"/><!-- 비고 -->
+      			<form:errors path="rmarkText"/>
+			</td>
+		</tr>
+		<tr>
+			<th>수정일</th>
+			<td class="left">
+			    <form:input path="mdtt" title="수정일" readonly="true" class="readOnlyClass" cssStyle="width:150px"/>
+	      		<div><form:errors path="mdtt" cssClass="error" /></div>
+			</td>
+			<th>수정자</th>
+			<td class="left">
+	      		<form:input path="amndrNm" title="수정자" readonly="true" class="readOnlyClass" cssStyle="width:150px"/>
+	      		<div><form:errors path="amndrNm" cssClass="error" /></div>
+			</td>
+		</tr>
+	</table>
+
+	<!-- 하단 버튼 -->
+	<div class="btn">
+	<c:if test="${sessionScope.loginVO.authorCode eq 'ROLE_ADMIN' || sessionScope.loginVO.chrgrNo == searchVO.chrgrNo}">
+		<input class="s_submit" type="submit" value='수정' onclick="updateDlalzMng(); return false;" /><!-- 수정 -->
+	</c:if>
+		<span class="btn_s"><a href="#LINK'/>" onclick="selectList(); return false;"><spring:message code="button.list"/></a></span><!-- 목록 -->
+	</div>
+	<div style="clear:both;"></div>
+</div>
+</form:form>
+</body>
+</html>

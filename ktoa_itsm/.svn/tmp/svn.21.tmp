@@ -1,0 +1,49 @@
+package truebon.com.opm.fix.service;
+
+import java.util.List;
+import java.util.Map;
+
+import truebon.com.opm.fix.model.FixedInspMngVO;
+
+public interface FixedInspMngService {
+
+    /**
+	 * tb_sw_asset 목록을 조회한다.
+	 * @param searchMap - 조회할 정보가 담긴 Map
+	 * @return tb_sw_asset 목록
+	 * @exception Exception
+	 */
+    List<FixedInspMngVO> selectFixedInspList(FixedInspMngVO searchVO) throws Exception;
+
+    /**
+	 * 정기점검 목록의 총 갯수를 조회한다.
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return 정기점검 목록의 총 갯수
+	 * @exception Exception
+	 */
+	int selectFixedInspListTotCnt(FixedInspMngVO searchVO) throws Exception;
+	
+    /**
+	 * 회사목록을 조회한다.
+	 * @param searchVO - 조회할 정보가 담긴 VO
+	 * @return 회사 목록
+	 * @exception Exception
+	 */
+    List<FixedInspMngVO> selectCmpnyList(FixedInspMngVO searchVO) throws Exception;
+
+    /**
+    * tb_sw_asset 현황을 조회한다.
+    * @param searchVO - 조회할 정보가 담긴 VO
+    * @return tb_sw_asset 목록
+    * @exception Exception
+    */
+	List<Map<String, Object>> selectFixedInspStus(FixedInspMngVO searchVO) throws Exception;
+	
+    /**
+    * 정기점검 계획을 생성한다 
+    * @param searchVO - 생성할 정보가 담긴 VO
+    * @exception Exception
+    */
+	void insertFixedInspStus(FixedInspMngVO searchVO) throws Exception;
+
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+    <formset>
+        <form name="SvclifeMngVO">
+			<field property="vrtlzDstnct" depends="required">
+				<arg0 key="가상화구분" />
+			</field>
+			<field property="ntwrkDstnct" depends="required">
+				<arg0 key="네트워크구분" />
+			</field>
+			<field property="bizSytm" depends="required">
+				<arg0 key="업무시스템" />
+			</field>
+			<field property="assetOwn" depends="required">
+				<arg0 key="자산소유" />
+			</field>
+			<field property="assetStat" depends="required">
+				<arg0 key="자산상태" />
+			</field>
+			<field property="appliYn" depends="required">
+				<arg0 key="어플라이언스여부" />
+			</field>
+			<field property="ctrlYn" depends="required">
+				<arg0 key="관제여부" />
+			</field>
+			<field property="prodPurp" depends="required">
+				<arg0 key="제품용도" />
+			</field>
+			<field property="svcDupCnvrConfgYn" depends="required">
+				<arg0 key="서비스이중화구성여부" />
+			</field>
+			<field property="prodCoQty" depends="required">
+				<arg0 key="제품수량" />
+			</field>
+			<field property="prodlocat" depends="required">
+				<arg0 key="제품위치" />
+			</field>
+			<field property="maintceCntr" depends="required">
+				<arg0 key="유지보수계약" />
+			</field>
+		</form>
+    </formset>
+</form-validation>

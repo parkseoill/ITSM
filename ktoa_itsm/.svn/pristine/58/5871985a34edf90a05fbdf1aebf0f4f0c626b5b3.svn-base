@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ComnCdNewMapper">
+
+	<resultMap id="ComnCdNewList" type="truebon.com.opm.com.model.ComnCdNewVO">
+		<result property="newComnCd" column="NEW_COMN_CD" />
+		<result property="comnCdNm" column="COMN_CD_NM" />
+		<result property="comnCdDc" column="COMN_CD_DC" />
+		<result property="comnCdLvl" column="COMN_CD_LVL" />
+		<result property="useYn" column="USE_YN" />
+		<result property="sortOrde" column="SORT_ORDE" />
+		<result property="upprNewComnCd" column="UPPR_NEW_COMN_CD" />
+		<result property="regstrId" column="REGSTR_ID" />
+		<result property="rdtt" column="RDTT" />
+		<result property="amndrId" column="AMNDR_ID" />
+		<result property="mdtt" column="MDTT" />
+	</resultMap>
+
+
+	<select id="selectComnCdNew"
+		parameterType="truebon.com.opm.com.model.ComnCdNewVO"
+		resultType="truebon.com.opm.com.model.ComnCdNewVO">
+		<![CDATA[
+			SELECT
+				NEW_COMN_CD
+				, COMN_CD_NM
+				, COMN_CD_DC
+				, COMN_CD_LVL
+				, USE_YN
+				, SORT_ORDE
+				, UPPR_NEW_COMN_CD
+				, REGSTR_ID
+				, RDTT
+				, AMNDR_ID
+				, MDTT
+			FROM TB_COMN_CD_NEW
+			WHERE UPPR_NEW_COMN_CD = #{upprNewComnCd}
+			]]>
+	</select>
+
+	<!-- ########################################## -->
+
+	<select id="selectComnCdNewList"
+		parameterType="truebon.com.opm.com.model.ComnCdNewVO" resultType="truebon.com.opm.com.model.ComnCdNewVO">
+		SELECT
+		NEW_COMN_CD
+		, COMN_CD_NM
+		, COMN_CD_DC
+		, COMN_CD_LVL
+		, USE_YN
+		, SORT_ORDE
+		, UPPR_NEW_COMN_CD
+		, REGSTR_ID
+		, RDTT
+		, AMNDR_ID
+		, MDTT
+		FROM TB_COMN_CD_NEW
+		WHERE USE_YN='Y'
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<if test="searchCondition == 1">
+				AND NEW_COMN_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 2">
+				AND COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 3">
+				AND UPPR_NEW_COMN_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+		</if>
+		<choose>
+			<when test="arrConditionTypes.size() != 0">
+				AND (
+			<foreach collection="arrConditionTypes" item="item" separator="OR">
+				NEW_COMN_CD LIKE CONCAT('%', #{item}, '%')
+			</foreach>
+				)
+			</when>
+		</choose>
+		limit #{recordCountPerPage} offset #{firstIndex}
+	</select>
+
+	<select id="selectComnCdNewListTotCnt"
+		parameterType="truebon.com.opm.com.model.ComnCdNewVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM TB_COMN_CD_NEW
+		WHERE USE_YN='Y'
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<if test="searchCondition == 1">
+				AND NEW_COMN_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 2">
+				AND COMN_CD_NM LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+			<if test="searchCondition == 3">
+				AND UPPR_NEW_COMN_CD LIKE CONCAT('%',#{searchKeyword},'%')
+			</if>
+		</if>
+		<choose>
+			<when test="arrConditionTypes.size() != 0">
+				AND (
+			<foreach collection="arrConditionTypes" item="item" separator="OR">
+				NEW_COMN_CD LIKE CONCAT('%', #{item}, '%')
+			</foreach>
+				)
+			</when>
+		</choose>
+	</select>
+	<select id="selectComnCdNewOne"
+		parameterType="truebon.com.opm.com.model.ComnCdNewVO"
+		resultType="truebon.com.opm.com.model.ComnCdNewVO">
+		SELECT
+		NEW_COMN_CD
+		, COMN_CD_NM
+		, COMN_CD_DC
+		, COMN_CD_LVL
+		, USE_YN
+		, SORT_ORDE
+		, UPPR_NEW_COMN_CD
+		, REGSTR_ID
+		, RDTT
+		, AMNDR_ID
+		, MDTT
+		FROM TB_COMN_CD_NEW
+		WHERE NEW_COMN_CD = #{newComnCd}
+	</select>
+
+	<insert id="insertComnCdNew" parameterType="truebon.com.opm.com.model.ComnCdNewVO">
+		INSERT INTO TB_COMN_CD_NEW
+		(NEW_COMN_CD
+		, COMN_CD_NM
+		, COMN_CD_DC
+		, COMN_CD_LVL
+		, UPPR_NEW_COMN_CD
+		, USE_YN
+		, SORT_ORDE
+		, REGSTR_ID
+		, RDTT
+		, AMNDR_ID
+		, MDTT  )
+		VALUES (
+		#{newComnCd}
+		,#{comnCdNm}
+		,#{comnCdDc}
+		,#{comnCdLvl}
+		,#{upprNewComnCd}
+		,#{useYn}
+		,#{sortOrde}
+		, #{regstrId}
+		, SYSDATE()
+		, #{regstrId}
+		, SYSDATE())
+	</insert>
+	<update id="updateComnCdNew" parameterType="truebon.com.opm.com.model.ComnCdNewVO">
+		<![CDATA[
+			UPDATE TB_COMN_CD_NEW
+			SET 
+			COMN_CD_NM=#{comnCdNm}
+			, COMN_CD_DC=#{comnCdDc}
+			, COMN_CD_LVL=#{comnCdLvl}
+			, UPPR_NEW_COMN_CD=#{upprNewComnCd}
+			, USE_YN=#{useYn}
+			, SORT_ORDE=#{sortOrde}
+			, AMNDR_ID=#{amndrId}
+			, MDTT=sysdate()
+			WHERE NEW_COMN_CD=#{newComnCd};
+		]]>
+	</update>
+
+</mapper>

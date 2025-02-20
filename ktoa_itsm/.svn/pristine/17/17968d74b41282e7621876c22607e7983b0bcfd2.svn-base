@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<%--
+ /**
+  * @Class Name : ReplaceOffdayRegist.jsp
+  * @Description : 대휴 등록  화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.08.25       김승현   	      최초 생성
+  *
+  *  @author 김승현
+  *  @since 2023.08.25
+  *  @version 1.0
+  *  @see
+  *
+  */
+--%>
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator" %>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>대휴 등록</title>
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+<!-- 달력 기본 설정 -->
+<script type="text/javascript" src="<c:url value='/js/truebon/com/cmm/initDatepicker.js' />"></script>
+<!-- 달력(연도, 월) API -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/truebon/com/cmm/jquery-monthPicker/MonthPicker.css' />">
+<script src="<c:url value='/js/truebon/com/cmm/jquery-monthPicker/MonthPicker.js' />"></script>
+<!-- validator 클라이언트 -->
+<script type="text/javascript" src="<c:url value="/validator.do" />"></script>
+<validator:javascript formName="replaceVO" staticJavascript="false" xhtml="true" cdata="false"/>
+
+<script language="javascript1.2" type="text/javaScript">
+
+/* ********************************************************
+ * 목록조회  함수
+ ******************************************************** */
+function selectList(){
+	document.ReplaceOffdayMng.action = "<c:url value='/dlm/rep/ReplaceOffdayMng.do' />";
+	document.ReplaceOffdayMng.submit();
+}
+
+/* ********************************************************
+ * 휴일 근무 현황 조회  함수
+ ******************************************************** */
+function selectOffdayWrk(){
+	document.offdayWrkList.action = "<c:url value='/dlm/rep/RepalceOffdayRegist.do'/>";
+	document.offdayWrkList.submit();
+}
+
+/* ********************************************************
+ * mnp당직 체크박스 모두선택 및 해제 처리 함수
+ ******************************************************** */
+function fn_checkAll(){
+	// 전체 체크박스 선택
+	$("input[name=mnpChkAll]").click(function() {
+		if($("input[name=mnpChkAll]").prop("checked")) {
+			$("input[name=mnpChkField]").prop("checked", true);
+		} else {
+			$("input[name=mnpChkField]").prop("checked", false);
+		}
+	});
+	
+	// 전체 체크박스 선택 중 체크박스 하나를 풀때 '전체' 체크 해제
+	$("input[name=mnpChkField]").click(function() {
+		let total = $("input[name=mnpChkField]").length;
+		let cntChecked = $("input[name=mnpChkField]:checked").length;
+		
+		if(total != cntChecked) {
+			$("input[name=mnpChkAll]").prop("checked", false);
+		} else {
+			$("input[name=mnpChkAll]").prop("checked", true);
+		}
+	});
+}
+
+/* ********************************************************
+ * 등록 처리 함수
+ ******************************************************** */
+function insertReplaceOffday() {
+	var objForm = document.getElementById("ReplaceOffdayMng");
+	if($(".insertCnt").val() == '' || $(".insertCnt").val() == '0'){
+		alert("대휴 수는 필수 입력값입니다.");
+	}
+	else if(confirm("<spring:message code="common.regist.msg" />")){
+		if(!validateReplaceVO(objForm)){
+			return;
+		}else{
+			objForm.submit();
+		}
+	}
+}
+ 
+function insertMnpReplaceOffday(){
+	if($("input[name=mnpChkField]").is(":checked") == false){
+		alert("선택된 담당자가 없습니다.");
+		return false;
+	}
+	else{
+		if(confirm("<spring:message code="common.regist.msg" />")){
+			document.offdayWrkList.action = "<c:url value='/dlm/rep/insertMnpReplaceOffday.do'/>";
+			document.offdayWrkList.submit();
+		}
+	}
+} 
+
+/* ********************************************************
+ * 달력 설정 함수
+ ******************************************************** */
+$(function() {
+   //대휴 생성 달력
+   $( "#currDate" ).datepicker({
+       changeMonth: true, 
+       changeYear: true,
+       gotoCurrent: true,
+       showButtonPanel:true, // 캘린더 하단에 버튼 패널을 표시한다(오늘날짜로이동버튼, 닫기버튼). 
+       currentText: '오늘', // 오늘날짜로이동되는 버튼의 텍스트 변경 
+       closeText: '닫기'  // 닫기버튼의 텍스트 변경 
+    });
+   
+   //MNP 당직 조회 달력
+ 	//연도-월(MonthPicker options)
+	var monthPickerOptions = {
+		MonthFormat: 'yy-mm',
+		ShowIcon: true,
+		i18n: {
+			year: '년도',
+			prevYear: '이전년도',
+			nextYear: '다음년도',
+			next12Years: '다음 12년',
+			prev12Years: '이전 12년',
+			nextLabel: '다음',
+			prevLabel: '이전',
+			buttonText: '달력보기',
+			jumpYears: '년도로 이동',
+			backTo: '뒤로',
+			months: ['1 월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+		}
+	};
+	$('#offdayWrkDate').MonthPicker(monthPickerOptions); 
+});
+
+$(document).ready(function() {
+	//대휴 생성 담담자 체크박스
+	$("#cbx_chkAll").click(function() {
+		if($("#cbx_chkAll").is(":checked")) $("input[name=chk]").prop("checked", true);
+		else $("input[name=chk]").prop("checked", false);
+	});
+	
+	$("input[name=chk]").click(function() {
+		var total = $("input[name=chk]").length;
+		var checked = $("input[name=chk]:checked").length;
+	
+		if(total != checked) $("#cbx_chkAll").prop("checked", false);
+		else $("#cbx_chkAll").prop("checked", true); 
+	});
+	
+	//mnp 체크박스
+	fn_checkAll();
+});
+
+<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if> //수정 메세지 창
+
+</script>
+
+<style>
+	.wTable td input {
+					border: 1px solid #d2d2d2;
+					height: 24px;
+					padding-left: 5px;
+	}
+.month-picker-open-button {
+	height: 22px;
+	vertical-align: middle;
+}
+</style>
+</head>
+<body>
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript><!-- 자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다. -->
+<form name="ReplaceOffdayMng" id="ReplaceOffdayMng" action="<c:url value='/dlm/rep/ReplaceOffdayInsert.do' />" method="post">
+	<input type="hidden" name="selectedDate" value="${searchVO.selectedDate}"/>
+	<div class="wTableFrm" >
+		<!-- 타이틀 -->
+		<h2 style="display: inline;">일반 대휴 등록</h2>
+		<!-- 목록 -->
+		<span class="btn_s" style="float: right; margin-bottom: 10px;">
+			<a href="#LINK'/>" onclick="selectList(); return false;"><spring:message code="button.list"/></a>
+		</span>
+		<div style="border-color: black;">
+			<!-- 대휴생성 -->
+			<table class="wTable">
+				<colgroup>
+					<col style="width: 10%" />
+					<col style="width: 15%" />
+					<col style="width: 10%" />
+					<col style="width: 15%" />
+					<col style="width: 10%" />
+				</colgroup>
+				<tr>
+					<th>근무일<span class="pilsu">*</span></th>
+					<td class="left"><input id="currDate" name="selectedDate2" value="${replaceVO.selectedDate2}"></td>
+	
+					<th>대휴 수 <span class="pilsu">*</span></th>
+					<!-- 성명 -->
+					<td class="left"><input type="number" class="insertCnt" name="insertCnt" step="0.5" placeholder="" min="0" value="1"></td>
+	
+					<th>사유 <span class="pilsu">*</span></th>
+					<!-- 사유 -->
+					<td class="left">
+						<select path="repOffdayRsnCd" class="repOffdayRsnCd" name="repOffdayRsnCd" id="repOffdayRsnCd" style="width: 130px;">
+							<c:forEach var="offdayWrkRsnCdList" items="${offdayWrkRsnCdList}" varStatus="status">
+								<option value="${offdayWrkRsnCdList.comnCd}">${offdayWrkRsnCdList.comnCdNm}</option>
+							</c:forEach>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>담당자 <span class="pilsu">*</span></th>
+					<!-- 출퇴근일 -->
+					<td class="left" colspan="5"><input type="checkbox" id="cbx_chkAll" style="vertical-align: -8px;"> 전체 선택<br> 
+						<c:forEach var="nameList" items="${chrgrNameList}" varStatus="status">
+								<input type="checkbox" name="chk" value="${nameList.chrgrNm}" style="vertical-align: -8px;"> ${nameList.chrgrNm} /
+	          			</c:forEach>
+	         		</td>
+				</tr>
+			</table>
+
+			<!-- 하단 버튼 -->
+			<div class="btn" style="margin-top:10px;">
+				<input class="s_submit" type="submit" value='<spring:message code="button.create" />' onclick="insertReplaceOffday(); return false;"/><!-- 등록 -->
+			</div>
+		</div>
+	</div>
+</form>	
+<div class="board" style="padding-top:0; margin-top:31px;">
+	<h1>MNP 당직 대휴 등록</h1>
+	<form name="offdayWrkList" action="<c:url value='/dlm/rep/insertMnpReplaceOffday.do' />" method="post">
+		<input type="hidden" name="insertCnt" id="insertCnt" value="1" />
+		<input type="hidden" name="repOffdayRsnCd" id="repOffdayRsnCd" value="1" />
+		<!-- 달력 -->
+		<div class="search_box">
+			<ul class="search_box-ul_bottom">
+				<li style="padding-Right: 70%;"><label for="">기간 : </label> 
+				<input id="offdayWrkDate" name="offdayWrkDate" type="text" class="offdayWrkDate" value="${replaceVO.offdayWrkDate}" /> 
+				<input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectOffdayWrk(); return false;"/> <!-- 조회 --> 
+				<span class="btn_b"><a href="#LINK'/>" onclick="initializeDate(); return false;">초기화</a></span> <!-- 초기화 --></li>
+			</ul>
+		</div>
+
+		<table class="board_list">
+			<colgroup>
+				<col style="width: 5%" />
+				<col style="width: 10%" />
+				<col style="width: 10%" />
+				<col style="width: 15%" />
+				<col style="width: 15%" />
+			</colgroup>
+			<thead>
+				<tr>
+					<th scope="col"><input type="checkbox" name="mnpChkAll" title="전체선택" /></th>
+					<th scope="col">근무일</th>
+					<th scope="col">성명</th>
+					<th scope="col">출근 시간</th>
+					<th scope="col">퇴근 시간</th>
+				</tr>
+			</thead>
+			<tbody class="ov">
+				<%-- 데이터가 없을때 화면에 메세지를 출력해준다 --%>
+				<c:if test="${fn:length(offdayWrkList) == 0}">
+					<tr>
+						<td colspan="5"><spring:message code="common.nodata.msg" /></td>
+					</tr>
+				</c:if>
+				
+				<c:forEach var="result" items="${offdayWrkList}" varStatus="status">
+					<tr style="text-align: center;">
+						<td>
+							<input type="checkbox" name="mnpChkField" value="${result.dlalzDate},${result.chrgrNm}">
+						</td>
+						<td>${result.dlalzDate}</td>
+						<td>${result.chrgrNm}</td>
+						<td>${result.atendTimeT}</td>
+						<td>${result.leofcTimeT}</td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+		
+		<!-- 하단 버튼 -->
+		<div class="btn" style="margin-top:10px;">
+			<input class="s_submit" type="submit" value='<spring:message code="button.create" />' onclick="insertMnpReplaceOffday(); return false;"/><!-- 등록 -->
+		</div>
+	</form>
+</div>
+</body>
+</html>

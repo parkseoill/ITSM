@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%
+ /**
+  * @Class Name : HwMngList.jsp
+  * @Description : HW자산 관리 목록 화면
+  * @Modification Information
+  * @
+  * @  수정일             수정자             수정내용
+  * @ ----------   --------   ---------------------------
+  * @ 2023.09.26   박서일               최초 생성
+  *
+  *  @author 박서일
+  *  @since 2023.09.26
+  *  @version 1.0
+  *  @see
+  *
+  */
+%>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>HW자산 관리 목록</title>
+
+<link href="<c:url value="/css/egovframework/com/com.css"/>" rel="stylesheet" type="text/css">
+<link href="<c:url value="/css/egovframework/com/button.css"/>" rel="stylesheet" type="text/css">
+<!-- jQuery -->
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/com/cmm/jqueryui.css' />">
+<script src="<c:url value='/js/egovframework/com/cmm/jquery.js' />"></script>
+<script src="<c:url value='/js/egovframework/com/cmm/jqueryui.js' />"></script>
+</head>
+<script language="javascript1.2" type="text/javascript">
+/* ********************************************************
+ * 페이징 처리 함수
+ ******************************************************** */
+ 
+var searchKeyword1 = "";//네트워크
+var searchKeyword2 = "";//자산소유
+var searchKeyword3 = "";//업무시스템
+var searchCnt1 = 0;//네트워크 
+var searchCnt2 = 0;//자산소유
+var searchCnt3 = 0;//업무시스템
+var searchList = "";//검색조건
+
+function linkPage(pageNo){
+	document.hwMngForm.pageIndex.value = pageNo;
+	document.hwMngForm.action = "<c:url value='/crm/hwm/HwMngList.do'/>?searchKeyword1=${searchVO.searchList1}&searchKeyword8=${searchVO.searchList2}&searchKeyword4=${searchVO.searchList3}";
+   	document.hwMngForm.submit();
+}
+
+/* ********************************************************
+ * 조회 처리 함수
+ ******************************************************** */
+function selectHwMng() {
+	
+	var url = "<c:url value='/crm/hwm/HwMngList.do'/>";
+	var chk  = 0;
+
+	if($('#searchKeyword1').val()==''){
+		searchKeyword1 = "";
+	}
+	if($('#searchKeyword8').val()==''){
+		searchKeyword2 = "";
+	}
+	if($('#searchKeyword4').val()==''){
+		searchKeyword3 = "";
+	}
+	
+	if((searchKeyword1.indexOf('OR') == -1 && $('#searchKeyword1').val()!='')|| (searchKeyword1 == '' && $('#searchKeyword1').val()!='')){
+		url += "?searchKeyword1=" +"'"+$('#searchKeyword1').val()+ "'";
+		chk++;
+	}
+	else{
+		url += "?searchKeyword1=" + searchKeyword1;
+		chk++;
+	}
+	if(chk == 0){url += "?"}else{url += "&"}
+	if((searchKeyword2.indexOf('OR') == -1 && $('#searchKeyword8').val()!='')|| (searchKeyword2 == '' && $('#searchKeyword8').val()!='')){
+		url += "searchKeyword8=" +"'"+$('#searchKeyword8').val()+"'";
+		chk++;
+	}
+	else{
+		url += "searchKeyword8=" + searchKeyword2;
+		chk++;
+	}
+	if(chk != 0){url += "&"}
+	if((searchKeyword3.indexOf('OR') == -1 && $('#searchKeyword4').val()!='')|| (searchKeyword3 == '' && $('#searchKeyword4').val()!='')){
+		url += "searchKeyword4=" +"'"+$('#searchKeyword4').val()+"'";
+	}
+	else{
+		url += "searchKeyword4=" + searchKeyword3;
+	}
+	document.hwMngForm.pageIndex.value = 1;
+	document.hwMngForm.action = url;
+	document.hwMngForm.submit();
+}
+
+/* ********************************************************
+ * 수정 페이지 
+ ******************************************************** */
+function selectHwMngDetail(hwAssetId) {
+	document.hwMngForm.hwAssetId.value = hwAssetId;															
+   	document.hwMngForm.action = "<c:url value='/crm/hwm/HwMngDetail.do'/>?searchList1=${searchVO.searchList1}&searchList2=${searchVO.searchList2}&searchList3=${searchVO.searchList3}";
+   	document.hwMngForm.submit();
+}
+
+/* ********************************************************
+ * 등록 페이지
+ ******************************************************** */
+function hwMngRegistDetail() {
+   	document.hwMngForm.action = "<c:url value='/crm/hwm/HwMngRegistDetail.do'/>?searchList1=${searchVO.searchList1}&searchList2=${searchVO.searchList2}&searchList3=${searchVO.searchList3}";
+   	document.hwMngForm.submit();
+}
+
+/* ********************************************************
+ * 엑셀 다운로드하기
+ ******************************************************** */
+function downloadExcel() {
+	document.hwMngForm.action = "<c:url value='/crm/hwm/downloadExcel.do'/>";
+   	document.hwMngForm.submit();
+}
+
+//초기화
+function reset(){
+	$('#searchKeyword1').val("");
+	$('#searchKeyword2').val("");
+	$('#searchKeyword3').val("");
+	$('#searchKeyword4').val("");
+	$('#searchKeyword5').val("");
+	$('#searchKeyword6').val("");
+	$('#searchKeyword7').val("");
+	$('#searchKeyword8').val("");
+	$('#searchList').val("");
+	searchKeyword1 = "";
+	searchKeyword2 = "";
+	searchKeyword3 = "";
+	searchList = "";
+
+}
+
+//네트워크 추가
+function ntwrkAdd(){
+	searchCnt1++;
+	if(searchCnt1 > 1){     
+		searchKeyword1 += " OR tha.NTWRK_DSTNCT_CD = '" + $('#searchKeyword1').val() +"'";
+	}else{
+		searchKeyword1 += "'" + $('#searchKeyword1').val() + "'";
+	}
+	searchList +=$("#searchKeyword1 option:checked").text() +", ";
+	$('#searchList').val(searchList);
+		
+}
+
+//자산소유 추가
+function assetOwnAdd(){
+	searchCnt2++;
+	if(searchCnt2 > 1){     
+		searchKeyword2 += " OR tha.ASSET_OWN_CD = '" + $('#searchKeyword8').val() +"'";
+	}else{
+		searchKeyword2 += "'" + $('#searchKeyword8').val() + "'";
+	}
+	searchList +=$("#searchKeyword8 option:checked").text() +", ";
+	$('#searchList').val(searchList);
+		
+}
+
+//업무시스템 추가
+function bizSysmAdd(){
+	searchCnt3++;
+	if(searchCnt3 > 1){     
+		searchKeyword3 += " OR tha.BIZ_SYTM_CD = '" + $('#searchKeyword4').val() +"'";
+	}else{
+		searchKeyword3 += "'" + $('#searchKeyword4').val() + "'";
+	}
+	searchList +=$("#searchKeyword4 option:checked").text() +", ";
+	$('#searchList').val(searchList);
+}
+
+$(document).ready(function(){
+	if("${searchVO.searchList1}" !=""){
+		searchKeyword1 = "${searchVO.searchList1}";
+		searchCnt1 = 1;	
+	}
+	if("${searchVO.searchList2}" !=""){
+		searchKeyword2 = "${searchVO.searchList2}";
+		searchCnt2 = 1;
+	}
+	if("${searchVO.searchList3}" !=""){
+		searchKeyword3 = "${searchVO.searchList3}";
+		searchCnt3 = 1;
+	}
+	searchList += "${searchVO.searchList}";
+	
+	$('#pageUnit').change(function(){
+		document.hwMngForm.pageIndex.value = 1;
+		document.hwMngForm.action = "<c:url value='/crm/hwm/HwMngList.do'/>?searchKeyword1=${searchVO.searchList1}&searchKeyword8=${searchVO.searchList2}&searchKeyword4=${searchVO.searchList3}";
+		document.hwMngForm.submit();
+	}); 
+}); 
+
+<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if>
+
+</script>
+<body> 
+
+<noscript class="noScriptTitle"><spring:message code="common.noScriptTitle.msg" /></noscript>
+<div class="board">	
+	<form name="hwMngForm" action ="<c:url value='/crm/hwm/HwMngList.do' />" method="post">
+	<h1>HW자산 관리 목록</h1>	
+		<p style="display:inline; font-size:15px; padding-left:15px; font-weight: bold;">검색 조건(OR) :</p>
+		<input type="text" id="searchList" name="searchList" style="width:600px; border:none; font-size:15px;" placeholder="멀티 검색을 원할 경우 아래(+)에서 선택하세요." value="<c:out value='${searchVO.searchList}'/>"/>	
+		<input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>	
+		<input type="hidden" name="hwAssetId">
+		<div class="search_box" style="margin-top: 6px;">
+			<ul style="text-align: center; display: flex; justify-content: space-around;">
+				<li style="float: left; margin-left:2%;">
+					<label for="">업무시스템 : </label> 
+					<select id="searchKeyword4" name="searchKeyword4" title="검색조건" >
+					<option value=""> == 전체 ==</option>
+						<c:forEach var="bizSysm" items="${bizSysmCdList}" varStatus="status" >         
+							<option value="${bizSysm.bizSytmCd}" <c:if test="${fn:contains(searchVO.searchKeyword4, bizSysm.bizSytmCd)}">selected="selected"</c:if>>${bizSysm.bizSytmNm}</option>
+						</c:forEach>
+					</select>	
+					<a href="#LINK" onclick="bizSysmAdd(); return false;">
+						<img  src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+					</a>
+				</li>				
+				<li style="float: left; margin-left:2%;">
+					<label for="">가상화 구분 : </label> &nbsp;
+					<select id="searchKeyword7" name="searchKeyword7" title="검색조건">
+						<option value=""> == 전체 ==</option>
+						<c:forEach var="vrtlzDstnctCd" items="${vrtlzDstnctCdList}" varStatus="status">         
+							<option value="${vrtlzDstnctCd.comnCdId}" <c:if test="${searchVO.searchKeyword7 == vrtlzDstnctCd.comnCdId}">selected="selected"</c:if>>${vrtlzDstnctCd.comnCdNm}</option> 
+						</c:forEach>	
+					</select>
+				</li> 
+				<li style="float: left; margin-left:2%;">
+					<label for="">HW 유형 : </label> &nbsp;
+					<select id="searchKeyword2" name="searchKeyword2" title="검색조건">
+					<option value=""> == 전체 ==</option>
+						<c:forEach var="hw" items="${hwTypeCdList}" varStatus="status">         
+							<option value="${hw.comnCdId}" <c:if test="${searchVO.searchKeyword2 == hw.comnCdId}">selected="selected"</c:if>>${hw.comnCdNm}</option> 
+						</c:forEach>
+	
+					</select>
+				</li> 
+				<li style="float: left; margin-left:2%;">
+					<label for="">자산소유 : </label> 
+					<select id="searchKeyword8" name="searchKeyword8" title="검색조건" >
+						<option value=""> == 전체 ==</option>
+						<c:forEach var="assetOwnCd" items="${assetOwnCdList}" varStatus="status">         
+							<option value="${assetOwnCd.comnCdId}" <c:if test="${fn:contains(searchVO.searchKeyword8, assetOwnCd.comnCdId)}">selected="selected"</c:if>>${assetOwnCd.comnCdNm}</option> 
+						</c:forEach>	
+					</select>	
+					<a href="#LINK" onclick="assetOwnAdd(); return false;">
+						<img  src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+					</a>
+				</li>
+				<li style="float: left; margin-left:2%;">
+					<label for="">자산상태 : </label>
+					<select id="searchKeyword3" name="searchKeyword3" title="검색조건">
+					<option value=""> == 전체 ==</option>
+						<c:forEach var="asset" items="${assetStatCdList}" varStatus="status">         
+							<option value="${asset.comnCdId}" <c:if test="${searchVO.searchKeyword3 == asset.comnCdId}">selected="selected"</c:if>>${asset.comnCdNm}</option>  
+						</c:forEach>
+					</select>
+				</li> 
+			</ul>
+			<ul style="display: flex; justify-content: space-around; border-top: 1px solid #dddddd; padding-top: 10px; margin-top: 10px;">
+				<li style="float: left">
+					<label for="">네트워크 : </label> &nbsp;
+					<select id="searchKeyword1" name="searchKeyword1" title="검색조건">
+						<option value="" selected="selected"> == 전체 ==</option>
+						<c:forEach var="ntwrk" items="${ntwrkCdList}" varStatus="status">   
+							<option value="${ntwrk.comnCdId}" <c:if test="${fn:contains(searchVO.searchKeyword1, ntwrk.comnCdId)}">selected="selected"</c:if>>${ntwrk.comnCdNm}</option>      
+						</c:forEach>
+					</select>
+					<a href="#LINK" onclick="ntwrkAdd(); return false;">
+						<img  src="<c:url value='/images/egovframework/com/cmm/icon/action_add.gif' />" alt='' />
+					</a>				
+				</li> 				
+				<li style="float: left; margin-left:2%;">  
+		            <label for="">제품명 : </label>
+		            <input id="F1" class="s_input2 vat" id="searchKeyword6" name="searchKeyword6" type="text" value="<c:out value='${searchVO.searchKeyword6}'/>" size="40" maxlength="60" onkeypress="press();" title="<spring:message code="title.searchCondition" />" /><!-- 검색조건 -->   
+		         </li>
+				<li style="float: left; margin-left:2%;">
+					<label for="">삭제유무 : </label> 
+					<select id="searchKeyword5" name="searchKeyword5" title="검색조건" >
+						<option value="">== 전체 ==</option>
+						<option value="Y" <c:if test="${searchVO.searchKeyword5 == 'Y'}">selected="selected"</c:if>>Y</option>
+						<option value="N" <c:if test="${searchVO.searchKeyword5 == 'N' || searchVO.searchKeyword5 == null}">selected="selected"</c:if>>N</option>
+					</select>	
+				</li>		
+				<li style="float: right; margin-left:2%;">					
+					<select id="pageUnit" name="pageUnit" title="검색조건" >
+						<option value="10"<c:if test="${searchVO.pageUnit == 10}">selected="selected"</c:if>>10개 보기</option>
+						<option value="20"<c:if test="${searchVO.pageUnit == 20}">selected="selected"</c:if>>20개 보기</option>
+						<option value="30"<c:if test="${searchVO.pageUnit == 30}">selected="selected"</c:if>>30개 보기</option>
+						<option value="50"<c:if test="${searchVO.pageUnit == 50}">selected="selected"</c:if>>50개 보기</option>
+						<option value="100"<c:if test="${searchVO.pageUnit == 100}">selected="selected"</c:if>>100개 보기</option>
+					</select>
+				</li>
+				
+				<li style="float:right;">
+					<span class="btn_b"><a href="#LINK" onclick="reset(); return false;">초기화</a></span><!-- 등록 -->
+					<input class="s_btn" type="submit" value='<spring:message code="button.inquire" />' title='<spring:message code="button.inquire" />' onclick="selectHwMng(); return false;" /><!-- 조회 -->
+					<span class="btn_b"><a href="#LINK" onclick="hwMngRegistDetail(); return false;" title='<spring:message code="button.create" />'><spring:message code="button.create" /></a></span><!-- 등록 -->
+				</li>
+			</ul>
+		</div>
+
+		<table class="board_list">
+			<caption></caption>
+			<colgroup>
+				<col style="width:17px" />
+				<col style="width:15px" />
+				<col style="width:25px" />
+				<col style="width:18px" />
+				<col style="width:17px" />
+				<col style="width:25px" />
+				<col style="width:35px" />
+				<col style="width:25px" />	
+				<col style="width:12px" />				
+				<col style="width:12px" />
+				<col style="width:15px" />
+			</colgroup>
+			<thead>
+				<tr>
+				   <th scope="col">HW자산ID</th>
+				   <th scope="col">네트워크구분</th>
+				   <th scope="col">HW유형/가상화유형</th>
+				   <th scope="col">HW유형상세</th>
+				   <th scope="col">업무시스템</th>
+				   <th scope="col">용도</th>
+				   <th scope="col">제품명</th>					   
+				   <th scope="col">장비위치</th>	
+				   <th scope="col">자산소유</th>			   
+				   <th scope="col">계약상태</th>
+				   <th scope="col">자산상태</th>
+				</tr>
+			</thead>
+			<tbody class="ov">				 
+				<c:forEach var="result" items="${hwMngList}" varStatus="status">
+				<tr onclick="selectHwMngDetail('<c:out value="${result.hwAssetId}"/>'); return false;">			
+					<td>
+						<c:out value="${result.hwAssetId}"/>
+					</td>
+					<td title="<c:out value="${result.ntwrkDstnct}"/>" class="Elli">
+						<c:out value="${result.ntwrkDstnct}"/>
+					</td>
+					<td title="<c:out value="${result.hwType}"/>" class="Elli">
+						<c:if test="${result.vrtlzType != ''}">
+							<c:out value="${result.vrtlzType}"/>
+						</c:if>
+						<c:if test="${result.vrtlzType == ''}">
+							<c:out value="${result.hwType}"/>
+						</c:if>
+					</td>
+					<td title="<c:out  value="${result.hwTypeDtl}"/>" class="Elli">	
+						<c:if test="${result.vrtlzType == ''}">
+							<c:out  value="${result.hwTypeDtl}"/>
+						</c:if>		    							
+					</td>
+					<td title="<c:out  value="${result.bizSytm}"/>" class="Elli">			    
+						<c:out  value="${result.bizSytm}"/>
+					</td>
+					<td title="<c:out  value="${result.prodPurp}"/>" class="Elli">			    
+						<c:out  value="${result.prodPurp}"/>
+					</td>
+					<td title="<c:out  value="${result.prodNm}"/>" class="Elli">			    
+						<c:out  value="${result.prodNm}"/>
+					</td>
+					<td title="<c:out  value="${result.prodlocat}"/>" class="Elli">			    
+						<c:out  value="${result.prodlocat}"/>
+					</td>
+					<td title="<c:out  value="${result.assetOwn}"/>" class="Elli">			    
+						<c:out  value="${result.assetOwn}"/>
+					</td>					
+					<td title="<c:out  value="${result.maintceCntr}"/>" class="Elli">			    
+						<c:out  value="${result.maintceCntr}"/>
+					</td>
+					<td title="<c:out  value="${result.assetStat}"/>" class="Elli">			    
+						<c:out  value="${result.assetStat}"/>
+					</td>
+				</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+		<p style="float:right; padding-top: 10px; padding-right: 10px;">총 ${paginationInfo.totalRecordCount}개</p>
+		<!-- paging navigation -->
+		<div class="pagination">
+			<ul>
+				<ui:pagination paginationInfo="${paginationInfo}" type="image" jsFunction="linkPage"/>
+			</ul>
+		</div>
+	
+		<div style="float:right;">
+			<span class="btn_s2"><a href="#LINK" onclick="downloadExcel(); return false;" title='엑셀 다운로드'>엑셀 다운로드</a></span><!-- 엑셀 다운로드 -->
+		</div>
+	</form>	
+</div> 
+</body>
+</html>
