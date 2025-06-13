@@ -1,3 +1,3 @@
-# KTOAITSM
+# ITSM
 
- KTOAITSM 개발
+ ITSM 개발
